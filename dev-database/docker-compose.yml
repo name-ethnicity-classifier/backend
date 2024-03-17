@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  dev_database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - ${DB_PORT}:5432
+
+  dev_adminer:
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+    restart: always
+    ports:
+      - ${ADMINER_PORT}:8080

@@ -1,0 +1,5 @@
+.coverage
+.env
+.pytest_cache/
+**/__pycache__/
+.fuse_*
