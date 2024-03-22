@@ -1,7 +1,7 @@
 import hashlib
-from errors import ModelError
+from errors import CustomError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
-from db.tables import Model, UserToModel, User
+from db.tables import Model, UserToModel
 from db.database import db
 from utils import check_requested_nationalities
 
@@ -18,7 +18,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
 
     # Is -1 if requested nationalities don't exist or are mixed with nationality groups
     if checked_nationalities == -1:
-        raise ModelError(
+        raise CustomError(
             error_code="NATIONALITIES_INVALID",
             message=f"Requested nationalities (-groups) are invalid.",
             status_code=404,
@@ -26,7 +26,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
 
     existing_model_names = UserToModel.query.filter_by(user_id=user_id, name=data.name).all()
     if data.name in [model.name for model in existing_model_names]:
-        raise ModelError(
+        raise CustomError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
             status_code=409,
@@ -118,20 +118,3 @@ def delete_models(user_id: str, data: DeleteModelSchema) -> None:
         db.session.delete(model)
 
     db.session.commit()
-
-
-def check_user_existence(user_id) -> None:
-    """
-    Checks if user with given ID exists in the database, to make sure
-    that even when a user is deleted their JWT token doesn't work anymore.
-    :param user_id: User id to check
-    """
-    
-    user = User.query.filter_by(id=user_id).first()
-
-    if not user:
-        raise ModelError(
-            error_code="AUTHENTICATION_FAILED",
-            message="User does not exist.",
-            status_code=401
-        )

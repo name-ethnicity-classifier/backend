@@ -7,7 +7,7 @@ from db.database import db
 from db.tables import User
 
 
-USER_DATA = {
+TEST_USER_DATA = {
     "name": "user",
     "email": "user@test.com",
     "role": "else",
@@ -27,7 +27,7 @@ def app_context():
         
         # Create a test user for which to test different CRUD operations
         # But if this test user already exists, delete it and its questionnaire data
-        test_user = User.query.filter_by(email=USER_DATA["email"]).first()
+        test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
         if test_user:
             db.session.delete(test_user)
 
@@ -40,17 +40,17 @@ def test_client(app_context):
 
 
 def test_signup_user(test_client):
-    response = test_client.post("/signup", json=USER_DATA)
+    response = test_client.post("/signup", json=TEST_USER_DATA)
 
     # Check that the response status code is 200 (successful registration)
     assert response.status_code == 200
-    assert User.query.filter_by(email=USER_DATA["email"]).first() is not None
+    assert User.query.filter_by(email=TEST_USER_DATA["email"]).first() is not None
 
 
 def test_login_user(test_client):
     login_data = {
-        "email": USER_DATA["email"],
-        "password": USER_DATA["password"]
+        "email": TEST_USER_DATA["email"],
+        "password": TEST_USER_DATA["password"]
     }
 
     response = test_client.post("/login", json=login_data)
@@ -74,8 +74,8 @@ def test_login_user_fail(test_client):
 
     # Invalid login request data (name instead of email)
     login_data = {
-        "name": USER_DATA["name"],
-        "password": USER_DATA["password"]
+        "name": TEST_USER_DATA["name"],
+        "password": TEST_USER_DATA["password"]
     }
 
     response = test_client.post("/login", json=login_data)

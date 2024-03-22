@@ -8,10 +8,13 @@ from db.database import db
 from db.tables import User, Model, UserToModel
 
 
-TEST_USER_NAME = "user"
-TEST_USER_ROLE = "else"
-TEST_USER_EMAIL = "user@test.com"
-TEST_USER_PASSWORD = "StrongPassword123"
+TEST_USER_DATA = {
+        "name": "user",
+        "email": "user@test.com",
+        "role": "else",
+        "password": "StrongPassword123",
+        "consented": True
+}
 TEST_MODEL_REQUEST_DATA = {
     "name": "test-model",
     "nationalities": ["chinese", "else"],
@@ -37,7 +40,7 @@ def app_context():
         
         # Create a test user for which to test different CRUD operations
         # But if such this test user already exists, delete it and its questionnaire data
-        test_user = User.query.filter_by(email=TEST_USER_EMAIL).first()
+        test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
         if test_user:
             db.session.delete(test_user)
 
@@ -52,20 +55,12 @@ def app_context():
 @pytest.fixture(scope="session")
 def test_client(app_context):
     # Creates the test user and retrieves a JWT token to make /questionnaire requests with
-
-    signup_data = {
-        "name": TEST_USER_NAME,
-        "email": TEST_USER_EMAIL,
-        "role": TEST_USER_ROLE,
-        "password": TEST_USER_PASSWORD,
-        "consented": True
-    }
-    response = app.test_client().post("/signup", json=signup_data)
+    response = app.test_client().post("/signup", json=TEST_USER_DATA)
     assert response.status_code == 200
 
     login_data = {
-        "email": TEST_USER_EMAIL,
-        "password": TEST_USER_PASSWORD
+        "email": TEST_USER_DATA["email"],
+        "password": TEST_USER_DATA["password"]
     }
     response = app.test_client().post("/login", json=login_data)
     assert response.status_code == 200
@@ -84,7 +79,7 @@ def test_add_model(test_client):
     response = test_client.post("/models", json=TEST_MODEL_REQUEST_DATA, headers=test_header)
 
     # Get the test user ID by the email
-    test_user_id = User.query.filter_by(email=TEST_USER_EMAIL).first().id
+    test_user_id = User.query.filter_by(email=TEST_USER_DATA["email"]).first().id
 
     expected_response_data = {
         "message": "Model added successfully."

@@ -25,13 +25,11 @@ def test_error_response(app_context):
 
     assert json.loads(response.data) == {"errorCode": "TEST_ERROR", "message": "Test error message."}
     assert response.status_code == 404
-
+ 
 
 def test_success_response(app_context):
     # Test success response with default status code
-    response = success_response(
-        message="Test success message.",
-    )
+    response = success_response(message="Test success message.")
 
     assert json.loads(response.data) == {"message": "Test success message."}
     assert response.status_code == 200
@@ -44,6 +42,17 @@ def test_success_response(app_context):
 
     assert json.loads(response.data) == {"message": "Test success message."}
     assert response.status_code == 205
+
+    # Test success response with specific status code
+    response = success_response(response_body={"value": 1})
+
+    assert json.loads(response.data) == {"value": 1}
+
+    # Test fail response
+    try:
+        response = success_response(status_code=205)
+    except ValueError as e:
+        assert str(e), "Provide a success message and/or a response body."
 
 
 def test_to_snake_case():

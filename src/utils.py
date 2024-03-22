@@ -3,6 +3,9 @@ from email_validator import validate_email, EmailNotValidError
 from flask import Response, jsonify
 import json
 
+from db.tables import User
+from errors import CustomError
+
 
 def error_response(error_code: str, message: str, status_code: int) -> Response:
     """
@@ -17,7 +20,7 @@ def error_response(error_code: str, message: str, status_code: int) -> Response:
     return response
 
 
-def success_response(message: str, response_body: dict = None, status_code: int = 200) -> Response:
+def success_response(message: str = None, response_body: dict = None, status_code: int = 200) -> Response:
     """
     Creates a JSON serialized Flask success response
     :param message: Success message
@@ -25,9 +28,26 @@ def success_response(message: str, response_body: dict = None, status_code: int 
     :return: Flask response
     """
     
-    response_data = {"message": message}
-    if response_body:
-        response_data["data"] = response_body
+    # Only response message (for GET requests)
+    if message and not response_body:
+        response_data = {
+            "message": message
+        }
+
+    # Only response data
+    elif response_body and not message:
+        response_data = response_body
+
+    # Both, response message and data
+    elif response_body and message:
+        response_data = {
+            "message": message,
+            "data": response_body
+        }
+
+    # Response message and/or body must be set
+    else:
+        raise ValueError("Provide a success message and/or a response body.")
 
     response = jsonify(response_data)
     response.status_code = status_code
@@ -105,5 +125,23 @@ def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     elif set(requested_nationalities).issubset(list(nationality_groups) + ["else"]):
         return 1
     return -1
+
+
+
+def check_user_existence(user_id) -> None:
+    """
+    Checks if user with given ID exists in the database, to make sure
+    that even when a user is deleted their JWT token doesn't work anymore.
+    :param user_id: User id to check
+    """
+    
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        raise CustomError(
+            error_code="AUTHENTICATION_FAILED",
+            message="User does not exist.",
+            status_code=401
+        )
 
 

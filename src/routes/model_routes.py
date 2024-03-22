@@ -1,13 +1,12 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask_limiter import RateLimitExceeded
 from pydantic import ValidationError
 import traceback
 from sqlalchemy.exc import SQLAlchemyError 
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
-from services.model_services import add_model, get_models, delete_models, check_user_existence
-from utils import success_response, error_response
-from errors import ModelError
+from services.model_services import add_model, get_models, delete_models
+from utils import success_response, error_response, check_user_existence
+from errors import CustomError
 
 model_routes = Blueprint("models", __name__)
 
@@ -42,7 +41,7 @@ def add_model_route():
         )
 
     # Handle custom thrown errors
-    except ModelError as e:
+    except CustomError as e:
         current_app.logger.error(f"Failed to process model data. Error:\n{e.message}")
         return error_response(
             error_code=e.error_code, message=e.message, status_code=e.status_code
@@ -93,7 +92,7 @@ def delete_models_route():
         )
 
     # Handle custom thrown errors
-    except ModelError as e:
+    except CustomError as e:
         current_app.logger.error(f"Failed to delete model. Error:\n{e.message}")
         return error_response(
             error_code=e.error_code, message=e.message, status_code=e.status_code
@@ -137,7 +136,7 @@ def get_models_route():
         )
 
     # Handle custom thrown errors
-    except ModelError as e:
+    except CustomError as e:
         current_app.logger.error(f"Failed to receive model data. Error:\n{e.message}")
         return error_response(
             error_code=e.error_code, message=e.message, status_code=e.status_code
@@ -186,7 +185,7 @@ def classify_names():
         )
 
     # Handle custom thrown errors
-    except ModelError as e:
+    except CustomError as e:
         current_app.logger.error(f"Failed to process classification request data. Error:\n{e.message}")
         return error_response(
             error_code=e.error_code, message=e.message, status_code=e.status_code

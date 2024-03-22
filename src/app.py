@@ -4,15 +4,13 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 import os
 
 from db.database import db
 from routes.model_routes import model_routes
 from routes.authentication_routes import authentication_routes
-
+from routes.util_routes import util_routes
 
 load_dotenv()
 
@@ -32,13 +30,6 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=int(os.environ.get("JWT_EXPIRATION_DAYS")))
 
 CORS(app)
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    storage_uri="memory://",
-)
-
-
 jwt = JWTManager(app)
 db.init_app(app)
 
@@ -49,6 +40,8 @@ def index():
 app.logger.setLevel(logging.INFO)
 app.register_blueprint(authentication_routes)
 app.register_blueprint(model_routes)
+app.register_blueprint(util_routes)
+
 
 if __name__ == "__main__":
     app.run()
