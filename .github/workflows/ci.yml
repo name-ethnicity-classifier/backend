@@ -13,6 +13,26 @@ on:
 jobs:  
   test:  
     runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pwd123
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      FLASK_ENV: test
+      FLASK_APP: src/app.py
+      JWT_SECRET: supersecret
+      JWT_EXPIRATION_DAYS: 30
+
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - ${{ env.POSTGRES_PORT }}:${{ env.POSTGRES_PORT }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -28,7 +48,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pytest
-        run: pytest
+        run: |
+          pytest
 
   docker-push:
     runs-on: ubuntu-latest

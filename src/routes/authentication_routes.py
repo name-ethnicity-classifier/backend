@@ -66,7 +66,7 @@ def login_user_route():
             "accessToken": create_access_token(identity=user_id)
         }
 
-        return success_response("Authentication successful.", data)
+        return success_response("Authentication successful.", response_data)
 
     except ValidationError as e:
         current_app.logger.error(f"Login data validation failed. Error:\n{e}")
