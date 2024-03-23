@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: test_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pwd123
       POSTGRES_PORT: 5432
       POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: localhost
       FLASK_ENV: test
       FLASK_APP: src/app.py
       JWT_SECRET: supersecret
