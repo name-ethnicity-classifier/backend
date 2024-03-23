@@ -21,7 +21,6 @@ jobs:
       POSTGRES_PORT: 5432
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_HOST: postgres
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       FLASK_ENV: test
       FLASK_APP: src/app.py
       JWT_SECRET: supersecret
