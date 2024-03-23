@@ -1,3 +1,5 @@
+[![Test and Build](https://github.com/name-ethnicity-classifier/backend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/name-ethnicity-classifier/backend/actions/workflows/ci.yml)
+
 # Name-to-Ethnicity Backend
 This repository contains the backend code of www.name-to-ethnicity.com.
 
