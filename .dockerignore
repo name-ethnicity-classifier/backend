@@ -1,0 +1,12 @@
+.coverage
+.pytest_cache/
+.vscode/
+tests/
+pytest.ini
+README.md
+dev-database/
+run_dev_db.sh
+.gitignore
+.env
+**/__pycache__/
+.github/

@@ -28,9 +28,8 @@ def test_error_response(app_context):
  
 
 def test_success_response(app_context):
-    # Test success response with default status code
+    # Test success response with message only and default status code
     response = success_response(message="Test success message.")
-
     assert json.loads(response.data) == {"message": "Test success message."}
     assert response.status_code == 200
 
@@ -39,14 +38,16 @@ def test_success_response(app_context):
         message="Test success message.",
         status_code=205
     )
-
     assert json.loads(response.data) == {"message": "Test success message."}
     assert response.status_code == 205
 
-    # Test success response with specific status code
-    response = success_response(response_body={"value": 1})
-
+    # Test success response with data only
+    response = success_response(data={"value": 1})
     assert json.loads(response.data) == {"value": 1}
+
+    # Test success response with message and data
+    response = success_response(message="Test success message.", data={"value": 1})
+    assert json.loads(response.data) == {"message": "Test success message.", "data": {"value": 1}}
 
     # Test fail response
     try:

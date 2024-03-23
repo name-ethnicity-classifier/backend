@@ -1,5 +1,5 @@
 # Name-to-Ethnicity Backend
-This repository contains the code backend of www.name-to-ethnicity.com.
+This repository contains the backend code of www.name-to-ethnicity.com.
 
 ## ⬇️ Setup:
 ### 1. Clone repository:

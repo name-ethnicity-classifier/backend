@@ -132,7 +132,7 @@ def get_models_route():
         current_app.logger.info(f"Successfully received model data from user with user id {user_id}.")
         return success_response(
             message="Model data received successfully.",
-            response_body=model_data
+            data=model_data
         )
 
     # Handle custom thrown errors

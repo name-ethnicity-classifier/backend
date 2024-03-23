@@ -20,7 +20,7 @@ def error_response(error_code: str, message: str, status_code: int) -> Response:
     return response
 
 
-def success_response(message: str = None, response_body: dict = None, status_code: int = 200) -> Response:
+def success_response(message: str = None, data: dict = None, status_code: int = 200) -> Response:
     """
     Creates a JSON serialized Flask success response
     :param message: Success message
@@ -29,20 +29,20 @@ def success_response(message: str = None, response_body: dict = None, status_cod
     """
     
     # Only response message (for GET requests)
-    if message and not response_body:
+    if message and not data:
         response_data = {
             "message": message
         }
 
     # Only response data
-    elif response_body and not message:
-        response_data = response_body
+    elif data and not message:
+        response_data = data
 
     # Both, response message and data
-    elif response_body and message:
+    elif data and message:
         response_data = {
             "message": message,
-            "data": response_body
+            "data": data
         }
 
     # Response message and/or body must be set

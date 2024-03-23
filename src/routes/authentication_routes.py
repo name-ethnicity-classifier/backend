@@ -62,11 +62,11 @@ def login_user_route():
         # Check if email and password are correct
         user_id = check_user_login(request_data)
 
-        response_body = {
+        response_data = {
             "accessToken": create_access_token(identity=user_id)
         }
 
-        return success_response("Authentication successful.", response_body)
+        return success_response("Authentication successful.", data)
 
     except ValidationError as e:
         current_app.logger.error(f"Login data validation failed. Error:\n{e}")
