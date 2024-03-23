@@ -11,25 +11,18 @@ util_routes = Blueprint("utils", __name__)
 
 
 @util_routes.route("/nationalities", methods=["GET"])
-@jwt_required()
 def get_nationalities_route():
     """ Route for model requests """
 
     current_app.logger.info(f"Received nationality data request.")
 
     # Add model to database
-    try:
-        # Retrieve user id by decoding JWT token
-        user_id = get_jwt_identity()
-
-        # Check if user exists
-        check_user_existence(user_id)
-    
+    try:    
         # Load nationality data
         nationalities = get_nationalities()
 
         current_app.logger.info("Successfully loaded nationalities.")
-        return success_response(response_body=nationalities)
+        return success_response(data=nationalities)
 
     # Handle unexpected errors
     except Exception as e:
