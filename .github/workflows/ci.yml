@@ -29,6 +29,10 @@ jobs:
     services:
       postgres:
         image: postgres:latest
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         ports:
           - ${{ env.POSTGRES_PORT }}:${{ env.POSTGRES_PORT }}
 
