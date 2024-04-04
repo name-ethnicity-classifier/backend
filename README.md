@@ -1,3 +1,5 @@
+[![Test and Build](https://github.com/name-ethnicity-classifier/backend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/name-ethnicity-classifier/backend/actions/workflows/ci.yml)
+
 # Name-to-Ethnicity Backend
 This repository contains the backend code of www.name-to-ethnicity.com.
 
@@ -29,11 +31,11 @@ JWT_SECRET=supersecret
 JWT_EXPIRATION_DAYS=30
 
 # Variables for dev. database
-DB_HOST=localhost
-DB_USER=postgres
-DB_PASSWORD=pwd123
-DB_NAME=n2e-db
-DB_PORT=5432
+POSTGRES_HOST=localhost
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=pwd123
+POSTGRES_DB=n2e-db
+POSTGRES_PORT=5432
 ADMINER_PORT=6060
 ```
 
@@ -55,11 +57,11 @@ Add the following variables (these are dummy values which can be used during dev
 Make sure that the ".env" in the root folder has the same values for the DB variables as this ".env"!
 
 ```conf
-DB_HOST=localhost
-DB_USER=postgres
-DB_PASSWORD=pwd123
-DB_NAME=n2e-db
-DB_PORT=5432
+POSTGRES_HOST=localhost
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=pwd123
+POSTGRES_DB=n2e-db
+POSTGRES_PORT=5432
 ADMINER_PORT=6060
 ```
 
