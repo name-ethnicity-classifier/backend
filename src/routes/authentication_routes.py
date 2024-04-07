@@ -6,7 +6,7 @@ from flask_jwt_extended import create_access_token
 from schemas.user_schema import LoginSchema, SignupSchema
 from services.user_services import add_user, check_user_login
 from utils import success_response, error_response
-from errors import CustomError, CustomError
+from errors import CustomError
 
 authentication_routes = Blueprint("authentication", __name__)
 

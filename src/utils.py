@@ -105,8 +105,7 @@ def get_nationalities() -> dict:
     :return: Dictionary with all nationalities
     """
 
-    with open("./data/nationalities.json", "r") as f:
-        return json.load(f)
+    return load_json("./data/nationalities.json")
 
 
 def check_requested_nationalities(requested_nationalities: list[str]) -> int:
@@ -127,7 +126,6 @@ def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     return -1
 
 
-
 def check_user_existence(user_id) -> None:
     """
     Checks if user with given ID exists in the database, to make sure
@@ -145,3 +143,12 @@ def check_user_existence(user_id) -> None:
         )
 
 
+def load_json(file_path: str) -> dict:
+    """
+    Loads content from a JSON file.
+    :param file_path: Path the the JSON file
+    :return: JSON content as a dictionary
+    """
+
+    with open(file_path, "r") as f:
+        return json.load(f)

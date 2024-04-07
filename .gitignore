@@ -3,3 +3,5 @@
 .pytest_cache/
 **/__pycache__/
 .fuse_*
+model_configurations/
+!model_configurations/test_model

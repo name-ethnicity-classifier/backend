@@ -3,30 +3,19 @@ import torch
 import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import numpy as np
-import json
 import string
 import os
-from dotenv import load_dotenv
-from errors import InferenceError
-from model import ConvLSTM as Model
 import unicodedata
 import re
+from dotenv import load_dotenv
+from errors import InferenceError
+from inference.model import ConvLSTM as Model
+from utils import load_json
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-def load_json(file_path: str) -> dict:
-    """
-    Loads content from a JSON file.
-    :param file_path: Path the the JSON file
-    :return: JSON content as a dictionary
-    """
-
-    with open(file_path, "r") as f:
-        return json.load(f)
-
-    
 def replace_special_chars(name: str) -> str:
     """
     Replaces all apostrophe letters with their base letters and removes all other special characters incl. numbers
@@ -76,13 +65,13 @@ def preprocess_names(names: list=[str], batch_size: int=128) -> torch.tensor:
     return padded_batch
 
 
-def predict(input_batch: torch.tensor, model_config: dict, classes: dict, with_distribution: bool=False) -> str:
+def predict(input_batch: torch.tensor, model_config: dict, classes: dict, get_distribution: bool=False) -> str:
     """ load model and predict preprocessed name
 
     :param torch.tensor input_batch: input-batch
     :param str model_path: path to saved model-paramters
     :param dict classes: a dictionary containing all countries with their class-number
-    :param with_distribution: Wether to return the entire distribution of the predicted nationalities
+    :param get_distribution: Wether to return the entire distribution of the predicted nationalities
     :return str: predicted ethnicities
     """
 
@@ -106,31 +95,73 @@ def predict(input_batch: torch.tensor, model_config: dict, classes: dict, with_d
 
     model = model.eval()
 
-    # classify names    
     total_predicted_ethncitities = []
 
+    # classify names and store results
     for batch in input_batch:
-        predictions = model(batch.float())
+        predictions = model(batch.float()).cpu().detach().numpy()
 
-        # convert numerics to country name
-        predicted_ethnicites = []
-        for idx in range(len(predictions)):
-            prediction = predictions.cpu().detach().numpy()[idx]
-            prediction_idx = list(prediction).index(max(prediction))
-            ethnicity = list(classes.keys())[list(classes.values()).index(prediction_idx)]
-            predicted_ethnicites.append([ethnicity, round(100 * float(np.exp(max(prediction))), 3)])
+        # get entire ethnicity confidence distribution for each name
+        if get_distribution:
+            prediction_result = get_output_distributions(predictions, classes=classes)
+        # get the ethnicity with the highest confidence for each name
+        else:
+            prediction_result = get_ethnicity_predictions(predictions, classes=classes)
 
-        total_predicted_ethncitities += predicted_ethnicites
+        total_predicted_ethncitities.extend(prediction_result)
 
     return total_predicted_ethncitities
 
 
-def run_inference(model_id: str, names: list[str], with_distribution: bool=False) -> list[str]:
+def get_ethnicity_predictions(predictions: np.array, classes: list) -> list[str]:
+    """
+    Collects the highest confidence ethnicity for every prediction in a batch.
+    For example if the model classified a batch of two names into eithher "german" or "greek":
+    > [(german, 0.9), (greek, 0.8)]
+
+    :param predictions: The output predictions of the model
+    :param classes: A list containing all the classes which a model can classify
+    :return: A list containing the predicted ethnicity and confidence score for each name
+    """
+
+    predicted_ethnicites = []
+    for prediction in predictions:
+        prediction_idx = list(prediction).index(max(prediction))
+        ethnicity = classes[prediction_idx]
+        predicted_ethnicites.append((ethnicity, round(100 * float(np.exp(max(prediction))), 3)))
+
+    return predicted_ethnicites
+
+
+def get_output_distributions(predictions: np.array, classes: list) -> list[dict]:
+    """
+    Collects the entire output distribution for every predictions in a batch
+    For example if the model classified a batch of two names into eithher "german" or "greek":
+    > [{german: 0.9, greek: 0.1}, {german: 0.2, greek: 0.8}]
+
+    :param predictions: The output predictions of the model
+    :param classes: A list containing all the classes which a model can classify
+    :return: A list containing an output distribution for each name
+    """
+
+    predicted_ethnicites = []
+    for prediction in predictions:
+        ethnicity_distribution = {}
+        for idx, ethnicity in enumerate(classes):
+            confidence = round(100 * float(np.exp(prediction[idx])), 3)
+            ethnicity_distribution[ethnicity] = confidence
+
+        predicted_ethnicites.append(ethnicity_distribution)
+
+    return predicted_ethnicites
+
+
+def run_inference(model_id: str, names: list[str], get_distribution: bool=False) -> list[str]:
     """
     Preprocesses and predicts the names.
     :param model_id: The ID of the model to use
     :param names: A list of all names which are to classify
-    :param with_distribution: Wether to return the entire distribution of the predicted nationalities
+    :param get_distribution: Wether to return the entire distribution of the predicted nationalities
     :return: List of the predicted nationalities (and optionally the entire output distr.)
     """
 
@@ -139,9 +170,9 @@ def run_inference(model_id: str, names: list[str], with_distribution: bool=False
     MAX_NAMES = int(os.getenv("MAX_NAMES"))
     BATCH_SIZE = int(os.getenv("BATCH_SIZE"))
 
-    model_config = load_json(f"nec-classification/nec_user_models/{model_id}/config.json")
-    classes = load_json(f"nec-classification/nec_user_models/{model_id}/dataset/nationalities.json")
-    model_file = f"nec-classification/nec_user_models/{model_id}/model.pt"
+    model_config = load_json(f"model_configurations/{model_id}/config.json")
+    classes = load_json(f"model_configurations/{model_id}/dataset/nationalities.json")
+    model_file = f"model_configurations/{model_id}/model.pt"
 
     if len(names) > MAX_NAMES:
         raise InferenceError(
@@ -161,4 +192,4 @@ def run_inference(model_id: str, names: list[str], with_distribution: bool=False
     }
 
     # predict ethnicities
-    return predict(input_batch, model_config, classes)
+    return predict(input_batch, model_config, classes, get_distribution)
