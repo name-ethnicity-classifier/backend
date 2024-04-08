@@ -118,3 +118,23 @@ def delete_models(user_id: str, data: DeleteModelSchema) -> None:
         db.session.delete(model)
 
     db.session.commit()
+
+
+def get_model_id_by_name(user_id: str, model_name: str) -> str:
+    """
+    Retrieves the model ID given a model name
+    :param user_id: The user which searches for the model by name
+    :param model_name: The name the user gave the model
+    :return: The model ID
+    """
+
+    models = UserToModel.query.filter_by(user_id=user_id, name=model_name).first()
+    
+    if not models:
+        raise CustomError(
+            error_code="MODEL_DOES_NOT_EXIST",
+            message=f"Model with name '{model_name}' does not exist for this user.",
+            status_code=404,
+        )
+    
+    return models.model_id

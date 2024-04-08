@@ -135,11 +135,3 @@ def test_delete_models(test_client):
     assert deleted_model is None
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
-
-"""
-def test_no_auth_questionnaire(test_client):
-    # POSTing a questionnaire without providing a authentication token
-    test_client, _ = test_client
-    response = test_client.post("/questionnaire", json=TEST_QUESTIONNAIRE_DATA)
-
-    assert response.status_code == 401"""

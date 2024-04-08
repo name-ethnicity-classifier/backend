@@ -65,7 +65,7 @@ def preprocess_names(names: list=[str], batch_size: int=128) -> torch.tensor:
     return padded_batch
 
 
-def predict(input_batch: torch.tensor, model_config: dict, classes: dict, get_distribution: bool=False) -> str:
+def classify_names(input_batch: torch.tensor, model_config: dict, classes: dict, get_distribution: bool=False) -> str:
     """ load model and predict preprocessed name
 
     :param torch.tensor input_batch: input-batch
@@ -145,6 +145,7 @@ def get_output_distributions(predictions: np.array, classes: list) -> list[dict]
     """
 
     predicted_ethnicites = []
+
     for prediction in predictions:
         ethnicity_distribution = {}
         for idx, ethnicity in enumerate(classes):
@@ -156,7 +157,7 @@ def get_output_distributions(predictions: np.array, classes: list) -> list[dict]
     return predicted_ethnicites
 
 
-def run_inference(model_id: str, names: list[str], get_distribution: bool=False) -> list[str]:
+def predict(model_id: str, names: list[str], get_distribution: bool=False) -> list[str]:
     """
     Preprocesses and predicts the names.
     :param model_id: The ID of the model to use
@@ -192,4 +193,5 @@ def run_inference(model_id: str, names: list[str], get_distribution: bool=False)
     }
 
     # predict ethnicities
-    return predict(input_batch, model_config, classes, get_distribution)
+    return classify_names(input_batch, model_config, classes, get_distribution)
+

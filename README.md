@@ -37,6 +37,10 @@ POSTGRES_PASSWORD=pwd123
 POSTGRES_DB=n2e-db
 POSTGRES_PORT=5432
 ADMINER_PORT=6060
+
+# Variables for inference
+BATCH_SIZE=64
+MAX_NAMES=1000
 ```
 
 ## 🏃 Run locally:
