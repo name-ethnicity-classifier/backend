@@ -23,6 +23,8 @@ jobs:
       FLASK_APP: src/app.py
       JWT_SECRET: supersecret
       JWT_EXPIRATION_DAYS: 30
+      MAX_NAMES: 10
+      BATCH_SIZE: 30
 
     services:
       postgres:
