@@ -19,12 +19,18 @@ TEST_MODEL_DATA = {
     "name": "test-model",
     "nationalities": ["chinese", "else"],
 }
+
+# Resulting model id will be: cf58c0536d2ab4fbd6a6
+# Therefore a model configuration folder ./model_configurations/cf58c0536d2ab4fbd6a6 is expected to exist that contains
+# a model to classify into chinese and else
 TEST_MODEL_ID = hashlib.sha256(",".join(sorted(set(TEST_MODEL_DATA["nationalities"]))).encode()).hexdigest()[:20]
+
 TEST_CLASSIFICATION_DATA = {
     "modelName": TEST_MODEL_DATA["name"],
     "names": ["peter schmidt", "cixin liu"],
     "getDistribution": False
 }
+TEST_EXPECTED_PREDICTIONS = {"cixin liu": "chinese", "peter schmidt": "else"}
 
 
 @pytest.fixture(scope="session")
@@ -82,8 +88,37 @@ def test_classification(test_client):
         "Authorization": f"Bearer {token}"
     }
     response = test_client.post("/classify", json=TEST_CLASSIFICATION_DATA, headers=test_header)
+    classifaction_result = json.loads(response.data)
+    # Format: { "name surname": ["nationality", 90.1], "name surname": ["nationality", 90.1]}
 
     assert response.status_code == 200
-    # assert json.loads(response.data) == expected_response_data
+    assert set(classifaction_result.keys()) == set(TEST_CLASSIFICATION_DATA["names"])
 
-     
+    classified_ethnicities = {name: prediction[0] for name, prediction in classifaction_result.items()}
+    assert classified_ethnicities == TEST_EXPECTED_PREDICTIONS
+
+
+def test_get_classification_distribution(test_client):
+    test_client, token = test_client
+
+    test_header = {
+        "Authorization": f"Bearer {token}"
+    }
+
+    TEST_CLASSIFICATION_DATA["getDistribution"] = True
+
+    response = test_client.post("/classify", json=TEST_CLASSIFICATION_DATA, headers=test_header)
+    classifaction_result = json.loads(response.data)
+    # Format: ["name": {"nationality1": 90.0, nationality2: 10.0}, "name": {"nationality1": 10.0, "nationality2": 90.0}]
+
+    assert response.status_code == 200
+    assert set(classifaction_result.keys()) == set(TEST_CLASSIFICATION_DATA["names"])
+    assert set(classifaction_result[TEST_CLASSIFICATION_DATA["names"][0]].keys()) == set(["else", "chinese"])
+    
+    # Get the ethnicites with the highest confidence
+    top_one_ethnicities = {}
+    for name in classifaction_result:
+        ethnicity_dist = classifaction_result[name]
+        top_one_ethnicities[name] = max(ethnicity_dist, key=ethnicity_dist.get)
+
+    assert top_one_ethnicities == TEST_EXPECTED_PREDICTIONS

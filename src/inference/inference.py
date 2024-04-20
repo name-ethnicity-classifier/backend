@@ -103,7 +103,7 @@ def classify_names(input_batch: torch.tensor, model_config: dict, classes: dict,
 
         # get entire ethnicity confidence distribution for each name
         if get_distribution:
-            prediction_result = get_output_distributions(predictions, classes=classes)
+            prediction_result = get_ethnicity_distributions(predictions, classes=classes)
         # get the ethnicity with the highest confidence for each name
         else:
             prediction_result = get_ethnicity_predictions(predictions, classes=classes)
@@ -133,7 +133,7 @@ def get_ethnicity_predictions(predictions: np.array, classes: list) -> list[str]
     return predicted_ethnicites
 
 
-def get_output_distributions(predictions: np.array, classes: list) -> list[dict]:
+def get_ethnicity_distributions(predictions: np.array, classes: list) -> list[dict]:
     """
     Collects the entire output distribution for every predictions in a batch
     For example if the model classified a batch of two names into eithher "german" or "greek":
