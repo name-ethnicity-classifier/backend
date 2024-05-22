@@ -9,7 +9,7 @@ import os
 
 from db.database import db
 from routes.model_routes import model_routes
-from routes.authentication_routes import authentication_routes
+from routes.user_routes import user_routes
 from routes.util_routes import util_routes
 from routes.inference_routes import inference_routes
 
@@ -39,7 +39,7 @@ def index():
     return json.dumps({"status": "OK"})
 
 app.logger.setLevel(logging.INFO)
-app.register_blueprint(authentication_routes)
+app.register_blueprint(user_routes)
 app.register_blueprint(model_routes)
 app.register_blueprint(inference_routes)
 app.register_blueprint(util_routes)

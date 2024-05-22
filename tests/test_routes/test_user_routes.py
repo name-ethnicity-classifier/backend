@@ -82,3 +82,35 @@ def test_login_user_fail(test_client):
 
     assert response.status_code == 400
     assert json.loads(response.data)["errorCode"] == "INVALID_LOGIN_DATA"
+
+
+def test_delete_user(test_client):
+    login_data = {
+        "email": TEST_USER_DATA["email"],
+        "password": TEST_USER_DATA["password"]
+    }
+
+    response = test_client.post("/login", json=login_data)
+
+    # Check that the response status code is 200 (successful login)
+    assert response.status_code == 200
+    
+    token = json.loads(response.data)["data"]["accessToken"]
+
+    test_header = {
+        "Authorization": f"Bearer {token}"
+    }
+    test_body = {
+        "password": TEST_USER_DATA["password"]
+    }
+    response = test_client.delete("/delete-user", json=test_body, headers=test_header)
+
+    expected_response_data = {
+        "message": "User deletion successful."
+    }
+
+    assert response.status_code == 200
+    assert json.loads(response.data) == expected_response_data
+
+    deleted_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
+    assert deleted_user is None

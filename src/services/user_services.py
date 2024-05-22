@@ -1,6 +1,5 @@
 import bcrypt
-from functools import wraps
-from schemas.user_schema import LoginSchema, SignupSchema
+from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
 from db.tables import User
 from db.database import db
 from utils import is_strong_password, is_valid_email
@@ -100,3 +99,26 @@ def add_user(data: SignupSchema) -> None:
     db.session.add(new_user)
     db.session.commit()
 
+
+def delete_user(user_id: str, data: DeleteUser) -> None:
+    """
+    Deletes a user from the database
+    :param user_id: ID of the user to delete
+    :param data: User deletion data (contains just the confirmation password)
+    """
+
+    user = User.query.filter_by(id=user_id).first()
+
+    true_password_bytes = user.password.encode("utf-8")
+    user_password_bytes = data.password.encode("utf-8")
+    
+    successful_authentication = bcrypt.checkpw(user_password_bytes, true_password_bytes)
+    if not successful_authentication:
+        raise CustomError(
+            error_code="USER_DELETION_FAILED",
+            message="Password incorrect.",
+            status_code=401
+        )
+
+    db.session.delete(user)
+    db.session.commit()
