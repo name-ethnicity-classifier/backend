@@ -5,10 +5,11 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from pydantic import ValidationError
 import traceback
 from sqlalchemy.exc import SQLAlchemyError 
-from utils import success_response, error_response, check_user_existence
+from utils import success_response, error_response
 from schemas.inference_schema import InferenceSchema
 from inference import inference
 from services.model_services import get_model_id_by_name
+from services.inference_services import increment_request_counter
 
 inference_routes = Blueprint("inference", __name__)
 
@@ -35,8 +36,9 @@ def classification_route():
             names=request_data.names,
             get_distribution=request_data.getDistribution
         )
-
         response_data = dict(zip(request_data.names, prediction))
+
+        increment_request_counter(user_id=user_id, model_id=model_id)
 
         current_app.logger.info("Successfully classified names.")
         return success_response(data=response_data)
