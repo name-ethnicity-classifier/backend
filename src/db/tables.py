@@ -66,6 +66,7 @@ class UserToModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     model_id = db.Column(db.String(40), db.ForeignKey("model.id", ondelete="CASCADE"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+    request_count = db.Column(db.Integer, default=0, nullable=False)
     name = db.Column(db.String(40), nullable=False)
 
     def to_dict(self):
@@ -73,5 +74,6 @@ class UserToModel(db.Model):
             "id": self.id,
             "model_id": self.model_id,
             "user_id": self.user_id,
+            "request_count": self.request_count,
             "name": self.name
         }

@@ -5,7 +5,7 @@ import json
 from utils import *
 from app import app
 from db.database import db
-from db.tables import User, Model
+from db.tables import User, Model, UserToModel
 
 
 TEST_USER_DATA = {
@@ -96,6 +96,11 @@ def test_classification(test_client):
 
     classified_ethnicities = {name: prediction[0] for name, prediction in classifaction_result.items()}
     assert classified_ethnicities == TEST_EXPECTED_PREDICTIONS
+
+    # Check if the request counter got incremented from 0 to 1
+    user_id = User.query.filter_by(email=TEST_USER_DATA["email"]).first().id
+    request_count = UserToModel.query.filter_by(user_id=user_id, name=TEST_MODEL_DATA["name"]).first().request_count
+    assert request_count == 1
 
 
 def test_get_classification_distribution(test_client):
