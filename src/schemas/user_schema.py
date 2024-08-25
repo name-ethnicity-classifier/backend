@@ -6,7 +6,6 @@ class LoginSchema(BaseModel):
     email: str
     password: str
 
-
 class SignupSchema(BaseModel):
     """ Schema to validate the /signup POST request data """
     email: str

@@ -4,7 +4,7 @@ from pydantic import ValidationError
 import traceback
 from sqlalchemy.exc import SQLAlchemyError 
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
-from services.model_services import add_model, get_models, delete_models
+from services.model_services import add_model, get_models, get_default_models, delete_models
 from utils import success_response, error_response, check_user_existence
 from errors import CustomError
 
@@ -147,6 +147,42 @@ def get_models_route():
         current_app.logger.error(f"Failed to receive model data. Error:\n{e}")
         return error_response(
             error_code="SERVER_SIDE_ERROR", message="Failed to store model data.", status_code=500)
+
+    # Handle unexpected errors
+    except Exception as e:
+        current_app.logger.error(f"Unexpected error. Error:\n{e}. Traceback:\n{traceback.format_exc()}")
+        return error_response(
+            error_code="UNEXPECTED_ERROR", message="Unexpected error.", status_code=500
+        )
+
+
+@model_routes.route("/default-models", methods=["GET"])
+def get_default_models_route():
+    """ Route for requesting default model data """
+
+    current_app.logger.info(f"Received default model retrieval request.")
+
+    # Get default model data from database
+    try:    
+        default_model_data = get_default_models()
+        current_app.logger.info(f"Successfully received default model data.")
+        return success_response(
+            message="Default model data received successfully.",
+            data=default_model_data
+        )
+
+    # Handle custom thrown errors
+    except CustomError as e:
+        current_app.logger.error(f"Failed to receive default model data. Error:\n{e.message}")
+        return error_response(
+            error_code=e.error_code, message=e.message, status_code=e.status_code
+        )
+
+    # Handle SQLAlchemy errors
+    except SQLAlchemyError as e:
+        current_app.logger.error(f"Failed to receive default model data. Error:\n{e}")
+        return error_response(
+            error_code="SERVER_SIDE_ERROR", message="Failed to receive default model data.", status_code=500)
 
     # Handle unexpected errors
     except Exception as e:

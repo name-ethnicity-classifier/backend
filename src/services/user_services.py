@@ -1,3 +1,6 @@
+from flask import current_app, render_template, request
+from flask_jwt_extended import create_access_token, decode_token
+from flask_mail import Mail, Message
 import bcrypt
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
 from db.tables import User
@@ -45,7 +48,7 @@ def add_user(data: SignupSchema) -> None:
 
     if user:
         raise CustomError(
-            error_code="AUTHENTICATION_FAILED",
+            error_code="EMAIL_EXISTS",
             message=f"User with email {data.email} does already exist.",
             status_code=409
         )
@@ -63,6 +66,9 @@ def add_user(data: SignupSchema) -> None:
             message=f"Invalid email.",
             status_code=422
         )
+
+    if len(data.role) == 0:
+        data.role = "Else"
 
     if len(data.password) > 100:
         raise CustomError(
@@ -121,4 +127,55 @@ def delete_user(user_id: str, data: DeleteUser) -> None:
         )
 
     db.session.delete(user)
+    db.session.commit()
+
+
+def send_verification_email(email: str) -> None:
+    """
+    Sends a verification email to the user
+    :param email: Email to which to send
+    :return: None
+    """
+
+    try:
+        mail = Mail(current_app)
+
+        token = create_access_token(email)
+        confirmation_url = f"{request.base_url}/verify/{token}"
+
+        email_subject = "Account confirmation for name-to-ethnicity.com."
+        msg = Message(
+            email_subject,
+            recipients=[email],
+            html=render_template("./src/templates/emailVerification.html", confirmation_url=confirmation_url)
+        )
+        mail.send(msg)
+        
+    except Exception as e:
+        current_app.logger.error(f"Failed to send verification email. Error:\n{e}")
+        raise CustomError(
+            error_code="SIGNUP_FAILED",
+            message="Error while sending verification email.",
+            status_code=500
+        )
+
+
+def handle_email_verification(token: str) -> None:
+    """
+    Handles a click on the verification url
+    :param token: JWT token which was added to the verification url
+    :return: None
+    """
+
+    data = decode_token(token)
+    email = data["email"]
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        raise CustomError(
+            error_code="VERIFICATION_FAILED",
+            message="User does not exist.",
+            status_code=404
+        )
+    user.verified = True
     db.session.commit()

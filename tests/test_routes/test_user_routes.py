@@ -26,7 +26,7 @@ def app_context():
         db.create_all()
         
         # Create a test user for which to test different CRUD operations
-        # But if this test user already exists, delete it and its questionnaire data
+        # But if this test user already exists, delete it and its model data
         test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
         if test_user:
             db.session.delete(test_user)

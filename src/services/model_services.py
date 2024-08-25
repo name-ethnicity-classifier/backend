@@ -56,22 +56,15 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
     db.session.commit()
 
 
-def get_models(user_id: str) -> dict:
+
+def get_default_models() -> dict:
     """
-    Gets a questionnaire row from the database
-    :param user_id: User ID from which to get the questionnaire data
-    :return: The questionnaire data row
+    Fetches all public default models from the database
+    :return: All default models
     """
 
     # Get all default models
     default_models = Model.query.filter_by(is_custom=False).all()
-
-    # Get all the users models from the user_to_model table
-    user_model_relations = UserToModel.query.filter_by(user_id=user_id)
-    user_model_ids = [relation.model_id for relation in user_model_relations]
-
-    # Get all custom models
-    custom_models = db.session.query(Model).filter(Model.id.in_(user_model_ids)).all()
 
     default_model_data = []
     for model in default_models:
@@ -84,6 +77,25 @@ def get_models(user_id: str) -> dict:
             "creationTime": model["creation_time"],
             "isCustom": model["is_custom"]
         })
+
+    return default_model_data
+    
+
+def get_models(user_id: str) -> dict:
+    """
+    Fetches all models a user has access to from the database
+    :param user_id: User ID from which to get the model data
+    :return: Users model data
+    """
+
+    # Get all the users models from the user_to_model table
+    user_model_relations = UserToModel.query.filter_by(user_id=user_id)
+    user_model_ids = [relation.model_id for relation in user_model_relations]
+
+    # Get all custom models
+    custom_models = db.session.query(Model).filter(Model.id.in_(user_model_ids)).all()
+
+    default_model_data = get_default_models()
 
     custom_model_data = []
     for model in custom_models:

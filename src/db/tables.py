@@ -1,6 +1,3 @@
-from sqlalchemy.orm import relationship
-from sqlalchemy.event import listens_for
-from flask_jwt_extended import jwt_required, get_jwt_identity
 import datetime
 from db.database import db
 

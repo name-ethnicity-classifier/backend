@@ -25,7 +25,7 @@ def app_context():
         db.create_all()
         
         # Create a test user for which to test different CRUD operations
-        # But if such this test user already exists, delete it and its questionnaire data
+        # But if such this test user already exists, delete it and its model data
         test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
         if test_user:
             db.session.delete(test_user)
@@ -35,7 +35,7 @@ def app_context():
 
 @pytest.fixture(scope="session")
 def test_client(app_context):
-    # Creates the test user and retrieves a JWT token to make /questionnaire requests with
+    # Creates the test user and retrieves a JWT token to make /models requests with
     response = app.test_client().post("/signup", json=TEST_USER_DATA)
     assert response.status_code == 200
 

@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import create_access_token
 
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from services.user_services import add_user, check_user_login, delete_user
+from services.user_services import add_user, check_user_login, delete_user, send_verification_email, handle_email_verification
 from utils import check_user_existence, success_response, error_response
 from errors import CustomError
 
@@ -23,6 +23,9 @@ def register_user_route():
 
         # Validates name, email and password and adds user
         add_user(request_data)
+
+        # Send verification email
+        # send_verification_email(request_data.email)
 
         return success_response("Registration successful.")
 
@@ -135,3 +138,8 @@ def delete_user_route():
         return error_response(
             error_code="UNEXPECTED_ERROR", message="Unexpected error.", status_code=500
         )
+
+
+@user_routes.route("/verify/<token>", methods=["GET"])
+def verify_email(token: str):
+    handle_email_verification(token)
