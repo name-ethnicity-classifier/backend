@@ -45,7 +45,7 @@ def classification_route():
     
     # Handle Pydantic schema validation errors
     except ValidationError as e:
-        current_app.logger.error("Model data validation failed. Error:\n{e}")
+        current_app.logger.error(f"Model data validation failed. Error:\n{e}")
         return error_response(
             error_code="INVALID_MODEL_DATA", message="Invalid model data.", status_code=422
         )

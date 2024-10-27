@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: name-to-ethnicity API
+  description: |-
+    This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retireve a list of all your models.
+    
+  termsOfService: https://www.name-to-ethnicity.com/terms-of-service
+  contact:
+    email: theodorpeifer@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+  
+tags:
+  - name: Endpoints
+
+paths:
+  /default-models:
+    get:
+      tags:
+        - Endpoints
+      summary: Retrieve all of our default models
+      description: This endpoint will return a list containing all of our already trained default models along with the following information
+      
+        - ethnicities it can classifiy between
+        
+        - overall accuracy
+        
+        - accuracy per ethnicity
+    
+      operationId: getDefaultModels
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Model'
+        '500':
+          description: Server side error
+  
+  /models:
+    get:
+      tags:
+        - Endpoints
+      summary: Retrieve all of your custom models
+      description: This endpoint will return a list containing all of your custom trained models along with the following information
+      
+        - ethnicities it can classifiy between
+        
+        - overall accuracy
+        
+        - accuracy per ethnicity
+      operationId: getCustomModels
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Model'
+        '500':
+          description: Server side error
+      security:
+        - api_key: []
+        
+  /classify:
+    post:
+      tags:
+        - Endpoints
+      summary: Classifiy names into their ethnicities
+      description: Using this endpoint you can classifiy names into their most likely ethnicity. You can choose to either retrieve the most likely ethnicity of a given name or the entire distribution.
+      operationId: classifyNames
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Classification'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassificationSuccessful'
+        '300':
+          description: Unexpected classification error
+        '411':
+          description: Too many names
+        '422':
+          description: Model data validation failed
+        '500':
+          description: Server side error
+          
+components:
+  schemas:
+    Classification:
+      type: object
+      properties:
+        modelName:
+          type: string
+          example: "chinese_and_else"
+        names:
+          type: array
+          items:
+            type: string
+          example: ["cixin liu", "samuel jackson"]
+        getDistribution:
+          type: boolean
+          example: false
+
+    ClassificationSuccessful:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Successfully classified names."
+  
+    Model:
+      type: object
+      properties:
+        name:
+          type: string
+          example: chinese_and_else
+        accuracy:
+          type: number
+          example: 0.98
+        nationalities:
+          type: array
+          items:
+            type: string
+          example: ["chinese", "else"]
+        scores:
+          type: array
+          items:
+            type: number
+          example:
+            [0.99, 0.97]
+        creationTime:
+          type: string
+          example: "01-01-2021T07:21:00"
+        isCustom:
+          type: boolean
+          example: true
+            
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
+      description: "Prefix 'Beaerer' followed by a space and then a JWT token"
