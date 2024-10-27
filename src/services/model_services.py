@@ -24,8 +24,11 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
             status_code=404,
         )
 
-    existing_model_names = UserToModel.query.filter_by(user_id=user_id, name=data.name).all()
-    if data.name in [model.name for model in existing_model_names]:
+    existing_custom_models = UserToModel.query.filter_by(user_id=user_id, name=data.name).all()
+    existing_default_models = Model.query.filter_by(is_custom=False).all()
+
+    all_model_names = [model.name for model in existing_custom_models] + [model.id for model in existing_default_models]
+    if data.name in all_model_names:
         raise CustomError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
@@ -125,6 +128,13 @@ def delete_models(user_id: str, data: DeleteModelSchema) -> None:
 
     # Get all the users models from the user_to_model table
     existing_models = UserToModel.query.filter(UserToModel.user_id == user_id, UserToModel.name.in_(data.names)).all()
+
+    if len(existing_models) == 0:
+        raise CustomError(
+            error_code="MODEL_DOES_NOT_EXIST",
+            message=f"Model does not exist for this user.",
+            status_code=404,
+        )
 
     for model in existing_models:
         db.session.delete(model)

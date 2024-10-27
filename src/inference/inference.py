@@ -85,7 +85,6 @@ def classify_names(input_batch: torch.tensor, model_config: dict, classes: dict,
         channels=model_config["cnn-parameters"][2]
     ).to(device=device)
 
-
     model_path = model_config["model-file"]
 
     if device != "cuda:0":

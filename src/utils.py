@@ -115,6 +115,9 @@ def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     :param requested_nationalities: Request nationality configuration
     :return: 0 if valid normal nationalities, 1 if valid nationality groups, -1 if invalid
     """
+
+    if len(requested_nationalities) < 2:
+        return -1
     
     nationalities = get_nationalities()["nationalities"].keys()
     nationality_groups = get_nationalities()["nationalityGroups"].keys()
