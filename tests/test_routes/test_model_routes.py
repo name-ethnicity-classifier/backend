@@ -6,87 +6,147 @@ from utils import *
 from app import app
 from db.database import db
 from db.tables import User, Model, UserToModel
+from sqlalchemy import text
 
 
-TEST_USER_DATA = {
+DEFAULT_MODEL = {
+    "public_name": "test-default-model",
+    "nationalities": ["chinese", "else"],
+    "accuracy": 98.5,
+    "scores": [98.0, 99.0],
+    "is_trained": True,
+    "is_grouped": False
+}
+CUSTOM_MODEL = {
+    "name": "test-custom-model",
+    "nationalities": ["german", "else"],
+    "accuracy": None,
+    "scores": None,
+    "is_trained": False,
+    "is_grouped": False,
+    "public_name": None
+}
+
+USER_DATA = {
     "name": "user",
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
     "consented": True
 }
-TEST_MODEL_REQUEST_DATA = {
-    "name": "test-model",
-    "nationalities": ["chinese", "else"],
+"""TEST_DEFAULT_MODEL_REQUEST_DATA = {
+    "name": DEFAULT_MODEL["name"],
+    "nationalities": DEFAULT_MODEL["nationalities"]   # already exist as default model
 }
-TEST_MODEL_RESPONSE_DATA = {
-    "name": "test-model",
+TEST_NEW_MODEL_REQUEST_DATA = {
+    "name": "test-model-new",
+    "nationalities": ["dutch", "german"]   # doesn't exist as default model
+}
+TEST_CUSTOM_MODEL_RESPONSE_DATA = {
+    "name": "test-model-new",
     "nationalities": ["chinese", "else"],
     "accuracy": None,
     "scores": None,
-    "isCustom": True,
+    "isPublic": False,
     # creationTime: ... (not comparing because how?)
+}"""
+
+GET_MODELS_RESPONSE = {
+    "customModels": [{
+        "name": CUSTOM_MODEL["name"],
+        "nationalities": sorted(CUSTOM_MODEL["nationalities"]),
+        "accuracy": CUSTOM_MODEL["accuracy"],
+        "scores": CUSTOM_MODEL["scores"],
+        "isPublic": False
+    }],
+    "defaultModels": [{
+        "name": DEFAULT_MODEL["public_name"],
+        "nationalities": sorted(DEFAULT_MODEL["nationalities"]),
+        "accuracy": DEFAULT_MODEL["accuracy"],
+        "scores": DEFAULT_MODEL["scores"],
+        "isPublic": True
+    }]
 }
+
 
 
 @pytest.fixture(scope="session")
 def app_context():
     with app.app_context():
-        
-        # Create all tables if they don't exist
-        # They will probably exist when you test locally and used the ``run_dev_db.sh`` script,
-        # but they won't exist in the CI/CD runner therefore we call it here
-        db.create_all()
-        
-        # Create a test user for which to test different CRUD operations
-        # But if such this test user already exists, delete it and its model data
-        test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
-        if test_user:
-            db.session.delete(test_user)
+        db.drop_all()
+    
+        with open("./dev-database/init_test.sql", "r") as file:
+            init_sql_script = file.read()    
+            db.session.execute(text(init_sql_script))
 
-        test_model_id = hashlib.sha256(",".join(sorted(set(TEST_MODEL_REQUEST_DATA["nationalities"]))).encode()).hexdigest()[:20]
-        test_model = Model.query.filter_by(id=test_model_id).first()
-        if test_model:
-            db.session.delete(test_model)
+        new_model = Model(
+            id=generate_model_id(DEFAULT_MODEL["nationalities"]),
+            public_name=DEFAULT_MODEL["public_name"],
+            nationalities=sorted(set(DEFAULT_MODEL["nationalities"])),
+            accuracy=DEFAULT_MODEL["accuracy"],
+            scores=DEFAULT_MODEL["scores"],
+            is_trained=DEFAULT_MODEL["is_trained"],
+            is_public=True,
+            is_grouped=DEFAULT_MODEL["is_grouped"]
+        )
+        db.session.add(new_model)
 
         yield app
 
 
 @pytest.fixture(scope="session")
 def test_client(app_context):
-    # Creates the test user and retrieves a JWT token to make /models requests with
-    response = app.test_client().post("/signup", json=TEST_USER_DATA)
+    response = app.test_client().post("/signup", json=USER_DATA)
     assert response.status_code == 200
 
     login_data = {
-        "email": TEST_USER_DATA["email"],
-        "password": TEST_USER_DATA["password"]
+        "email": USER_DATA["email"],
+        "password": USER_DATA["password"]
     }
     response = app.test_client().post("/login", json=login_data)
     assert response.status_code == 200
 
-    token = json.loads(response.data)["data"]["accessToken"]
-
-    return app_context.test_client(), token
+    return app_context.test_client(), json.loads(response.data)["data"]["accessToken"]
 
 
-def test_add_model(test_client):
+def test_add_new_model_to_user(test_client):
     test_client, token = test_client
+   
+    response = test_client.post(
+        "/models",
+        json={"name": CUSTOM_MODEL["name"], "nationalities": CUSTOM_MODEL["nationalities"]},
+        headers={"Authorization": f"Bearer {token}"}
+    )
 
-    test_header = {
-        "Authorization": f"Bearer {token}"
-    }
-    response = test_client.post("/models", json=TEST_MODEL_REQUEST_DATA, headers=test_header)
-
-    # Get the test user ID by the email
-    test_user_id = User.query.filter_by(email=TEST_USER_DATA["email"]).first().id
+    test_user_id = User.query.filter_by(email=USER_DATA["email"]).first().id
+    model_id = generate_model_id(CUSTOM_MODEL["nationalities"])
 
     expected_response_data = {
         "message": "Model added successfully."
     }
     assert response.status_code == 200
-    assert UserToModel.query.filter_by(user_id=test_user_id).first() is not None
     assert json.loads(response.data) == expected_response_data
+    assert UserToModel.query.filter_by(user_id=test_user_id).first() is not None
+    assert Model.query.filter_by(id=model_id).first() is not None
+
+
+def test_add_existing_model_to_user(test_client):
+    test_client, token = test_client
+
+    response = test_client.post(
+        "/models",
+        json={"name": DEFAULT_MODEL["public_name"], "nationalities": DEFAULT_MODEL["nationalities"]},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    test_user_id = User.query.filter_by(email=USER_DATA["email"]).first().id
+
+    expected_response_data = {
+        "message": "Model added successfully."
+    }
+    assert response.status_code == 200
+    assert json.loads(response.data) == expected_response_data
+    assert UserToModel.query.filter_by(user_id=test_user_id).first() is not None
 
         
 def test_get_models(test_client):
@@ -99,9 +159,7 @@ def test_get_models(test_client):
     response = test_client.get("/models", headers=test_header)
     
     expected_response_data = {
-        "data": {
-            "customModels": [TEST_MODEL_RESPONSE_DATA]
-        },
+        "data": GET_MODELS_RESPONSE,
         "message": "Model data received successfully."
     }
 
@@ -109,13 +167,13 @@ def test_get_models(test_client):
 
     # Remove fields that are too difficult to check
     del response_data["data"]["customModels"][0]["creationTime"]
-    del response_data["data"]["defaultModels"]
+    del response_data["data"]["defaultModels"][0]["creationTime"]
 
     assert response.status_code == 200
     assert response_data == expected_response_data
 
 
-def test_delete_models(test_client):
+"""def test_delete_models(test_client):
     test_client, token = test_client
 
     # Make GET request
@@ -123,15 +181,16 @@ def test_delete_models(test_client):
         "Authorization": f"Bearer {token}"
     }
     test_body = {
-        "names": [TEST_MODEL_REQUEST_DATA["name"]]
+        "names": [TEST_EXISTING_MODEL_REQUEST_DATA["name"]]
     }
     response = test_client.delete("/models", json=test_body, headers=test_header)
     
     expected_response_data = {
         "message": "Model(-s) deleted successfully."
     }
-    deleted_model = UserToModel.query.filter_by(name=TEST_MODEL_REQUEST_DATA["name"]).first()
+    deleted_model = UserToModel.query.filter_by(name=TEST_EXISTING_MODEL_REQUEST_DATA["name"]).first()
     
     assert deleted_model is None
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
+"""

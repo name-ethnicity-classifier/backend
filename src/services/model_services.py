@@ -1,9 +1,9 @@
-import hashlib
+from sqlalchemy import and_, or_
 from errors import CustomError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
 from db.tables import Model, UserToModel
 from db.database import db
-from utils import check_requested_nationalities
+from utils import check_requested_nationalities, generate_model_id
 
 
 def add_model(user_id: str, data: AddModelSchema) -> None:
@@ -21,31 +21,40 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         raise CustomError(
             error_code="NATIONALITIES_INVALID",
             message=f"Requested nationalities (-groups) are invalid.",
-            status_code=404,
+            status_code=404
         )
 
     existing_custom_models = UserToModel.query.filter_by(user_id=user_id, name=data.name).all()
-    existing_default_models = Model.query.filter_by(is_custom=False).all()
+    existing_default_models = Model.query.filter_by(is_public=True).all()
 
-    all_model_names = [model.name for model in existing_custom_models] + [model.id for model in existing_default_models]
-    if data.name in all_model_names:
+    same_name_models = (
+        db.session.query(UserToModel)
+        .join(Model, UserToModel.model_id == Model.id)
+        .filter(or_(
+            # Check if the user already has a model with the same name
+            and_(UserToModel.user_id == user_id, UserToModel.name == data.name),
+            # Check if a public model exists with the same public name
+            and_(Model.is_public == True, Model.public_name == data.name)
+        ))
+        .first()
+    )
+
+    #all_model_names = [model.name for model in existing_custom_models] + [model.id for model in existing_default_models]
+    if same_name_models is not None:
         raise CustomError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
             status_code=409,
         )
 
-    # Sort nationalities
-    nationalities = sorted(set(data.nationalities))
-    model_id = hashlib.sha256(",".join(nationalities).encode()).hexdigest()[:20]
+    model_id = generate_model_id(data.nationalities)
 
     same_model_exists = Model.query.filter_by(id=model_id).first()
     if not same_model_exists:
         new_model = Model(
             id=model_id,
-            nationalities=nationalities,
-            is_grouped=(checked_nationalities == 1),
-            is_custom=True
+            nationalities=sorted(set(data.nationalities)),
+            is_grouped=(checked_nationalities == 1)
         )
         db.session.add(new_model)
 
@@ -55,9 +64,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         name=data.name
     )
     db.session.add(user_to_model_entry)
-
     db.session.commit()
-
 
 
 def get_default_models() -> dict:
@@ -67,18 +74,18 @@ def get_default_models() -> dict:
     """
 
     # Get all default models
-    default_models = Model.query.filter_by(is_custom=False).all()
+    default_models = Model.query.filter_by(is_public=True).all()
 
     default_model_data = []
     for model in default_models:
         model = model.to_dict()
         default_model_data.append({
-            "name": model["id"],
+            "name": model["public_name"],
             "accuracy": model["accuracy"],
             "nationalities": model["nationalities"],
             "scores": model["scores"],
             "creationTime": model["creation_time"],
-            "isCustom": model["is_custom"]
+            "isPublic": model["is_public"]
         })
 
     return default_model_data
@@ -96,9 +103,14 @@ def get_models(user_id: str) -> dict:
     user_model_ids = [relation.model_id for relation in user_model_relations]
 
     # Get all custom models
-    custom_models = db.session.query(Model).filter(Model.id.in_(user_model_ids)).all()
-
-    default_model_data = get_default_models()
+    custom_models = (
+        db.session.query(Model)
+        .filter(
+            Model.id.in_(user_model_ids),
+            Model.is_public == False
+        )
+        .all()
+    )
 
     custom_model_data = []
     for model in custom_models:
@@ -109,11 +121,13 @@ def get_models(user_id: str) -> dict:
             "nationalities": model["nationalities"],
             "scores": model["scores"],
             "creationTime": model["creation_time"],
-            "isCustom": model["is_custom"]
+            "isPublic": model["is_public"]
         })
 
+    
+
     return {
-        "defaultModels": default_model_data,
+        "defaultModels": get_default_models(),
         "customModels": custom_model_data
     }
 
