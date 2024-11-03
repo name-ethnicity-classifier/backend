@@ -1,13 +1,15 @@
 from flask import jsonify
 import pytest
 import json
+
+from sqlalchemy import text
 from utils import *
 from app import app
 from db.database import db
 from db.tables import User
 
 
-TEST_USER_DATA = {
+TEST_USER = {
     "name": "user",
     "email": "user@test.com",
     "role": "else",
@@ -18,17 +20,11 @@ TEST_USER_DATA = {
 @pytest.fixture(scope="session")
 def app_context():
     with app.app_context():
-        
-        # Create all tables if they don't exist
-        # They will probably exist when you test locally and used the ``run_dev_db.sh`` script,
-        # but they won't exist in the CI/CD runner therefore we call it here
-        db.create_all()
-        
-        # Create a test user for which to test different CRUD operations
-        # But if such this test user already exists, delete it and its model data
-        test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
-        if test_user:
-            db.session.delete(test_user)
+        db.drop_all()
+        with open("./dev-database/init_test.sql", "r") as file:
+            init_sql_script = file.read()    
+            db.session.execute(text(init_sql_script))
+        db.session.commit()
 
         yield app
 
@@ -36,12 +32,12 @@ def app_context():
 @pytest.fixture(scope="session")
 def test_client(app_context):
     # Creates the test user and retrieves a JWT token to make /models requests with
-    response = app.test_client().post("/signup", json=TEST_USER_DATA)
+    response = app.test_client().post("/signup", json=TEST_USER)
     assert response.status_code == 200
 
     login_data = {
-        "email": TEST_USER_DATA["email"],
-        "password": TEST_USER_DATA["password"]
+        "email": TEST_USER["email"],
+        "password": TEST_USER["password"]
     }
     response = app.test_client().post("/login", json=login_data)
     assert response.status_code == 200
@@ -52,12 +48,9 @@ def test_client(app_context):
 
 
 def test_get_nationalities(test_client):
-    test_client, token = test_client
+    test_client, _ = test_client
 
-    test_header = {
-        "Authorization": f"Bearer {token}"
-    }
-    response = test_client.get("/nationalities", headers=test_header)
+    response = test_client.get("/nationalities")
 
     expected_response_data = get_nationalities()
                               

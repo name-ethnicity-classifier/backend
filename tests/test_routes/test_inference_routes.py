@@ -8,7 +8,7 @@ from db.database import db
 from db.tables import User, Model, UserToModel
 
 
-TEST_USER_DATA = {
+TEST_USER = {
     "name": "user",
     "email": "user@test.com",
     "role": "else",
@@ -44,7 +44,7 @@ def app_context():
         
         # Create a test user for which to test different CRUD operations
         # But if such this test user already exists, delete it and its model data
-        test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
+        test_user = User.query.filter_by(email=TEST_USER["email"]).first()
         if test_user:
             db.session.delete(test_user)
     
@@ -59,12 +59,12 @@ def app_context():
 @pytest.fixture(scope="session")
 def test_client(app_context):
     # Creates the test user and retrieves a JWT token to make /models requests with
-    response = app.test_client().post("/signup", json=TEST_USER_DATA)
+    response = app.test_client().post("/signup", json=TEST_USER)
     assert response.status_code == 200
 
     login_data = {
-        "email": TEST_USER_DATA["email"],
-        "password": TEST_USER_DATA["password"]
+        "email": TEST_USER["email"],
+        "password": TEST_USER["password"]
     }
     response = app.test_client().post("/login", json=login_data)
     assert response.status_code == 200
@@ -98,7 +98,7 @@ def test_classification(test_client):
     assert classified_ethnicities == TEST_EXPECTED_PREDICTIONS
 
     # Check if the request counter got incremented from 0 to 1
-    user_id = User.query.filter_by(email=TEST_USER_DATA["email"]).first().id
+    user_id = User.query.filter_by(email=TEST_USER["email"]).first().id
     request_count = UserToModel.query.filter_by(user_id=user_id, name=TEST_MODEL_DATA["name"]).first().request_count
     assert request_count == 1
 
