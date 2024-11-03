@@ -24,33 +24,55 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
             status_code=404
         )
 
-    existing_custom_models = UserToModel.query.filter_by(user_id=user_id, name=data.name).all()
-    existing_default_models = Model.query.filter_by(is_public=True).all()
-
-    same_name_models = (
+    custom_models_name_name = (
         db.session.query(UserToModel)
-        .join(Model, UserToModel.model_id == Model.id)
-        .filter(or_(
-            # Check if the user already has a model with the same name
-            and_(UserToModel.user_id == user_id, UserToModel.name == data.name),
-            # Check if a public model exists with the same public name
-            and_(Model.is_public == True, Model.public_name == data.name)
-        ))
+        .filter(UserToModel.user_id == user_id, UserToModel.name == data.name)
+        .first()
+    )
+    public_models_same_name = (
+        db.session.query(Model)
+        .filter(Model.is_public == True, Model.public_name == data.name)
         .first()
     )
 
-    #all_model_names = [model.name for model in existing_custom_models] + [model.id for model in existing_default_models]
-    if same_name_models is not None:
+    if custom_models_name_name is not None or public_models_same_name is not None:
         raise CustomError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
             status_code=409,
         )
+    
+    """models_same_classes = (
+        db.session.query(UserToModel)
+        .join(Model, UserToModel.model_id == Model.id)
+        .filter(or_(
+            # Check if the user already has a model with the same name
+            and_(UserToModel.user_id == user_id, UserToModel.name == data.nationalities),
+            # Check if a public model exists with the same public name
+            and_(Model.is_public == True, Model.nationalities == data.nationalities)
+        ))
+        .first()
+    )
+
+    if models_same_classes:
+        raise CustomError(
+            error_code="SAME_MODEL_EXISTS",
+            message=f"Model with classes '{data.nationalities}' already exists for this user.",
+            status_code=409,
+        )"""
 
     model_id = generate_model_id(data.nationalities)
-
     same_model_exists = Model.query.filter_by(id=model_id).first()
-    if not same_model_exists:
+    
+    if same_model_exists:
+        same_model_same_user = UserToModel.query.filter_by(user_id=user_id, model_id=model_id).first()
+        if same_model_same_user or same_model_exists.is_public:
+            raise CustomError(
+                error_code="SAME_MODEL_EXISTS",
+                message=f"Model with classes '{data.nationalities}' already exists for this user.",
+                status_code=409,
+            )
+    else:
         new_model = Model(
             id=model_id,
             nationalities=sorted(set(data.nationalities)),
@@ -85,7 +107,6 @@ def get_default_models() -> dict:
             "nationalities": model["nationalities"],
             "scores": model["scores"],
             "creationTime": model["creation_time"],
-            "isPublic": model["is_public"]
         })
 
     return default_model_data
@@ -105,10 +126,8 @@ def get_models(user_id: str) -> dict:
     # Get all custom models
     custom_models = (
         db.session.query(Model)
-        .filter(
-            Model.id.in_(user_model_ids),
-            Model.is_public == False
-        )
+        .filter(Model.id.in_(user_model_ids))
+        .order_by(Model.creation_time.desc())
         .all()
     )
 
@@ -121,10 +140,7 @@ def get_models(user_id: str) -> dict:
             "nationalities": model["nationalities"],
             "scores": model["scores"],
             "creationTime": model["creation_time"],
-            "isPublic": model["is_public"]
         })
-
-    
 
     return {
         "defaultModels": get_default_models(),

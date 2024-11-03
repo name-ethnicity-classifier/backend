@@ -19,13 +19,18 @@ DEFAULT_MODEL = {
 }
 CUSTOM_MODEL = {
     "name": "test-custom-model",
-    "nationalities": ["german", "else"],
+    "nationalities": ["else", "german"],
     "accuracy": None,
     "scores": None,
     "is_trained": False,
     "is_grouped": False,
     "public_name": None
 }
+CUSTOM_MODEL_SAME_AS_DEFAULT = DEFAULT_MODEL.copy()
+CUSTOM_MODEL_SAME_AS_DEFAULT["name"] = "test-custom-model-2"
+
+CUSTOM_MODEL_SAME_AS_CUSTOM = CUSTOM_MODEL.copy()
+CUSTOM_MODEL_SAME_AS_CUSTOM["name"] = "test-custom-model-3"
 
 USER_DATA = {
     "name": "user",
@@ -52,13 +57,29 @@ TEST_CUSTOM_MODEL_RESPONSE_DATA = {
 }"""
 
 GET_MODELS_RESPONSE = {
-    "customModels": [{
-        "name": CUSTOM_MODEL["name"],
-        "nationalities": sorted(CUSTOM_MODEL["nationalities"]),
-        "accuracy": CUSTOM_MODEL["accuracy"],
-        "scores": CUSTOM_MODEL["scores"],
-        "isPublic": False
-    }],
+    "customModels": [
+        {
+            "name": CUSTOM_MODEL_SAME_AS_CUSTOM["name"],
+            "nationalities": sorted(CUSTOM_MODEL_SAME_AS_CUSTOM["nationalities"]),
+            "accuracy": CUSTOM_MODEL_SAME_AS_CUSTOM["accuracy"],
+            "scores": CUSTOM_MODEL_SAME_AS_CUSTOM["scores"],
+            "isPublic": False
+        },
+        {
+            "name": CUSTOM_MODEL_SAME_AS_DEFAULT["name"],
+            "nationalities": sorted(CUSTOM_MODEL_SAME_AS_DEFAULT["nationalities"]),
+            "accuracy": CUSTOM_MODEL_SAME_AS_DEFAULT["accuracy"],
+            "scores": CUSTOM_MODEL_SAME_AS_DEFAULT["scores"],
+            "isPublic": True
+        },
+        {
+            "name": CUSTOM_MODEL["name"],
+            "nationalities": sorted(CUSTOM_MODEL["nationalities"]),
+            "accuracy": CUSTOM_MODEL["accuracy"],
+            "scores": CUSTOM_MODEL["scores"],
+            "isPublic": False
+        }
+    ],
     "defaultModels": [{
         "name": DEFAULT_MODEL["public_name"],
         "nationalities": sorted(DEFAULT_MODEL["nationalities"]),
@@ -109,7 +130,7 @@ def test_client(app_context):
     return app_context.test_client(), json.loads(response.data)["data"]["accessToken"]
 
 
-def test_add_new_model_to_user(test_client):
+def test_add_model_to_user(test_client):
     test_client, token = test_client
    
     response = test_client.post(
@@ -130,12 +151,31 @@ def test_add_new_model_to_user(test_client):
     assert Model.query.filter_by(id=model_id).first() is not None
 
 
-def test_add_existing_model_to_user(test_client):
+def test_add_model_same_as_default_to_user(test_client):
     test_client, token = test_client
 
     response = test_client.post(
         "/models",
-        json={"name": DEFAULT_MODEL["public_name"], "nationalities": DEFAULT_MODEL["nationalities"]},
+        json={"name": CUSTOM_MODEL_SAME_AS_DEFAULT["name"], "nationalities": CUSTOM_MODEL_SAME_AS_DEFAULT["nationalities"]},
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    test_user_id = User.query.filter_by(email=USER_DATA["email"]).first().id
+
+    expected_response_data = {
+        "message": "Model added successfully."
+    }
+    assert response.status_code == 200
+    assert json.loads(response.data) == expected_response_data
+    assert UserToModel.query.filter_by(user_id=test_user_id).first() is not None
+
+
+def test_add_model_same_as_custom_to_user(test_client):
+    test_client, token = test_client
+
+    response = test_client.post(
+        "/models",
+        json={"name": CUSTOM_MODEL_SAME_AS_CUSTOM["name"], "nationalities": CUSTOM_MODEL_SAME_AS_CUSTOM["nationalities"]},
         headers={"Authorization": f"Bearer {token}"}
     )
 
@@ -167,6 +207,8 @@ def test_get_models(test_client):
 
     # Remove fields that are too difficult to check
     del response_data["data"]["customModels"][0]["creationTime"]
+    del response_data["data"]["customModels"][1]["creationTime"]
+    del response_data["data"]["customModels"][2]["creationTime"]
     del response_data["data"]["defaultModels"][0]["creationTime"]
 
     assert response.status_code == 200
