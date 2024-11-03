@@ -63,13 +63,10 @@ def login_user_route():
     try:
         request_data = LoginSchema(**request.json)
 
-        # Check if email and password are correct
         user_id = check_user_login(request_data)
-
         response_data = {
             "accessToken": create_access_token(identity=user_id)
         }
-
         return success_response("Authentication successful.", response_data)
 
     except ValidationError as e:
@@ -110,7 +107,6 @@ def delete_user_route():
         check_user_existence(user_id)
 
         request_data = DeleteUser(**request.json)
-
         delete_user(user_id, request_data)
 
         return success_response("User deletion successful.")
