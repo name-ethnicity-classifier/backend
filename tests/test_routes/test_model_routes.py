@@ -59,7 +59,6 @@ CUSTOM_MODEL = {
 def app_context():
     with app.app_context():
         db.drop_all()
-    
         with open("./dev-database/init_test.sql", "r") as file:
             init_sql_script = file.read()    
             db.session.execute(text(init_sql_script))
@@ -147,34 +146,50 @@ def test_add_custom_model(test_client):
 
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
-    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id).first() is not None
+    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id, name=CUSTOM_MODEL["name"]).first() is not None
     assert Model.query.filter_by(id=model_id).first() is not None
 
 
 @pytest.mark.order(2)
-@pytest.mark.it("should fail to add a custom model when the user already has a model trained on same nationalities")
+@pytest.mark.it("should add a new model when the user already has a model trained on same nationalities")
 def test_add_custom_model_with_same_classes(test_client):
     test_client, token = test_client
+
+    new_model_name = "custom-model-2"
+
     response = test_client.post(
         "/models",
-        json={"name": "custom-model-2", "nationalities": CUSTOM_MODEL["nationalities"]},
+        json={"name": new_model_name, "nationalities": CUSTOM_MODEL["nationalities"]},
         headers={"Authorization": f"Bearer {token}"}
     )
-    assert response.status_code == 409
-    assert json.loads(response.data)["errorCode"] == "SAME_MODEL_EXISTS"
+    test_user_id = User.query.filter_by(email=TEST_USER["email"]).first().id
+    model_id = generate_model_id(CUSTOM_MODEL["nationalities"])
+    expected_response_data = {"message": "Model added successfully."}
+
+    assert response.status_code == 200
+    assert json.loads(response.data) == expected_response_data
+    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id, name=new_model_name).first() is not None
 
 
 @pytest.mark.order(3)
-@pytest.mark.it("should fail to add a custom model when there already is a default model trained on same nationalities")
+@pytest.mark.it("should add a custom model when there already is a default model trained on same nationalities")
 def test_add_custom_model_with_same_classes_as_default_model(test_client):
     test_client, token = test_client
+
+    new_model_name = "custom-model-3"
+
     response = test_client.post(
         "/models",
-        json={"name": "custom-model-3", "nationalities": DEFAULT_MODEL["nationalities"]},
+        json={"name": new_model_name, "nationalities": DEFAULT_MODEL["nationalities"]},
         headers={"Authorization": f"Bearer {token}"}
     )
-    assert response.status_code == 409
-    assert json.loads(response.data)["errorCode"] == "SAME_MODEL_EXISTS"
+    test_user_id = User.query.filter_by(email=TEST_USER["email"]).first().id
+    model_id = generate_model_id(DEFAULT_MODEL["nationalities"])
+    expected_response_data = {"message": "Model added successfully."}
+
+    assert response.status_code == 200
+    assert json.loads(response.data) == expected_response_data
+    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id, name=new_model_name).first() is not None
 
 
 @pytest.mark.order(4)
@@ -207,9 +222,12 @@ def test_add_custom_model_with_same_name_as_default_model(test_client):
 @pytest.mark.it("should add a new user-to-model entry when creating a custom model with the same classes of another users model")
 def test_add_custom_model_with_existing_classes_other_user(test_client):
     test_client, token = test_client
+
+    new_model_name = "custom-model-4"
+
     response = test_client.post(
         "/models",
-        json={"name": "custom-model-6", "nationalities": EXISTING_CUSTOM_MODEL["nationalities"]},
+        json={"name": new_model_name, "nationalities": EXISTING_CUSTOM_MODEL["nationalities"]},
         headers={"Authorization": f"Bearer {token}"}
     )
     test_user_id = User.query.filter_by(email=TEST_USER["email"]).first().id
@@ -218,7 +236,7 @@ def test_add_custom_model_with_existing_classes_other_user(test_client):
 
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
-    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id).first() is not None
+    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id, name=new_model_name).first() is not None
     assert Model.query.filter_by(id=model_id).first() is not None
 
 
@@ -237,7 +255,7 @@ def test_add_custom_model_with_existing_name_other_user(test_client):
 
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
-    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id).first() is not None
+    assert UserToModel.query.filter_by(user_id=test_user_id, model_id=model_id, name=EXISTING_CUSTOM_MODEL["name"]).first() is not None
     assert Model.query.filter_by(id=model_id).first() is not None
 
 
@@ -263,7 +281,7 @@ def test_get_all_models(test_client):
     response_data = json.loads(response.data)
     GetModelsResponseSchema(**response_data["data"])
 
-    assert len(response_data["data"]["customModels"]) == 3
+    assert len(response_data["data"]["customModels"]) == 5
     assert len(response_data["data"]["defaultModels"]) == 1
 
 
@@ -314,7 +332,5 @@ def test_delete_model(test_client):
 
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
-    assert UserToModel.query.filter_by(user_id=User.query.filter_by(email=TEST_USER["email"]).first().id, model_id=model_id).first() is None
     assert Model.query.filter_by(id=model_id).first() is not None
-
 

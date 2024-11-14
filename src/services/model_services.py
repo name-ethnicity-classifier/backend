@@ -52,9 +52,9 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
             and_(Model.is_public == True, Model.nationalities == data.nationalities)
         ))
         .first()
-    )
+    )"""
 
-    if models_same_classes:
+    """if models_same_classes:
         raise CustomError(
             error_code="SAME_MODEL_EXISTS",
             message=f"Model with classes '{data.nationalities}' already exists for this user.",
@@ -62,17 +62,18 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         )"""
 
     model_id = generate_model_id(data.nationalities)
-    same_model_exists = Model.query.filter_by(id=model_id).first()
-    
-    if same_model_exists:
-        same_model_same_user = UserToModel.query.filter_by(user_id=user_id, model_id=model_id).first()
-        if same_model_same_user or same_model_exists.is_public:
-            raise CustomError(
-                error_code="SAME_MODEL_EXISTS",
-                message=f"Model with classes '{data.nationalities}' already exists for this user.",
-                status_code=409,
-            )
-    else:
+    same_model = Model.query.filter_by(id=model_id).first()
+    #
+    #if same_model_exists:
+    #    same_model_same_user = UserToModel.query.filter_by(user_id=user_id, model_id=model_id).first()
+    #    if same_model_same_user or same_model_exists.is_public:
+    #        raise CustomError(
+    #            error_code="SAME_MODEL_EXISTS",
+    #            message=f"Model with classes '{data.nationalities}' already exists for this user.",
+    #            status_code=409,
+    #        )
+    #else:
+    if not same_model:
         new_model = Model(
             id=model_id,
             nationalities=sorted(set(data.nationalities)),
@@ -123,8 +124,7 @@ def get_models(user_id: str) -> dict:
     user_model_relations = UserToModel.query.filter_by(user_id=user_id)
     user_model_ids = [relation.model_id for relation in user_model_relations]
 
-    # Get all custom models
-    custom_models = (
+    models = (
         db.session.query(Model)
         .filter(Model.id.in_(user_model_ids))
         .order_by(Model.creation_time.desc())
@@ -132,15 +132,17 @@ def get_models(user_id: str) -> dict:
     )
 
     custom_model_data = []
-    for model in custom_models:
-        model = model.to_dict()
-        custom_model_data.append({
-            "name": user_model_relations.filter_by(model_id=model["id"]).first().name,
-            "accuracy": model["accuracy"],
-            "nationalities": model["nationalities"],
-            "scores": model["scores"],
-            "creationTime": model["creation_time"],
-        })
+    for model in models:
+
+        # There might be multiple user_to_models pointing to the same model due to same classes
+        for relation in user_model_relations.filter_by(model_id=model.id).all():
+            custom_model_data.append({
+                "name": relation.name,
+                "accuracy": model.accuracy,
+                "nationalities": model.nationalities,
+                "scores": model.scores,
+                "creationTime": model.creation_time,
+            })
 
     return {
         "defaultModels": get_default_models(),
