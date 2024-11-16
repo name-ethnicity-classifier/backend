@@ -1,4 +1,6 @@
+from unittest.mock import patch
 from flask import jsonify
+from flask_jwt_extended import create_access_token
 import pytest
 import json
 
@@ -14,10 +16,13 @@ TEST_USER = {
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
+    "verified": True,
     "consented": True
 }
+TEST_USER_ID = 1
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture(scope="function")
 def app_context():
     with app.app_context():
         db.drop_all()
@@ -29,30 +34,31 @@ def app_context():
         yield app
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_client(app_context):
-    # Creates the test user and retrieves a JWT token to make /models requests with
-    response = app.test_client().post("/signup", json=TEST_USER)
-    assert response.status_code == 200
-
-    login_data = {
-        "email": TEST_USER["email"],
-        "password": TEST_USER["password"]
-    }
-    response = app.test_client().post("/login", json=login_data)
-    assert response.status_code == 200
-
-    token = json.loads(response.data)["data"]["accessToken"]
-
-    return app_context.test_client(), token
+    client = app.test_client()
+    user = User(**TEST_USER)
+    db.session.add(user)
+    db.session.commit()
+    return client
 
 
+@pytest.fixture(scope="function")
+def authenticated_client(test_client):
+    """Mocks user authentication for tests requiring it."""
+    user_id = 2
+    with patch("flask_jwt_extended.get_jwt_identity") as mock_identity:
+        mock_identity.return_value = user_id
+
+        with app.test_request_context():
+            token = create_access_token(identity=user_id)
+        test_client.token = token
+        yield test_client
+
+
+@pytest.mark.it("should retrieve a nationalities and nationality groups when not authenticated")
 def test_get_nationalities(test_client):
-    test_client, _ = test_client
-
     response = test_client.get("/nationalities")
-
-    expected_response_data = get_nationalities()
                               
     assert response.status_code == 200
-    assert json.loads(response.data) == expected_response_data
+    assert json.loads(response.data) == get_nationalities()

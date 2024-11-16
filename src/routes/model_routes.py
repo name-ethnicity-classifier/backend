@@ -166,7 +166,6 @@ def get_default_models_route():
 
     # Get default model data from database
     try:    
-        # default_model_data = GetModelsResponseSchema(**get_default_models()).model_dump()
         default_model_data = get_default_models()
         [N2EModel(**model) for model in default_model_data]
 
