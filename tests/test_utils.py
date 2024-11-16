@@ -104,6 +104,12 @@ def test_is_valid_email():
     assert is_valid_email("test@missingdomain.") == False
 
 
+def test_generate_model_id():
+    nationalities = ["else", "chinese", "dutch"]
+    nationalities_scrambled = ["chinese", "dutch", "else"]
+    assert generate_model_id(nationalities) == generate_model_id(nationalities_scrambled)
+
+
 def test_check_requested_nationalities():
     requested_nationalities = ["chinese", "else"]
     assert check_requested_nationalities(requested_nationalities) == 0

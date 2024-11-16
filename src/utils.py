@@ -1,3 +1,4 @@
+import hashlib
 import re
 from email_validator import validate_email, EmailNotValidError
 from flask import Response, jsonify
@@ -108,6 +109,15 @@ def get_nationalities() -> dict:
     return load_json("./data/nationalities.json")
 
 
+def generate_model_id(nationalities: list[str]) -> str:
+    """
+    Generates a model ID based on its nationalities (sorted alphabetically)
+    :param nationalities: Nationalities the model should be able to classify
+    :return: SHA256 hash id, truncated to 20 characters
+    """
+    return hashlib.sha256(",".join(sorted(set(nationalities))).encode()).hexdigest()[:20]
+
+
 def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     """
     Checks weather a requested nationality configuration is valid, ie. all nationalities do exist
@@ -119,12 +129,14 @@ def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     if len(requested_nationalities) < 2:
         return -1
     
-    nationalities = get_nationalities()["nationalities"].keys()
-    nationality_groups = get_nationalities()["nationalityGroups"].keys()
+    existing_nationalities = get_nationalities()
+    
+    nationalities = list(existing_nationalities["nationalities"].keys()) + ["else"]
+    nationality_groups = list(existing_nationalities["nationalityGroups"].keys()) + ["else"]
 
-    if set(requested_nationalities).issubset(list(nationalities) + ["else"]):
+    if set(requested_nationalities).issubset(nationalities):
         return 0
-    elif set(requested_nationalities).issubset(list(nationality_groups) + ["else"]):
+    elif set(requested_nationalities).issubset(nationality_groups):
         return 1
     return -1
 

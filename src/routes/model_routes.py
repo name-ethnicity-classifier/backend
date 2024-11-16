@@ -1,9 +1,9 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from pydantic import ValidationError
+from pydantic import ValidationError, parse_obj_as
 import traceback
 from sqlalchemy.exc import SQLAlchemyError 
-from schemas.model_schema import AddModelSchema, DeleteModelSchema
+from schemas.model_schema import AddModelSchema, DeleteModelSchema, GetModelsResponseSchema, N2EModel
 from services.model_services import add_model, get_models, get_default_models, delete_models
 from utils import success_response, error_response, check_user_existence
 from errors import CustomError
@@ -127,8 +127,10 @@ def get_models_route():
 
         # Check if user exists
         check_user_existence(user_id)
-    
+
         model_data = get_models(user_id)
+        GetModelsResponseSchema(**model_data)
+
         current_app.logger.info(f"Successfully received model data from user with user id {user_id}.")
         return success_response(
             message="Model data received successfully.",
@@ -165,6 +167,8 @@ def get_default_models_route():
     # Get default model data from database
     try:    
         default_model_data = get_default_models()
+        [N2EModel(**model) for model in default_model_data]
+
         current_app.logger.info(f"Successfully received default model data.")
         return success_response(
             message="Default model data received successfully.",

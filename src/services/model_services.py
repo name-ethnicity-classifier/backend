@@ -1,9 +1,9 @@
-import hashlib
+from sqlalchemy import and_, or_
 from errors import CustomError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
 from db.tables import Model, UserToModel
 from db.database import db
-from utils import check_requested_nationalities
+from utils import check_requested_nationalities, generate_model_id
 
 
 def add_model(user_id: str, data: AddModelSchema) -> None:
@@ -21,31 +21,35 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         raise CustomError(
             error_code="NATIONALITIES_INVALID",
             message=f"Requested nationalities (-groups) are invalid.",
-            status_code=404,
+            status_code=404
         )
 
-    existing_custom_models = UserToModel.query.filter_by(user_id=user_id, name=data.name).all()
-    existing_default_models = Model.query.filter_by(is_custom=False).all()
+    custom_models_name_name = (
+        db.session.query(UserToModel)
+        .filter(UserToModel.user_id == user_id, UserToModel.name == data.name)
+        .first()
+    )
+    public_models_same_name = (
+        db.session.query(Model)
+        .filter(Model.is_public == True, Model.public_name == data.name)
+        .first()
+    )
 
-    all_model_names = [model.name for model in existing_custom_models] + [model.id for model in existing_default_models]
-    if data.name in all_model_names:
+    if custom_models_name_name is not None or public_models_same_name is not None:
         raise CustomError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
             status_code=409,
         )
 
-    # Sort nationalities
-    nationalities = sorted(set(data.nationalities))
-    model_id = hashlib.sha256(",".join(nationalities).encode()).hexdigest()[:20]
+    model_id = generate_model_id(data.nationalities)
+    same_model = Model.query.filter_by(id=model_id).first()
 
-    same_model_exists = Model.query.filter_by(id=model_id).first()
-    if not same_model_exists:
+    if not same_model:
         new_model = Model(
             id=model_id,
-            nationalities=nationalities,
-            is_grouped=(checked_nationalities == 1),
-            is_custom=True
+            nationalities=sorted(set(data.nationalities)),
+            is_grouped=(checked_nationalities == 1)
         )
         db.session.add(new_model)
 
@@ -55,9 +59,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         name=data.name
     )
     db.session.add(user_to_model_entry)
-
     db.session.commit()
-
 
 
 def get_default_models() -> dict:
@@ -67,18 +69,17 @@ def get_default_models() -> dict:
     """
 
     # Get all default models
-    default_models = Model.query.filter_by(is_custom=False).all()
+    default_models = Model.query.filter_by(is_public=True).all()
 
     default_model_data = []
     for model in default_models:
         model = model.to_dict()
         default_model_data.append({
-            "name": model["id"],
+            "name": model["public_name"],
             "accuracy": model["accuracy"],
             "nationalities": model["nationalities"],
             "scores": model["scores"],
             "creationTime": model["creation_time"],
-            "isCustom": model["is_custom"]
         })
 
     return default_model_data
@@ -95,39 +96,49 @@ def get_models(user_id: str) -> dict:
     user_model_relations = UserToModel.query.filter_by(user_id=user_id)
     user_model_ids = [relation.model_id for relation in user_model_relations]
 
-    # Get all custom models
-    custom_models = db.session.query(Model).filter(Model.id.in_(user_model_ids)).all()
-
-    default_model_data = get_default_models()
+    models = (
+        db.session.query(Model)
+        .filter(Model.id.in_(user_model_ids))
+        .order_by(Model.creation_time.desc())
+        .all()
+    )
 
     custom_model_data = []
-    for model in custom_models:
-        model = model.to_dict()
-        custom_model_data.append({
-            "name": user_model_relations.filter_by(model_id=model["id"]).first().name,
-            "accuracy": model["accuracy"],
-            "nationalities": model["nationalities"],
-            "scores": model["scores"],
-            "creationTime": model["creation_time"],
-            "isCustom": model["is_custom"]
-        })
+    for model in models:
+
+        # There might be multiple user_to_models pointing to the same model due to same classes
+        for relation in user_model_relations.filter_by(model_id=model.id).all():
+            custom_model_data.append({
+                "name": relation.name,
+                "accuracy": model.accuracy,
+                "nationalities": model.nationalities,
+                "scores": model.scores,
+                "creationTime": model.creation_time,
+            })
 
     return {
-        "defaultModels": default_model_data,
+        "defaultModels": get_default_models(),
         "customModels": custom_model_data
     }
 
 
-def delete_models(user_id: str, data: DeleteModelSchema) -> None:
+def delete_models(user_id: str, model_names: DeleteModelSchema) -> None:
     """
     Deletes a model-user relation from the database. This does not delete the model itself since 
     it can be shared across multiple users.
     :param user_id: User ID of which to delete the model
-    :param model_name: Name of the model which to delete
+    :param data: Name of the model which to delete
     """
 
     # Get all the users models from the user_to_model table
-    existing_models = UserToModel.query.filter(UserToModel.user_id == user_id, UserToModel.name.in_(data.names)).all()
+    existing_models = UserToModel.query.filter(UserToModel.user_id == user_id, UserToModel.name.in_(model_names.names)).all()
+
+    if len(existing_models) == 0:
+        raise CustomError(
+            error_code="MODEL_DOES_NOT_EXIST",
+            message=f"Model does not exist for this user.",
+            status_code=404,
+        )
 
     if len(existing_models) == 0:
         raise CustomError(

@@ -1,10 +1,7 @@
 from utils import get_nationalities
 from flask import Blueprint, current_app
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from pydantic import ValidationError
 import traceback
-from sqlalchemy.exc import SQLAlchemyError 
-from utils import success_response, error_response, get_nationalities, check_user_existence
+from utils import success_response, error_response, get_nationalities
 
 
 util_routes = Blueprint("utils", __name__)
