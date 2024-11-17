@@ -71,7 +71,7 @@ def test_signup_user_with_invalid_schema(test_client):
 
     response = test_client.post("/signup", json=signup_data)
     assert response.status_code == 400
-    assert json.loads(response.data)["errorCode"] == "INVALID_SIGNUP_DATA"
+    assert json.loads(response.data)["errorCode"] == "VALIDATION_ERROR"
 
 
 @pytest.mark.it("should fail to signup user when they don't consent to ToS")
@@ -126,13 +126,13 @@ def test_login_not_existing_user(test_client):
 @pytest.mark.it("should fail to login user when login schema is invalid")
 def test_login_invalid_user_schema(test_client):
     login_data = {
-        "mail": TEST_USER["email"],     # 'mail' instead of 'email'
+        "mail": TEST_USER["email"], # 'mail' instead of 'email'
         "password": TEST_USER["password"]
     }
 
     response = test_client.post("/login", json=login_data)
     assert response.status_code == 400
-    assert json.loads(response.data)["errorCode"] == "INVALID_LOGIN_DATA"
+    assert json.loads(response.data)["errorCode"] == "VALIDATION_ERROR"
 
 
 @pytest.mark.it("should fail to login user when password is wrong")

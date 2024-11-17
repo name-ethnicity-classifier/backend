@@ -1,7 +1,6 @@
 from utils import get_nationalities
 from flask import Blueprint, current_app
-import traceback
-from utils import success_response, error_response, get_nationalities
+from utils import success_response, get_nationalities
 
 
 util_routes = Blueprint("utils", __name__)
@@ -13,17 +12,7 @@ def get_nationalities_route():
 
     current_app.logger.info(f"Received nationality data request.")
 
-    # Add model to database
-    try:    
-        # Load nationality data
-        nationalities = get_nationalities()
+    nationalities = get_nationalities()
 
-        current_app.logger.info("Successfully loaded nationalities.")
-        return success_response(data=nationalities)
-
-    # Handle unexpected errors
-    except Exception as e:
-        current_app.logger.error(f"Unexpected error while loading nationality data. Error:\n{e}. Traceback:\n{traceback.format_exc()}")
-        return error_response(
-            error_code="UNEXPECTED_ERROR", message="Unexpected error.", status_code=500
-        )
+    current_app.logger.info("Successfully loaded nationalities.")
+    return success_response(data=nationalities)

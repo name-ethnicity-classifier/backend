@@ -1,5 +1,5 @@
 
-from errors import CustomError, InferenceError
+from errors import GeneralError, InferenceError
 from flask import Blueprint, current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from pydantic import ValidationError
@@ -58,7 +58,7 @@ def classification_route():
         )
     
     # Handle custom errors
-    except CustomError as e:
+    except GeneralError as e:
         current_app.logger.error(f"Classification failed. Error:\n{e}. Traceback:\n{traceback.format_exc()}")
         return error_response(
             error_code=e.error_code, message=e.message, status_code=e.status_code

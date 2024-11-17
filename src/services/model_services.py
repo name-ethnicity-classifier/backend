@@ -1,5 +1,5 @@
 from sqlalchemy import and_, or_
-from errors import CustomError
+from errors import GeneralError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
 from db.tables import Model, UserToModel
 from db.database import db
@@ -18,7 +18,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
 
     # Is -1 if requested nationalities don't exist or are mixed with nationality groups
     if checked_nationalities == -1:
-        raise CustomError(
+        raise GeneralError(
             error_code="NATIONALITIES_INVALID",
             message=f"Requested nationalities (-groups) are invalid.",
             status_code=404
@@ -36,7 +36,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
     )
 
     if custom_models_name_name is not None or public_models_same_name is not None:
-        raise CustomError(
+        raise GeneralError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
             status_code=409,
@@ -134,14 +134,7 @@ def delete_models(user_id: str, model_names: DeleteModelSchema) -> None:
     existing_models = UserToModel.query.filter(UserToModel.user_id == user_id, UserToModel.name.in_(model_names.names)).all()
 
     if len(existing_models) == 0:
-        raise CustomError(
-            error_code="MODEL_DOES_NOT_EXIST",
-            message=f"Model does not exist for this user.",
-            status_code=404,
-        )
-
-    if len(existing_models) == 0:
-        raise CustomError(
+        raise GeneralError(
             error_code="MODEL_DOES_NOT_EXIST",
             message=f"Model does not exist for this user.",
             status_code=404,
@@ -161,13 +154,16 @@ def get_model_id_by_name(user_id: str, model_name: str) -> str:
     :return: The model ID
     """
 
-    models = UserToModel.query.filter_by(user_id=user_id, name=model_name).first()
+    user_model = UserToModel.query.filter_by(user_id=user_id, name=model_name).first()
+    if user_model:
+        return user_model.model_id
     
-    if not models:
-        raise CustomError(
-            error_code="MODEL_DOES_NOT_EXIST",
-            message=f"Model with name '{model_name}' does not exist for this user.",
-            status_code=404,
-        )
+    public_model = Model.query.filter_by(public_name=model_name).first()
+    if public_model:
+        return public_model.id
     
-    return models.model_id
+    raise GeneralError(
+        error_code="MODEL_DOES_NOT_EXIST",
+        message=f"Model with name '{model_name}' does not exist.",
+        status_code=404,
+    )
