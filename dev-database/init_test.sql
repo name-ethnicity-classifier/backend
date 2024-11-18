@@ -7,18 +7,20 @@ CREATE TABLE model (
     is_public     BOOLEAN DEFAULT false  NOT NULL,
     public_name   VARCHAR(40),
     creation_time VARCHAR(64)            NOT NULL,
+    request_count INTEGER DEFAULT 0      NOT NULL,
     id            VARCHAR(40)            NOT NULL CONSTRAINT model_pk PRIMARY KEY
 );
 
 CREATE TABLE "user" (
-    email       VARCHAR(320)           NOT NULL,
-    password    VARCHAR(64)            NOT NULL,
-    name        VARCHAR(64)            NOT NULL,
-    role        VARCHAR(32)            NOT NULL,
-    signup_time VARCHAR(64)            NOT NULL,
-    verified    BOOLEAN DEFAULT false  NOT NULL,
-    consented   BOOLEAN DEFAULT false  NOT NULL,
-    id          SERIAL                 NOT NULL CONSTRAINT user_pk PRIMARY KEY
+    email         VARCHAR(320)           NOT NULL,
+    password      VARCHAR(64)            NOT NULL,
+    name          VARCHAR(64)            NOT NULL,
+    role          VARCHAR(32)            NOT NULL,
+    signup_time   VARCHAR(64)            NOT NULL,
+    verified      BOOLEAN DEFAULT false  NOT NULL,
+    consented     BOOLEAN DEFAULT false  NOT NULL,
+    request_count INTEGER DEFAULT 0      NOT NULL,
+    id            SERIAL                 NOT NULL CONSTRAINT user_pk PRIMARY KEY
 );
 
 

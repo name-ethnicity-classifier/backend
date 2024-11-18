@@ -43,7 +43,7 @@ EXISTING_CUSTOM_MODEL = {
 }
 EXISTING_USER_TO_MODEL = {
     "model_id": EXISTING_CUSTOM_MODEL["id"],
-    "user_id": 1,
+    "user_id": EXISTING_USER_ID,
     "request_count": 0,
     "name": "existing-custom-model"
 }

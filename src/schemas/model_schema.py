@@ -12,12 +12,6 @@ class DeleteModelSchema(BaseModel):
     names: list[str]
 
 
-class ClassificationSchema(BaseModel):
-    """ Schema to validate the /classify POST request data """ 
-    modelName: str
-    names: list[str]
-
-
 class N2EModel(BaseModel):
     """ Schema to validate N2E Model data """ 
     name: str

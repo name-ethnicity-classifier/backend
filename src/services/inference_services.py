@@ -1,4 +1,4 @@
-from db.tables import  UserToModel
+from db.tables import  Model, User, UserToModel
 from db.database import db
 
 
@@ -10,6 +10,15 @@ def increment_request_counter(user_id: str, model_id: str) -> None:
     :return: None
     """
 
-    user_to_model = UserToModel.query.filter_by(user_id=user_id, model_id=model_id).first()
-    user_to_model.request_count += 1
+    user = User.query.filter_by(id=user_id).first()
+    user.request_count += 1
     db.session.commit()
+
+    model = Model.query.filter_by(id=model_id).first()
+    model.request_count += 1
+    db.session.commit()
+    
+    user_to_model = UserToModel.query.filter_by(user_id=user_id, model_id=model_id).first()
+    if user_to_model:
+        user_to_model.request_count += 1
+        db.session.commit()

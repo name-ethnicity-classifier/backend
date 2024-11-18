@@ -14,8 +14,7 @@ class User(db.Model):
     password = db.Column(db.String(64), nullable=False)
     verified = db.Column(db.Boolean, default=False)
     consented = db.Column(db.Boolean, default=False)
-
-    # models = relationship("Model", secondary="user_to_model")
+    request_count = db.Column(db.Integer, default=0, nullable=False)
 
     def to_dict(self):
         return {
@@ -26,7 +25,8 @@ class User(db.Model):
             "role": self.role,
             "password": self.password,
             "verified": self.consented,
-            "consented": self.consented
+            "consented": self.consented,
+            "request_count": self.request_count
         }
 
 
@@ -42,6 +42,7 @@ class Model(db.Model):
     is_grouped = db.Column(db.Boolean, default=False, nullable=False)
     is_public = db.Column(db.Boolean, default=False, nullable=True)
     public_name = db.Column(db.String(40), nullable=False)
+    request_count = db.Column(db.Integer, default=0, nullable=False)
     creation_time = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     def to_dict(self):
@@ -54,6 +55,7 @@ class Model(db.Model):
             "is_grouped": self.is_grouped,
             "is_public": self.is_public,
             "public_name": self.public_name,
+            "request_count": self.request_count,
             "creation_time": self.creation_time,
         }
 

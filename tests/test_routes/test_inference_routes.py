@@ -1,43 +1,68 @@
 import hashlib
 import os
+from unittest.mock import patch
 import bcrypt
 from flask import jsonify
+from flask_jwt_extended import create_access_token
 import pytest
 import json
 from pathlib import Path
 from sqlalchemy import text
+from schemas.inference_schema import InferenceDistributionResponseSchema, InferenceResponseSchema
 from utils import *
 from app import app
 from db.database import db
 from db.tables import User, Model, UserToModel
 
 
+# Ensure this model configuration exist inside model_configuration/
+DEFAULT_MODEL = {
+    "public_name": "default-model",
+    "nationalities": (classes := sorted(set(["chinese", "else"]))),
+    "accuracy": 98.5,
+    "scores": [98.0, 99.0],
+    "is_trained": True,
+    "is_grouped": False,
+    "is_public": True,
+    "id": generate_model_id(classes),
+}
+
 TEST_USER = {
     "name": "user",
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
-    "consented": True,
-    "verified": True
+    "verified": True,
+    "consented": True
 }
+TEST_USER_ID = 1
+
+# Ensure this model configuration exist inside model_configuration/
 CUSTOM_MODEL = {
-    "name": "test-custom-model",
-    "nationalities": ["chinese", "else"],
+    "public_name": None,
+    "nationalities": (classes := sorted(set(["japanese", "else"]))),
     "accuracy": 98.5,
     "scores": [98.0, 99.0],
     "is_trained": True,
     "is_grouped": False,
-    "is_public": False
+    "is_public": False,
+    "id": generate_model_id(classes),
 }
-TEST_CLASSIFICATION_DATA = {
-    "modelName": CUSTOM_MODEL["name"],
-    "names": ["peter schmidt", "cixin liu"],
-    "getDistribution": False
+USER_TO_MODEL = {
+    "model_id": CUSTOM_MODEL["id"],
+    "user_id": TEST_USER_ID,
+    "request_count": 0,
+    "name": "custom-model"
 }
-TEST_EXPECTED_PREDICTIONS = {"cixin liu": "chinese", "peter schmidt": "else"}
+USER_TO_DEFAULT_MODEL = {
+    "model_id": DEFAULT_MODEL["id"],
+    "user_id": TEST_USER_ID,
+    "request_count": 0,
+    "name": "custom-model-same-as-default"
+}
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def app_context():
     with app.app_context():
         db.drop_all()
@@ -45,109 +70,139 @@ def app_context():
             init_sql_script = file.read()    
             db.session.execute(text(init_sql_script))
 
-        # Add user with whom to test the inference
-        existing_test_user = User(
-            name=TEST_USER["name"],
-            email=TEST_USER["email"],
-            role=TEST_USER["role"],
-            password=bcrypt.hashpw(TEST_USER["password"].encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),
-            verified=TEST_USER["verified"],
-            consented=TEST_USER["consented"]
-        )
-        db.session.add(existing_test_user)
+        # Add a default model, the test user, a custom trained model and
+        # a custom model that points to the default model because it has the same classes
+        db.session.add(Model(**DEFAULT_MODEL))
+        db.session.add(User(**TEST_USER))
+        db.session.add(Model(**CUSTOM_MODEL))
+        db.session.add(UserToModel(**USER_TO_MODEL))
+        db.session.add(UserToModel(**USER_TO_DEFAULT_MODEL))
         db.session.commit()
 
-        # Add a custom model with classes [chinese, else]
-        model_id = generate_model_id(CUSTOM_MODEL["nationalities"])
+        if not Path(f"./model_configurations/{DEFAULT_MODEL['id']}").exists():
+            raise FileNotFoundError(f"For this test, the ./model_configurations/ folder is expected to have a folder with the 'model_id' ({DEFAULT_MODEL['id']}) as name! It must contain a valid model configuration with a .pt file, etc.")
 
-        if not Path(f"./model_configurations/{model_id}").exists():
-            raise FileNotFoundError(f"For this test, the ./model_configurations/ folder is expected to have a folder with the 'model_id' ({model_id}) as name! It must contain a valid model configuration with a .pt file, etc.")
-
-        existing_model = Model(
-            id=model_id,
-            public_name=CUSTOM_MODEL["name"],
-            nationalities=sorted(set(CUSTOM_MODEL["nationalities"])),
-            accuracy=CUSTOM_MODEL["accuracy"],
-            scores=CUSTOM_MODEL["scores"],
-            is_trained=CUSTOM_MODEL["is_trained"],
-            is_grouped=CUSTOM_MODEL["is_grouped"],
-            is_public=CUSTOM_MODEL["is_public"]
-        )
-        db.session.add(existing_model)
-        db.session.commit()
-
-        user_to_model_link = UserToModel(
-            model_id=existing_model.id,
-            user_id=existing_test_user.id,
-            request_count=0,
-            name=CUSTOM_MODEL["name"]
-        )
-        db.session.add(user_to_model_link)
-        db.session.commit()
+        if not Path(f"./model_configurations/{CUSTOM_MODEL['id']}").exists():
+            raise FileNotFoundError(f"For this test, the ./model_configurations/ folder is expected to have a folder with the 'model_id' ({CUSTOM_MODEL['id']}) as name! It must contain a valid model configuration with a .pt file, etc.")
 
         yield app
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_client(app_context):
-    login_data = {
-        "email": TEST_USER["email"],
-        "password": TEST_USER["password"]
-    }
-    response = app.test_client().post("/login", json=login_data)
-
-    assert response.status_code == 200
-
-    return app_context.test_client(), json.loads(response.data)["data"]["accessToken"]
+    client = app.test_client()
+    user = User(**TEST_USER)
+    db.session.add(user)
+    db.session.commit()
+    return client
 
 
-def test_classification(test_client):
-    test_client, token = test_client
+@pytest.fixture(scope="function")
+def authenticated_client(test_client):
+    """Mocks user authentication for tests requiring it."""
+    with patch("flask_jwt_extended.get_jwt_identity") as mock_identity:
+        mock_identity.return_value = TEST_USER_ID
 
-    response = test_client.post(
+        with app.test_request_context():
+            token = create_access_token(identity=TEST_USER_ID)
+        test_client.token = token
+        yield test_client
+
+
+@pytest.mark.it("should respond with correct predictions when classfiying using a custom model")
+def test_custom_model_classification(authenticated_client):
+    response = authenticated_client.post(
         "/classify",
-        json=TEST_CLASSIFICATION_DATA,
-        headers={"Authorization": f"Bearer {token}"}
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt", "cixin liu"],
+            "getDistribution": False
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
-    classifaction_result = json.loads(response.data)
-    # Schema: { <name: str>: [<predicted class: str>, <confidence: float>], ... }
+    classification_result = json.loads(response.data)
+
+    InferenceResponseSchema(**classification_result)
 
     assert response.status_code == 200
-    classified_ethnicities = {name: prediction[0] for name, prediction in classifaction_result.items()}
-    assert classified_ethnicities == TEST_EXPECTED_PREDICTIONS
+    classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
+    assert classified_ethnicities == {"cixin liu": "japanese", "peter schmidt": "else"}
 
-    # Check if the request counter got incremented from 0 to 1
-    user_id = User.query.filter_by(email=TEST_USER["email"]).first().id
-    request_count = UserToModel.query.filter_by(user_id=user_id, name=CUSTOM_MODEL["name"]).first().request_count
-    assert request_count == 1
+    assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
+    assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
 
 
-def test_get_classification_distribution(test_client):
-    test_client, token = test_client
+@pytest.mark.it("should respond with a output distribution for all classes when classfiying using 'getDistribution' set to 'True'")
+def test_custom_model_classification_distribution(authenticated_client):
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt", "cixin liu"],
+            "getDistribution": True
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    classification_result = json.loads(response.data)
 
-    test_header = {
-        "Authorization": f"Bearer {token}"
-    }
-
-    TEST_CLASSIFICATION_DATA["getDistribution"] = True
-
-    response = test_client.post("/classify", json=TEST_CLASSIFICATION_DATA, headers=test_header)
-    classifaction_result = json.loads(response.data)
-    # Schema: { <name: str>: {<class 1: str>: <confidence: float>, <class 2: str>: <confidcence: float>}, ... }
-
+    InferenceDistributionResponseSchema(**classification_result)
     assert response.status_code == 200
     
     # Get the ethnicites with the highest confidence to check if they match expected predictions
     top_one_ethnicities = {}
-    for name in classifaction_result:
-        ethnicity_dist = classifaction_result[name]
+    for name in classification_result:
+        ethnicity_dist = classification_result[name]
         top_one_ethnicities[name] = max(ethnicity_dist, key=ethnicity_dist.get)
 
-    assert top_one_ethnicities == TEST_EXPECTED_PREDICTIONS
+    assert top_one_ethnicities == {"cixin liu": "japanese", "peter schmidt": "else"}
+    assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
+    assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
 
 
-def test_classification_with_default_model(test_client):
-    test_client, token = test_client
+@pytest.mark.it("should respond with correct predictions when classfiying using a custom model which points to a default model with same classes")
+def test_custom_same_as_default_model_classification(authenticated_client):
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_DEFAULT_MODEL["name"],
+            "names": ["peter schmidt", "cixin liu"],
+            "getDistribution": False
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    classification_result = json.loads(response.data)
+
+    InferenceResponseSchema(**classification_result)
+
+    assert response.status_code == 200
+    classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
+    assert classified_ethnicities == {"cixin liu": "chinese", "peter schmidt": "else"}
+
+    assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
+    assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_DEFAULT_MODEL["name"]).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
 
 
-    # TODO
+@pytest.mark.it("should respond with correct predictions when classfiying using a default model")
+def test_default_model_classification(authenticated_client):
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": DEFAULT_MODEL["public_name"],
+            "names": ["peter schmidt", "cixin liu"],
+            "getDistribution": False
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    classification_result = json.loads(response.data)
+
+    InferenceResponseSchema(**classification_result)
+
+    assert response.status_code == 200
+    classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
+    assert classified_ethnicities == {"cixin liu": "chinese", "peter schmidt": "else"}
+
+    assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1  
