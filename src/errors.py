@@ -29,6 +29,9 @@ def error_handler(func: callable):
         except GeneralError as e:
             current_app.logger.error(f"Custom error: {e.message}")
             return error_response(e.error_code, e.message, e.status_code)
+        except InferenceError as e:
+            current_app.logger.error(f"Inference error: {e.message}")
+            return error_response(e.error_code, e.message, e.status_code)
         except SQLAlchemyError as e:
             current_app.logger.error(f"Database error: {e}")
             return error_response("UNEXPECTED_ERROR", "An unexpected error occurred.", 500)

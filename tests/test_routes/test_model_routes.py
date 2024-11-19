@@ -71,6 +71,7 @@ def app_context():
         db.session.add(User(**EXISTING_USER))
         db.session.add(Model(**EXISTING_CUSTOM_MODEL))
         db.session.add(UserToModel(**EXISTING_USER_TO_MODEL))
+        db.session.add(User(**TEST_USER))
         db.session.commit()
 
         yield app
@@ -79,9 +80,6 @@ def app_context():
 @pytest.fixture(scope="function")
 def test_client(app_context):
     client = app.test_client()
-    user = User(**TEST_USER)
-    db.session.add(user)
-    db.session.commit()
     return client
 
 

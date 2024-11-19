@@ -62,6 +62,7 @@ def add_user(data: SignupSchema) -> None:
     """
 
     user = User.query.filter_by(email=data.email).first()
+    # TODO make case insensitive
 
     if user:
         raise GeneralError(

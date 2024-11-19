@@ -91,9 +91,6 @@ def app_context():
 @pytest.fixture(scope="function")
 def test_client(app_context):
     client = app.test_client()
-    user = User(**TEST_USER)
-    db.session.add(user)
-    db.session.commit()
     return client
 
 
@@ -131,6 +128,7 @@ def test_custom_model_classification(authenticated_client):
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2
 
 
 @pytest.mark.it("should respond with a output distribution for all classes when classfiying using 'getDistribution' set to 'True'")
@@ -159,6 +157,7 @@ def test_custom_model_classification_distribution(authenticated_client):
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2
 
 
 @pytest.mark.it("should respond with correct predictions when classfiying using a custom model which points to a default model with same classes")
@@ -183,6 +182,7 @@ def test_custom_same_as_default_model_classification(authenticated_client):
     assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_DEFAULT_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2
 
 
 @pytest.mark.it("should respond with correct predictions when classfiying using a default model")
@@ -205,4 +205,5 @@ def test_default_model_classification(authenticated_client):
     assert classified_ethnicities == {"cixin liu": "chinese", "peter schmidt": "else"}
 
     assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
-    assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1  
+    assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
+    assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2

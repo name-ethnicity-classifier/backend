@@ -29,6 +29,8 @@ def app_context():
         with open("./dev-database/init_test.sql", "r") as file:
             init_sql_script = file.read()    
             db.session.execute(text(init_sql_script))
+
+        db.session.add(User(**TEST_USER))
         db.session.commit()
 
         yield app
@@ -37,9 +39,6 @@ def app_context():
 @pytest.fixture(scope="function")
 def test_client(app_context):
     client = app.test_client()
-    user = User(**TEST_USER)
-    db.session.add(user)
-    db.session.commit()
     return client
 
 
