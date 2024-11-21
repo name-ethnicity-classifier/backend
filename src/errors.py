@@ -13,9 +13,10 @@ class GeneralError(Exception):
 
 
 class InferenceError(Exception):
-    def __init__(self, error_code: str, message: str):
+    def __init__(self, error_code: str, message: str, status_code: str):
         self.error_code = error_code
         self.message = message
+        self.status_code = status_code
 
 
 def error_handler(func: callable):
