@@ -15,7 +15,7 @@ def check_user_login(data: LoginSchema) -> str:
     :param data: User email and password
     """
 
-    user = User.query.filter_by(email=data.email).first()
+    user = User.query.filter(User.email.ilike(data.email)).first()
 
     if not user:
         raise GeneralError(
@@ -61,8 +61,7 @@ def add_user(data: SignupSchema) -> None:
     :param data: User sign up data
     """
 
-    user = User.query.filter_by(email=data.email).first()
-    # TODO make case insensitive
+    user = User.query.filter(User.email.ilike(data.email)).first()
 
     if user:
         raise GeneralError(

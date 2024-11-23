@@ -100,6 +100,19 @@ def test_signup_user_with_existing_email(test_client):
     assert json.loads(response.data)["errorCode"] == "EMAIL_EXISTS"
 
 
+@pytest.mark.it("should fail to signup user when other user already has same email address but with different casing")
+def test_signup_user_with_existing_email_uppercase(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
+    same_user = TEST_USER.copy()
+    same_user["email"] = same_user["email"].upper()
+    
+    response = test_client.post("/signup", json=same_user)
+    assert response.status_code == 409
+    assert json.loads(response.data)["errorCode"] == "EMAIL_EXISTS"
+
+
 @pytest.mark.it("should return JWT token when user logs in successully")
 def test_login_user(test_client):
     response = test_client.post("/signup", json=TEST_USER)
@@ -108,6 +121,19 @@ def test_login_user(test_client):
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
+    )
+    assert response.status_code == 200
+    assert "accessToken" in json.loads(response.data)["data"]
+
+
+@pytest.mark.it("should return JWT token when user logs in successully but with different email casing")
+def test_login_user_email_uppercase(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
+    response = test_client.post(
+        "/login",
+        json={"email": TEST_USER["email"].upper(), "password": TEST_USER["password"]}
     )
     assert response.status_code == 200
     assert "accessToken" in json.loads(response.data)["data"]
