@@ -56,7 +56,8 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
     user_to_model_entry = UserToModel(
         model_id=model_id,
         user_id=user_id,
-        name=data.name
+        name=data.name,
+        description=data.description
     )
     db.session.add(user_to_model_entry)
     db.session.commit()
@@ -110,6 +111,7 @@ def get_models(user_id: str) -> dict:
         for relation in user_model_relations.filter_by(model_id=model.id).all():
             custom_model_data.append({
                 "name": relation.name,
+                "description": relation.description,
                 "accuracy": model.accuracy,
                 "nationalities": model.nationalities,
                 "scores": model.scores,

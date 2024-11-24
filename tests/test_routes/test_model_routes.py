@@ -45,7 +45,8 @@ EXISTING_USER_TO_MODEL = {
     "model_id": EXISTING_CUSTOM_MODEL["id"],
     "user_id": EXISTING_USER_ID,
     "request_count": 0,
-    "name": "existing-custom-model"
+    "name": "existing-custom-model",
+    "description": "Model for unit testing."
 }
 
 TEST_USER = {
@@ -107,7 +108,7 @@ def test_add_custom_model(authenticated_client):
     classes = ["german", "else"]
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": classes},
+        json={"name": model_name, "nationalities": classes, "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -124,7 +125,7 @@ def test_add_custom_model_with_same_classes(authenticated_client):
     classes = ["german", "else"]
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": classes},
+        json={"name": model_name, "nationalities": classes, "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -133,7 +134,7 @@ def test_add_custom_model_with_same_classes(authenticated_client):
     second_model_name = "different_name"
     response = authenticated_client.post(
         "/models",
-        json={"name": second_model_name, "nationalities": classes},
+        json={"name": second_model_name, "nationalities": classes, "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -149,7 +150,7 @@ def test_add_custom_model_with_same_classes_as_default(authenticated_client):
     model_name = "new_model"
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": DEFAULT_MODEL["nationalities"]},
+        json={"name": model_name, "nationalities": DEFAULT_MODEL["nationalities"], "description": None},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -164,7 +165,7 @@ def test_add_custom_model_with_same_name(authenticated_client):
     model_name = "new_model"
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": ["japanese", "else"]},
+        json={"name": model_name, "nationalities": ["japanese", "else"], "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -172,7 +173,7 @@ def test_add_custom_model_with_same_name(authenticated_client):
 
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": ["german", "else"]},
+        json={"name": model_name, "nationalities": ["german", "else"], "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -184,7 +185,7 @@ def test_add_custom_model_with_same_name(authenticated_client):
 def test_add_custom_model_with_same_name_as_default_model(authenticated_client):
     response = authenticated_client.post(
         "/models",
-        json={"name": DEFAULT_MODEL["public_name"], "nationalities": ["japanese", "else"]},
+        json={"name": DEFAULT_MODEL["public_name"], "nationalities": ["japanese", "else"], "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -198,7 +199,7 @@ def test_add_custom_model_with_same_name_as_other_users_model(authenticated_clie
     classes = ["german", "else"]
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": classes},
+        json={"name": model_name, "nationalities": classes, "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -213,7 +214,7 @@ def test_add_custom_model_with_same_classes_other_user(authenticated_client):
     model_name = "new_model"
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": EXISTING_CUSTOM_MODEL["nationalities"]},
+        json={"name": model_name, "nationalities": EXISTING_CUSTOM_MODEL["nationalities"], "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -221,6 +222,25 @@ def test_add_custom_model_with_same_classes_other_user(authenticated_client):
     assert json.loads(response.data) == {"message": "Model added successfully."}
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, model_id=EXISTING_CUSTOM_MODEL["id"], name=model_name).first() is not None
     assert Model.query.filter_by(id=EXISTING_CUSTOM_MODEL["id"]).first() is not None
+
+
+@pytest.mark.it("should add a new user-to-model entry when creating a custom model without a description")
+def test_add_custom_model_with_no_description(authenticated_client):
+    model_name = "new_model"
+    classes = ["german", "else"]
+    
+    response = authenticated_client.post(
+        "/models",
+        json={"name": model_name, "nationalities": classes},
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    model_id = generate_model_id(classes)
+
+    assert response.status_code == 200
+    assert json.loads(response.data) == {"message": "Model added successfully."}
+    assert UserToModel.query.filter_by(user_id=TEST_USER_ID, model_id=model_id, name=model_name).first() is not None
+    assert UserToModel.query.filter_by(user_id=TEST_USER_ID, model_id=model_id, name=model_name).first().description == None
+    assert Model.query.filter_by(id=model_id).first() is not None
 
 
 @pytest.mark.it("should retrieve all custom and default models the user has access to")
@@ -234,7 +254,7 @@ def test_get_all_models(authenticated_client):
     for name, classes in models_to_create:
         response = authenticated_client.post(
             "/models",
-            json={"name": name, "nationalities": classes},
+            json={"name": name, "nationalities": classes, "description": ""},
             headers={"Authorization": f"Bearer {authenticated_client.token}"}
         )
     
@@ -265,7 +285,7 @@ def test_delete_custom_model_relation(authenticated_client):
     classes = ["german", "else"]
     response = authenticated_client.post(
         "/models",
-        json={"name": model_name, "nationalities": classes},
+        json={"name": model_name, "nationalities": classes, "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
@@ -300,7 +320,7 @@ def test_delete_default_model(authenticated_client):
 def test_delete_default_model(authenticated_client, mock_bcrypt_checkpw):
     response = authenticated_client.post(
         "/models",
-        json={"name": "new_model", "nationalities": ["german", "else"]},
+        json={"name": "new_model", "nationalities": ["german", "else"], "description": ""},
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
     assert response.status_code == 200

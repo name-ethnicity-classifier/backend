@@ -42,7 +42,7 @@ class Model(db.Model):
     scores = db.Column(db.ARRAY(db.Float), nullable=True)
     is_trained = db.Column(db.Boolean, default=False, nullable=False)
     is_grouped = db.Column(db.Boolean, default=False, nullable=False)
-    is_public = db.Column(db.Boolean, default=False, nullable=True)
+    is_public = db.Column(db.Boolean, default=False, nullable=False)
     public_name = db.Column(db.String(40), nullable=False)
     request_count = db.Column(db.Integer, default=0, nullable=False)
     creation_time = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
@@ -71,6 +71,7 @@ class UserToModel(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     request_count = db.Column(db.Integer, default=0, nullable=False)
     name = db.Column(db.String(40), nullable=False)
+    description = db.Column(db.String(512), nullable=True)
 
     def to_dict(self):
         return {
@@ -78,5 +79,6 @@ class UserToModel(db.Model):
             "model_id": self.model_id,
             "user_id": self.user_id,
             "request_count": self.request_count,
-            "name": self.name
+            "name": self.name,
+            "description": self.description
         }
