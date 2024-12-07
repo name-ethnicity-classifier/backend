@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import and_, or_
 from errors import GeneralError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
@@ -23,10 +24,34 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
             message=f"Requested nationalities (-groups) are invalid.",
             status_code=404
         )
+    
+    if len(data.name) > 64 or len(data.name) == 0:
+        raise GeneralError(
+            error_code="MODEL_NAME_INVALID",
+            message=f"Model name too long or not existant.",
+            status_code=422
+        )
+    
+    if data.description and len(data.description) > 300:
+        raise GeneralError(
+            error_code="MODEL_DESCRIPTION_INVALID",
+            message=f"Model description too long.",
+            status_code=422
+        )
+    
+    all_custom_models = db.session.query(UserToModel).filter(UserToModel.user_id == user_id)
 
-    custom_models_name_name = (
-        db.session.query(UserToModel)
-        .filter(UserToModel.user_id == user_id, UserToModel.name == data.name)
+    MAX_MODELS_PER_USER = int(os.getenv("MAX_MODELS"))
+    if len(all_custom_models.all()) >= MAX_MODELS_PER_USER:
+        raise GeneralError(
+            error_code="MAX_MODELS_REACHED",
+            message=f"Maximum amounts of models reached.",
+            status_code=405
+        )
+
+    custom_models_same_name = (
+        all_custom_models
+        .filter(UserToModel.name == data.name)
         .first()
     )
     public_models_same_name = (
@@ -35,7 +60,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         .first()
     )
 
-    if custom_models_name_name is not None or public_models_same_name is not None:
+    if custom_models_same_name is not None or public_models_same_name is not None:
         raise GeneralError(
             error_code="MODEL_NAME_EXISTS",
             message=f"Model with name '{data.name}' already exists for this user.",
@@ -120,7 +145,7 @@ def get_models(user_id: str) -> dict:
 
     return {
         "defaultModels": get_default_models(),
-        "customModels": custom_model_data
+        "customModels": custom_model_data[::-1]
     }
 
 

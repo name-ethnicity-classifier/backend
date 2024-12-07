@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 from flask import jsonify
 from flask_jwt_extended import create_access_token
@@ -97,6 +98,12 @@ def authenticated_client(test_client):
 
 
 @pytest.fixture
+def mock_max_models_env():
+    with patch("src.model_services.os.getenv", side_effect=(lambda arg: 0 if arg == "MAX_MODELS" else os.getenv(arg))):
+        yield
+
+
+@pytest.fixture
 def mock_bcrypt_checkpw():
     with patch("bcrypt.checkpw", return_value=True):
         yield
@@ -191,6 +198,55 @@ def test_add_custom_model_with_same_name_as_default_model(authenticated_client):
 
     assert response.status_code == 409
     assert json.loads(response.data)["errorCode"] == "MODEL_NAME_EXISTS"
+
+
+@pytest.mark.it("should fail to add a custom model when the model name is too long or empty")
+def test_add_custom_model_with_invalid_name(authenticated_client):
+    too_long_name = "a" * 65
+    response = authenticated_client.post(
+        "/models",
+        json={"name": too_long_name, "nationalities": ["japanese", "else"], "description": ""},
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 422
+    assert json.loads(response.data)["errorCode"] == "MODEL_NAME_INVALID"
+
+    response = authenticated_client.post(
+        "/models",
+        json={"name": "", "nationalities": ["japanese", "else"], "description": ""},
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 422
+    assert json.loads(response.data)["errorCode"] == "MODEL_NAME_INVALID"
+
+
+@pytest.mark.it("should fail to add a custom model when the model description is too long")
+def test_add_custom_model_with_invalid_description(authenticated_client):
+    too_long_description = "lorem ipsum" * 301
+    response = authenticated_client.post(
+        "/models",
+        json={"name": "new_model", "nationalities": ["japanese", "else"], "description": too_long_description},
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 422
+    assert json.loads(response.data)["errorCode"] == "MODEL_DESCRIPTION_INVALID"
+
+
+@pytest.mark.it("should fail to add a custom model when the maximum is reached")
+def test_add_custom_model_but_maximum_reached(authenticated_client, monkeypatch):
+    monkeypatch.setenv("MAX_MODELS", "0")
+
+    response = authenticated_client.post(
+        "/models",
+        json={"name": "new_model", "nationalities": ["japanese", "else"], "description": ""},
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 405
+    assert json.loads(response.data)["errorCode"] == "MAX_MODELS_REACHED"
 
 
 @pytest.mark.it("should add a new custom model and user-to-model relation when creating a model with the same name of another users model")

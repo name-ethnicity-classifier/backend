@@ -123,11 +123,11 @@ def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     :return: 0 if valid normal nationalities, 1 if valid nationality groups, -1 if invalid
     """
 
-    if len(requested_nationalities) < 2:
-        return -1
-    
     existing_nationalities = get_nationalities()
-    
+
+    if len(requested_nationalities) < 2 or len(requested_nationalities) > len(existing_nationalities["nationalities"]):
+        return -1
+        
     nationalities = list(existing_nationalities["nationalities"].keys()) + ["else"]
     nationality_groups = list(existing_nationalities["nationalityGroups"].keys()) + ["else"]
 
