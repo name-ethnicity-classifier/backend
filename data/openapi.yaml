@@ -47,7 +47,7 @@ paths:
       tags:
         - Endpoints
       summary: Retrieve all of your custom models
-      description: This endpoint will return a list containing all of your custom trained models along with the following information
+      description: This endpoint will return a list containing all of your custom trained and default models along with the following information
       
         - ethnicities it can classifiy between
         
@@ -63,7 +63,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Model'
+                  $ref: '#/components/schemas/Models'
         '500':
           description: Server side error
       security:
@@ -74,20 +74,56 @@ paths:
       tags:
         - Endpoints
       summary: Classifiy names into their ethnicities
-      description: Using this endpoint you can classifiy names into their most likely ethnicity. You can choose to either retrieve the most likely ethnicity of a given name or the entire distribution.
+      description: |
+        Using this endpoint, you can classify names into their most likely ethnicity.  
+        - If `getDistribution` is **False**, the response provides the most likely ethnicity and its confidence.  
+        - If `getDistribution` is **True**, the response provides the entire confidence distribution.
       operationId: classifyNames
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Classification'
+
       responses:
         '200':
           description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClassificationSuccessful'
+                oneOf:
+                  - $ref: '#/components/schemas/ClassifiedNames'
+                  - $ref: '#/components/schemas/ClassifiedNamesDistribution'
+              examples:
+                mostLikelyConfidence:
+                  summary: getDistribution = false
+                  description: Response when `getDistribution` is **False** returns the ethnicity with the highest confidence.
+                  value:
+                    cixin liu:
+                      - "chinese"
+                      - 0.97
+                    john doe:
+                      - "american"
+                      - 0.85
+                    theo baumgartner:
+                      - "german"
+                      - 0.92
+                confidenceDistribution:
+                  summary: getDistribution = true
+                  description: Response when `getDistribution` is **True** returns the entire confidence distribution (sums up to 1.0).
+                  value:
+                    cixin liu:
+                      chinese: 0.97
+                      american: 0.02
+                      german: 0.01
+                    john doe:
+                      chinese: 0.85
+                      american: 0.10
+                      german: 0.05
+                    theo baumgartner:
+                      chinese: 0.04
+                      american: 0.04
+                      german: 0.92
         '300':
           description: Unexpected classification error
         '411':
@@ -104,29 +140,26 @@ components:
       properties:
         modelName:
           type: string
-          example: "chinese_and_else"
+          example: "american_chinese_german"
         names:
           type: array
           items:
             type: string
-          example: ["cixin liu", "samuel jackson"]
+          example: ["cixin liu", "john doe", "theo baumgartner"]
         getDistribution:
           type: boolean
           example: false
 
-    ClassificationSuccessful:
-      type: object
-      properties:
-        message:
-          type: string
-          example: "Successfully classified names."
-  
     Model:
       type: object
       properties:
         name:
           type: string
           example: chinese_and_else
+        description:
+          type: string
+          nullable: true
+          example: "Example model description."
         accuracy:
           type: number
           example: 0.98
@@ -144,9 +177,57 @@ components:
         creationTime:
           type: string
           example: "01-01-2021T07:21:00"
-        isCustom:
-          type: boolean
-          example: true
+
+    Models:
+      type: object
+      properties:
+        defaultModels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Model'
+        customModels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Model'
+
+    ClassifiedNames:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          oneOf:
+            - type: string
+              description: "Classified ethnicity."
+            - type: number
+              description: "Confidence of prediction."
+      example:
+        cixin liu:
+          - "chinese"
+          - 0.99
+        john doe:
+          - "american"
+          - 0.85
+
+    ClassifiedNamesDistribution:
+      type: object
+      additionalProperties:
+        type: object
+        additionalProperties:
+          type: number
+          example: 0.95
+      example:
+        cixin liu:
+          chinese: 0.97
+          american: 0.02
+          german: 0.01
+        john doe:
+          chinese: 0.85
+          american: 0.10
+          german: 0.05
+        theo baumgartner:
+          chinese: 0.01
+          american: 0.04
+          german: 0.95
             
   securitySchemes:
     api_key:
