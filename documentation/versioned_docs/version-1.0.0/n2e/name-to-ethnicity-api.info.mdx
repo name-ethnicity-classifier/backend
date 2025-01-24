@@ -1,0 +1,117 @@
+---
+id: name-to-ethnicity-api
+title: "Name-to-Ethnicity API"
+description: "This is the official REST API documentation for www.name-to-ethnicity.com."
+sidebar_label: Introduction
+sidebar_position: 0
+hide_title: true
+custom_edit_url: null
+---
+
+import ApiLogo from "@theme/ApiLogo";
+import Heading from "@theme/Heading";
+import SchemaTabs from "@theme/SchemaTabs";
+import TabItem from "@theme/TabItem";
+import Export from "@theme/ApiExplorer/Export";
+
+<span
+  className={"theme-doc-version-badge badge badge--secondary"}
+  children={"Version: 1.0.0"}
+>
+</span>
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Name-to-Ethnicity API"}
+>
+</Heading>
+
+
+
+This is the official REST API documentation for www.name-to-ethnicity.com.
+Using our public API you can classify names into their most likely ethnicity.
+
+<div
+  style={{"marginBottom":"2rem"}}
+>
+  <Heading
+    id={"authentication"}
+    as={"h2"}
+    className={"openapi-tabs__heading"}
+    children={"Authentication"}
+  >
+  </Heading><SchemaTabs
+    className={"openapi-tabs__security-schemes"}
+  >
+    <TabItem
+      label={"HTTP: Bearer Auth"}
+      value={"BearerAuth"}
+    >
+      
+      
+      For authorizing your requests, use the "Authorization" header in the format of "Bearer \{token\}". To get your API token visit https://www.name-to-ethnicity.com and create an account.
+      
+      <div>
+        <table>
+          <tbody>
+            <tr>
+              <th>
+                Security Scheme Type:
+              </th><td>
+                http
+              </td>
+            </tr><tr>
+              <th>
+                HTTP Authorization Scheme:
+              </th><td>
+                bearer
+              </td>
+            </tr><tr>
+              <th>
+                Bearer format:
+              </th><td>
+                JWT
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </TabItem>
+  </SchemaTabs>
+</div><div
+  style={{"display":"flex","flexDirection":"column","marginBottom":"var(--ifm-paragraph-margin-bottom)"}}
+>
+  <h3
+    style={{"marginBottom":"0.25rem"}}
+  >
+    Contact
+  </h3><span>
+    [theodorpeifer@gmail.com](mailto:theodorpeifer@gmail.com)
+  </span>
+</div><div
+  style={{"marginBottom":"var(--ifm-paragraph-margin-bottom)"}}
+>
+  <h3
+    style={{"marginBottom":"0.25rem"}}
+  >
+    Terms of Service
+  </h3><a
+    href={"https://www.name-to-ethnicity.com/terms-of-service"}
+  >
+    {'https://www.name-to-ethnicity.com/terms-of-service'}
+  </a>
+</div><div
+  style={{"marginBottom":"var(--ifm-paragraph-margin-bottom)"}}
+>
+  <h3
+    style={{"marginBottom":"0.25rem"}}
+  >
+    License
+  </h3><a
+    href={"http://www.apache.org/licenses/LICENSE-2.0.html"}
+  >
+    Apache 2.0
+  </a>
+</div>
+      

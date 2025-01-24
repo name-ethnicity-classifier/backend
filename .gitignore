@@ -4,3 +4,4 @@
 **/__pycache__/
 .fuse_*
 !model_configurations/test_model
+documentation/node_modules/

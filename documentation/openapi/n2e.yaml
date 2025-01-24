@@ -1,9 +1,10 @@
 openapi: 3.0.3
 info:
-  title: name-to-ethnicity API
+  title: Name-to-Ethnicity API
   description: |-
-    This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retireve a list of all your models.
-    
+    This is the official REST API documentation for www.name-to-ethnicity.com.
+    Using our public API you can classify names into their most likely ethnicity.
+
   termsOfService: https://www.name-to-ethnicity.com/terms-of-service
   contact:
     email: theodorpeifer@gmail.com
@@ -15,60 +16,11 @@ info:
 tags:
   - name: Endpoints
 
-paths:
-  /default-models:
-    get:
-      tags:
-        - Endpoints
-      summary: Retrieve all of our default models
-      description: This endpoint will return a list containing all of our already trained default models along with the following information
-      
-        - ethnicities it can classifiy between
-        
-        - overall accuracy
-        
-        - accuracy per ethnicity
-    
-      operationId: getDefaultModels
-      responses:
-        '200':
-          description: Successful
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Model'
-        '500':
-          description: Server side error
-  
-  /models:
-    get:
-      tags:
-        - Endpoints
-      summary: Retrieve all of your custom models
-      description: This endpoint will return a list containing all of your custom trained and default models along with the following information
-      
-        - ethnicities it can classifiy between
-        
-        - overall accuracy
-        
-        - accuracy per ethnicity
-      operationId: getCustomModels
-      responses:
-        '200':
-          description: Successful
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Models'
-        '500':
-          description: Server side error
-      security:
-        - api_key: []
-        
+servers:
+  - url: https://api.name-to-ethnicity.com/
+    description: Production server
+
+paths:  
   /classify:
     post:
       tags:
@@ -130,6 +82,56 @@ paths:
           description: Too many names
         '422':
           description: Model data validation failed
+        '500':
+          description: Server side error
+  /default-models:
+    get:
+      tags:
+        - Endpoints
+      summary: Retrieve all of our default models
+      description: This endpoint will return a list containing all of our already trained default models along with the following information
+      
+        - ethnicities it can classifiy between
+        
+        - overall accuracy
+        
+        - accuracy per ethnicity
+    
+      operationId: getDefaultModels
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Model'
+        '500':
+          description: Server side error
+  
+  /models:
+    get:
+      tags:
+        - Endpoints
+      summary: Retrieve all of your custom models
+      description: This endpoint will return a list containing all of your custom trained and default models along with the following information
+      
+        - ethnicities it can classifiy between
+        
+        - overall accuracy
+        
+        - accuracy per ethnicity
+      operationId: getCustomModels
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Models'
         '500':
           description: Server side error
           
@@ -230,8 +232,11 @@ components:
           german: 0.95
             
   securitySchemes:
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
-      description: "Prefix 'Beaerer' followed by a space and then a JWT token"
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+      description: For authorizing your requests, use the "Authorization" header in the format of "Bearer {token}". To get your API token visit https://www.name-to-ethnicity.com and create an account.
+
+security:
+  - BearerAuth: []

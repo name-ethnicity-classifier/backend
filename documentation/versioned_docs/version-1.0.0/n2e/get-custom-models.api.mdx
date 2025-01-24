@@ -1,0 +1,66 @@
+---
+id: get-custom-models
+title: "Retrieve all of your custom models"
+description: "This endpoint will return a list containing all of your custom trained and default models along with the following information"
+sidebar_label: "Retrieve all of your custom models"
+hide_title: true
+hide_table_of_contents: true
+api: eJztVk2P2zYQ/SuDOcuy1kCRrk7dBk6xRZsGWQc9eI2ApsYWsxSpkCM7rqH/HgwtO8ruBil6bHuyPBw+vvngPB6R1TZiucS5q1pvHEdcZVhR1MG0bLzDEhe1iUDDOuyNtRCIu+BAgTWRQXvHyjjjtqCsBb+Bg+8C6C6yb4CDMo4qUK6CijaqswyNr8hGUNa7LewN18A1wcZb6/cCY9zGh0YJgXs3AeLaGW3YUATDoJUDbVWMZmMOsCbeEyU/v6MgDJTWXVD6ILbzN7QULkAHzNC3FNIJtxWWuCV+mfj+nqhhhoFi612kiOURZ0UhP18n5q7TmmLcdBYzlCSQY/FSbWuNTtjTD1Fcjxh1TY2SLz60hCWqEJTQMExNHNn9+gNpxgzbIAwl5tPJKXMDu38M41RDI6/IwbgtZkifVNNaMenaOIr0XrnqPdlI2D/qh6ebXWetWstuDh2Nweanr1O9YQSTC+y5NCNM1zVrCmNCRX79Y5+hS+lU1pwj+U78A7l+hLQ8xybwEtmqzzBqH/4W4MDsK8Aiv77Oivz6hSDpQInjwnwvxcXVpLiazIrZ1aJ4Uc6uyqLAvs+QDaf1VORk0eOW/L/o/4WiPzZFsYn1h2dHEIUdBYimIqAQfEiYDXHth6km3aC4xhKnzXm0xbRL5v4Ru2CxxJq5jeV0qlqTS7tM2E8uwzLXvpniY1l4E3zVafkDJzzsVwKtuyADVrB/JhUo3HRy/HI1Xr6TcXgqwdjpkkDhI0STG5a4Tk6YDR+vkjpgib/+uXhC7JUPoDqufTB/iZgkMQr0saPIMYMuUlKbe7wZnE46g1CTqiiAcYMayRmiZvcDRziyfyDX32MOCw9b4hP2zZtbSCuwM9EwnJO53++fT2bSwtQ6BMqJRPnOcZ5qJ9KXEjE0wesBYH4GkOOexJw02sRE3G82Rhtl4e38bpHIVV53DTlOgUpg8E1q+b17FyVrEljbra3RCeLgu7HuHkB2RzCOvRxqAjQ+MljzQPbwRWdzzJApNPGPjbSq0TRqtm+SmKYtE7+ZxGHTSV+VTvpKjTLStFyTr3xoyWwo/LQVq+yW62qNJhfpy/TDm1bpmmCWF5iNmn6godJq7sN2OmyN099uX85f380ns7zIa26s4Mq1OWX8Ki/yQkytj9woNzrqLXEwtKPnXkOXO/hovF6eD//W59ZwsZk+8bS1yjjJXarDcRhQSxySs8qw9pHFcjyuVaR3wfa9mD92FGS0rDLcqWBO+rOUQXy6u2nqPNBB6q01tTL9dsp2acY/fpXJPLpMyl/mC+z7z1bo1yE=
+sidebar_class_name: "get api-method"
+info_path: n2e/name-to-ethnicity-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Retrieve all of your custom models"}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/models"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+This endpoint will return a list containing all of your custom trained and default models along with the following information
+- ethnicities it can classifiy between
+- overall accuracy
+- accuracy per ethnicity
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful","content":{"application/json":{"schema":{"type":"array","items":{"type":"object","properties":{"defaultModels":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","example":"chinese_and_else"},"description":{"type":"string","nullable":true,"example":"Example model description."},"accuracy":{"type":"number","example":0.98},"nationalities":{"type":"array","items":{"type":"string"},"example":["chinese","else"]},"scores":{"type":"array","items":{"type":"number"},"example":[0.99,0.97]},"creationTime":{"type":"string","example":"01-01-2021T07:21:00"}},"title":"Model"}},"customModels":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","example":"chinese_and_else"},"description":{"type":"string","nullable":true,"example":"Example model description."},"accuracy":{"type":"number","example":0.98},"nationalities":{"type":"array","items":{"type":"string"},"example":["chinese","else"]},"scores":{"type":"array","items":{"type":"number"},"example":[0.99,0.97]},"creationTime":{"type":"string","example":"01-01-2021T07:21:00"}},"title":"Model"}}},"title":"Models"}}}}},"500":{"description":"Server side error"}}}
+>
+  
+</StatusCodes>
+
+
+      
