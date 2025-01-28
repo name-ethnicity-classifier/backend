@@ -178,7 +178,7 @@ def predict(model_id: str, names: list[str], get_distribution: bool=False) -> li
         raise InferenceError(
             error_code="TOO_MANY_NAMES",
             message=f"Too many names (maximum {MAX_NAMES}.",
-            status_code=405    
+            status_code=422    
         )
 
     # preprocess inputs

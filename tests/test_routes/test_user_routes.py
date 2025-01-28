@@ -123,7 +123,7 @@ def test_login_user(test_client):
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
     )
     assert response.status_code == 200
-    assert "accessToken" in json.loads(response.data)["data"]
+    assert "accessToken" in json.loads(response.data)
 
 
 @pytest.mark.it("should return JWT token when user logs in successully but with different email casing")
@@ -136,7 +136,7 @@ def test_login_user_email_uppercase(test_client):
         json={"email": TEST_USER["email"].upper(), "password": TEST_USER["password"]}
     )
     assert response.status_code == 200
-    assert "accessToken" in json.loads(response.data)["data"]
+    assert "accessToken" in json.loads(response.data)
 
 
 @pytest.mark.it("should fail to login user when email does not exist")
@@ -185,7 +185,7 @@ def test_delete_user_with_wrong_password(test_client):
     )
     assert response.status_code == 200
     
-    token = json.loads(response.data)["data"]["accessToken"]
+    token = json.loads(response.data)["accessToken"]
     response = test_client.delete(
         "/delete-user",
         json={"password": "invalidpassword"},
@@ -224,7 +224,7 @@ def test_delete_user(test_client):
     )
     assert response.status_code == 200
     
-    token = json.loads(response.data)["data"]["accessToken"]
+    token = json.loads(response.data)["accessToken"]
     response = test_client.delete(
         "/delete-user",
         json={"password": TEST_USER["password"]},

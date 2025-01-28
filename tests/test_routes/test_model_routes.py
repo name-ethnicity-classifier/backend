@@ -4,7 +4,7 @@ from flask import jsonify
 from flask_jwt_extended import create_access_token
 import pytest
 import json
-from schemas.model_schema import GetModelsResponseSchema, N2EModel
+from schemas.model_schema import ModelsResponseSchema, N2EModel
 from utils import *
 from app import app
 from db.database import db
@@ -245,7 +245,7 @@ def test_add_custom_model_but_maximum_reached(authenticated_client, monkeypatch)
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
 
-    assert response.status_code == 405
+    assert response.status_code == 422
     assert json.loads(response.data)["errorCode"] == "MAX_MODELS_REACHED"
 
 
@@ -321,9 +321,9 @@ def test_get_all_models(authenticated_client):
     response_data = json.loads(response.data)
 
     assert response.status_code == 200
-    GetModelsResponseSchema(**response_data["data"])
-    assert len(response_data["data"]["customModels"]) == len(models_to_create)
-    assert len(response_data["data"]["defaultModels"]) == 1
+    ModelsResponseSchema(**response_data)
+    assert len(response_data["customModels"]) == len(models_to_create)
+    assert len(response_data["defaultModels"]) == 1
 
 
 @pytest.mark.it("should retrieve all default models when user is not authenticated")
@@ -332,7 +332,7 @@ def test_get_all_default_models_without_authentication(test_client):
     response_data = json.loads(response.data)
 
     assert response.status_code == 200
-    assert len(response_data["data"]) == 1
+    assert len(response_data) == 1
 
 
 @pytest.mark.it("should remove user-to-model relation but keep the model itself when user deletes custom model")

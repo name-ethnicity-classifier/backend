@@ -46,7 +46,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
         raise GeneralError(
             error_code="MAX_MODELS_REACHED",
             message=f"Maximum amounts of models reached.",
-            status_code=405
+            status_code=422
         )
 
     custom_models_same_name = (
@@ -88,7 +88,7 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
     db.session.commit()
 
 
-def get_default_models() -> dict:
+def get_default_models() -> list[dict]:
     """
     Fetches all public default models from the database
     :return: All default models

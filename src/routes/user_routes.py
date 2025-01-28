@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import create_access_token
 
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from services.user_services import add_user, check_user_login, delete_user, send_verification_email, handle_email_verification, check_user_existence
+from services.user_services import add_user, check_user_login, delete_user, handle_email_verification, check_user_existence
 from utils import success_response
 from errors import error_handler
 
@@ -38,12 +38,9 @@ def login_user_route():
     request_data = LoginSchema(**request.json)
     user_id = check_user_login(request_data)
 
-    return success_response(
-        "Authentication successful.", 
-        {
-            "accessToken": create_access_token(identity=user_id)
-        }
-    )
+    return success_response(data={
+        "accessToken": create_access_token(identity=user_id)
+    })
 
 
 @user_routes.route("/delete-user", methods=["DELETE"])

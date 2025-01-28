@@ -5,6 +5,7 @@ from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError 
 from utils import error_response
 
+
 class GeneralError(Exception):
     def __init__(self, error_code: str, message: str, status_code: int):
         self.error_code = error_code
@@ -28,7 +29,7 @@ def error_handler(func: callable):
             current_app.logger.error(f"Validation error: {e}")
             return error_response("VALIDATION_ERROR", str(e), 400)
         except GeneralError as e:
-            current_app.logger.error(f"Custom error: {e.message}")
+            current_app.logger.error(f"General error: {e.message}")
             return error_response(e.error_code, e.message, e.status_code)
         except InferenceError as e:
             current_app.logger.error(f"Inference error: {e.message}")
