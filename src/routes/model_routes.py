@@ -95,6 +95,5 @@ def get_default_models_route():
 
     current_app.logger.info(f"Successfully received default model data.")
     return success_response(
-        message="Default model data received successfully.",
         data=default_model_data
     )

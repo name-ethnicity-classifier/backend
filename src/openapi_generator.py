@@ -99,23 +99,16 @@ class OpenAIGenerator:
             route_spec["responses"][str(response.status_code)] = response_spec
 
         self.openapi_routes.setdefault(rule, {})[method] = route_spec
-
-    def _replace_defs(self, schema: dict) -> dict:
-        if "properties" not in schema:
-            return schema
-        
-        for prop_name in schema["properties"]:
-            prop = schema["properties"][prop_name]
-
-            if "items" in prop and "$ref" in prop["items"]:
-                if prop["items"]["$ref"].split("/")[1] == "$defs":
-                    component_name = prop["items"]["$ref"].split("/")[-1]
-                    schema["properties"][prop_name]["items"]["$ref"] = f"#/components/schemas/{component_name}"
-
-            if "$ref" in prop:
-                if prop["$ref"].split("/")[1] == "$defs":
-                    component_name = prop["$ref"].split("/")[-1]
-                    schema["properties"][prop_name]["$ref"] = f"#/components/schemas/{component_name}"
+    
+    def _update_schema_ref(self, schema: dict) -> dict:
+        if "items" in schema and "$ref" in schema["items"]:
+            if schema["items"]["$ref"].split("/")[1] == "$defs":
+                component_name = schema["items"]["$ref"].split("/")[-1]
+                schema["items"]["$ref"] = f"#/components/schemas/{component_name}"
+        if "$ref" in schema:
+            if schema["$ref"].split("/")[1] == "$defs":
+                component_name = schema["$ref"].split("/")[-1]
+                schema["$ref"] = f"#/components/schemas/{component_name}"
 
         return schema
 
@@ -132,15 +125,9 @@ class OpenAIGenerator:
 
         if "properties" in schema:
             for prop_name in schema["properties"]:
-                prop = schema["properties"][prop_name]
-                if "items" in prop and "$ref" in prop["items"]:
-                    if prop["items"]["$ref"].split("/")[1] == "$defs":
-                        component_name = prop["items"]["$ref"].split("/")[-1]
-                        schema["properties"][prop_name]["items"]["$ref"] = f"#/components/schemas/{component_name}"
-                if "$ref" in prop:
-                    if prop["$ref"].split("/")[1] == "$defs":
-                        component_name = prop["$ref"].split("/")[-1]
-                        schema["properties"][prop_name]["$ref"] = f"#/components/schemas/{component_name}"
+                schema["properties"][prop_name] = self._update_schema_ref(schema["properties"][prop_name])
+        else:
+            schema = self._update_schema_ref(schema)
 
         self.components[model_name] = schema
 

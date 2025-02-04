@@ -321,9 +321,9 @@ def test_get_all_models(authenticated_client):
     response_data = json.loads(response.data)
 
     assert response.status_code == 200
-    ModelsResponseSchema(**response_data["data"])
-    assert len(response_data["data"]["customModels"]) == len(models_to_create)
-    assert len(response_data["data"]["defaultModels"]) == 1
+    ModelsResponseSchema(**response_data)
+    assert len(response_data["customModels"]) == len(models_to_create)
+    assert len(response_data["defaultModels"]) == 1
 
 
 @pytest.mark.it("should retrieve all default models when user is not authenticated")
@@ -332,7 +332,7 @@ def test_get_all_default_models_without_authentication(test_client):
     response_data = json.loads(response.data)
 
     assert response.status_code == 200
-    assert len(response_data["data"]) == 1
+    assert len(response_data) == 1
 
 
 @pytest.mark.it("should remove user-to-model relation but keep the model itself when user deletes custom model")

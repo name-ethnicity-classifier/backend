@@ -44,7 +44,14 @@ class ModelsResponseSchema(BaseModel):
         json_schema_extra = {
             "example": {
                 "customModels": [
-                    N2EModel.model_json_schema(ref_template="#/components/schemas/{model}")["example"]
+                    {
+                        "name": "chinese_german_french",
+                        "description": "Classifies between 3 ethnicities.",
+                        "nationalities": ["chinese", "german", "french"],
+                        "accuracy": 0.87,
+                        "scores": [0.97, 0.85, 0.81],
+                        "creationTime": "01-01-2025T07:21:00"
+                    }
                 ],
                 "defaultModels": [
                     {
