@@ -1,10 +1,11 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from schemas.model_schema import AddModelSchema, DeleteModelSchema, GetModelsResponseSchema, N2EModel
+from schemas.model_schema import AddModelSchema, DefaultModelsResponseSchema, DeleteModelSchema, ModelsResponseSchema, N2EModel
 from services.model_services import add_model, get_models, get_default_models, delete_models
 from services.user_services import check_user_existence
 from utils import success_response
 from errors import error_handler
+from openapi_generator import OAIRequest, OAIResponse, register_route
 
 model_routes = Blueprint("models", __name__)
 
@@ -46,6 +47,15 @@ def delete_models_route():
 
 
 @model_routes.route("/models", methods=["GET"])
+@register_route(
+    description="Get all models available to you.",
+    tags=["Models"],
+    responses=[
+        OAIResponse(200, "Successfully retrieved models.", ModelsResponseSchema),
+        OAIResponse(401, "Authentication failed"),
+        OAIResponse(500, "Internal server error"),
+    ],
+)
 @jwt_required()
 @error_handler
 def get_models_route():
@@ -57,16 +67,23 @@ def get_models_route():
     check_user_existence(user_id)
 
     model_data = get_models(user_id)
-    GetModelsResponseSchema(**model_data)
+    ModelsResponseSchema(**model_data)
 
     current_app.logger.info(f"Successfully received model data from user with user id {user_id}.")
     return success_response(
-        message="Model data received successfully.",
         data=model_data
     )
 
 
 @model_routes.route("/default-models", methods=["GET"])
+@register_route(
+    description="Get all available default models.",
+    tags=["Models"],
+    responses=[
+        OAIResponse(200, "Successfully retrieved models.", DefaultModelsResponseSchema),
+        OAIResponse(500, "Internal server error"),
+    ],
+)
 @error_handler
 def get_default_models_route():
     """ Route for requesting default model data """
@@ -74,7 +91,7 @@ def get_default_models_route():
     current_app.logger.info(f"Received default model retrieval request.")
 
     default_model_data = get_default_models()
-    [N2EModel(**model) for model in default_model_data]
+    DefaultModelsResponseSchema(default_model_data)
 
     current_app.logger.info(f"Successfully received default model data.")
     return success_response(

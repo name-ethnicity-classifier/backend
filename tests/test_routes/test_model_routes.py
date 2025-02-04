@@ -4,7 +4,7 @@ from flask import jsonify
 from flask_jwt_extended import create_access_token
 import pytest
 import json
-from schemas.model_schema import GetModelsResponseSchema, N2EModel
+from schemas.model_schema import ModelsResponseSchema, N2EModel
 from utils import *
 from app import app
 from db.database import db
@@ -321,7 +321,7 @@ def test_get_all_models(authenticated_client):
     response_data = json.loads(response.data)
 
     assert response.status_code == 200
-    GetModelsResponseSchema(**response_data["data"])
+    ModelsResponseSchema(**response_data["data"])
     assert len(response_data["data"]["customModels"]) == len(models_to_create)
     assert len(response_data["data"]["defaultModels"]) == 1
 

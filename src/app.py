@@ -13,6 +13,8 @@ from routes.user_routes import user_routes
 from routes.util_routes import util_routes
 from routes.inference_routes import inference_routes
 
+from openapi_generator import OpenAIGenerator, register_route
+
 load_dotenv()
 
 
@@ -24,12 +26,12 @@ db_password = os.environ.get("POSTGRES_PASSWORD")
 
 app = Flask(__name__)
 
-postgres_uri = f"postgresql://{db_host}:{db_port}/{db_name}?user={db_user}&password={db_password}"
-app.config["SQLALCHEMY_DATABASE_URI"] = postgres_uri
+app.config["OPENAPI_SPEC"] = json.load(open("./data/api_config.json", "r"))
+
+app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{db_host}:{db_port}/{db_name}?user={db_user}&password={db_password}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=int(os.environ.get("JWT_EXPIRATION_DAYS")))
-
 
 app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER")
 app.config["MAIL_PORT"] = os.environ.get("MAIL_PORT")
@@ -40,10 +42,11 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER")
 
 
+openai_generator = OpenAIGenerator(app)
+
 CORS(app)
 jwt = JWTManager(app)
 db.init_app(app)
-
 
 @app.route("/")
 def index():
@@ -55,6 +58,8 @@ app.register_blueprint(model_routes)
 app.register_blueprint(inference_routes)
 app.register_blueprint(util_routes)
 
+
+app.openapi_generator.generate_openapi_spec(app)
 
 if __name__ == "__main__":
     app.run()
