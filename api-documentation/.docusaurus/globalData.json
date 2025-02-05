@@ -1,0 +1,148 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": false,
+          "path": "/next",
+          "mainDocId": "n2e/name-to-ethnicity-api",
+          "docs": [
+            {
+              "id": "n2e/classification",
+              "path": "/next/n2e/classification",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/classification-route",
+              "path": "/next/n2e/classification-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-default-models-route",
+              "path": "/next/n2e/get-default-models-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-models-route",
+              "path": "/next/n2e/get-models-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-nationalities-route",
+              "path": "/next/n2e/get-nationalities-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/models",
+              "path": "/next/n2e/models",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/name-to-ethnicity-api",
+              "path": "/next/n2e/name-to-ethnicity-api",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/utilities",
+              "path": "/next/n2e/utilities",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "/",
+              "path": "/next/",
+              "sidebar": "openApiSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/next/n2e/name-to-ethnicity-api",
+                "label": "n2e/name-to-ethnicity-api"
+              }
+            },
+            "openApiSidebar": {
+              "link": {
+                "path": "/next/",
+                "label": "N2E API"
+              }
+            }
+          }
+        },
+        {
+          "name": "1.0.0",
+          "label": "1.0.0",
+          "isLast": true,
+          "path": "/",
+          "mainDocId": "n2e/name-to-ethnicity-api",
+          "docs": [
+            {
+              "id": "n2e/classification",
+              "path": "/n2e/classification",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/classification-route",
+              "path": "/n2e/classification-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-default-models-route",
+              "path": "/n2e/get-default-models-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-models-route",
+              "path": "/n2e/get-models-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-nationalities-route",
+              "path": "/n2e/get-nationalities-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/models",
+              "path": "/n2e/models",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/name-to-ethnicity-api",
+              "path": "/n2e/name-to-ethnicity-api",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/utilities",
+              "path": "/n2e/utilities",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "/",
+              "path": "/",
+              "sidebar": "openApiSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/n2e/name-to-ethnicity-api",
+                "label": "n2e/name-to-ethnicity-api"
+              }
+            },
+            "openApiSidebar": {
+              "link": {
+                "path": "/",
+                "label": "N2E API"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

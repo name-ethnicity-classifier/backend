@@ -4,7 +4,8 @@ import yaml
 from flask import Flask, jsonify, send_file, render_template_string
 from pydantic import BaseModel
 
-OPENAPI_FLASK_ENV = "OPENAPI_SPEC"
+OPENAPI_SPEC_ENV = "OPENAPI_SPEC"
+OPENAPI_SWAGGER_ENDPOINT_ENV = "OPENAPI_SWAGGER_ENDPOINT"
 SWAGGER_UI_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -47,8 +48,8 @@ class OpenAIGenerator:
         self._init_app(app)
 
     def _init_app(self, app: Flask):
-        if OPENAPI_FLASK_ENV not in app.config:
-            raise ValueError(f"Basic OpenAPI configuration must be provided under app.config['{OPENAPI_FLASK_ENV}'].")
+        if OPENAPI_SPEC_ENV not in app.config:
+            raise ValueError(f"Basic OpenAPI configuration must be provided under app.config['{OPENAPI_SPEC_ENV}'].")
         
         app.openapi_generator = self
         original_add_url_rule = app.add_url_rule
@@ -65,7 +66,7 @@ class OpenAIGenerator:
         def serve_openapi_json():
             return jsonify(self.openapi_specification)
 
-        @app.route("/swagger")
+        @app.route(f"/{app.config[OPENAPI_SWAGGER_ENDPOINT_ENV]}")
         def serve_swagger_ui():
             return render_template_string(SWAGGER_UI_TEMPLATE)
 
@@ -77,7 +78,12 @@ class OpenAIGenerator:
             "description": view_func._description,
             "summary": view_func._description,
             "operationId": view_func.__name__,
-            "responses": {}
+            "responses": {},
+            "security": [
+                {
+                    "BearerAuth": []
+                }
+            ]
         }
 
         if view_func._request_models:
@@ -144,9 +150,13 @@ class OpenAIGenerator:
             yaml.dump(spec, open("openapi.yml", "w"), default_flow_style=False)
 
     def generate_openapi_spec(self, app: Flask, save_to_file: bool = True, file_format: str = "both"):
-        spec = app.config[OPENAPI_FLASK_ENV]
+        spec = app.config[OPENAPI_SPEC_ENV]
         spec["paths"] = self.openapi_routes
-        spec["components"] = {"schemas": self.components}
+
+        if "components" not in spec:
+            spec["components"] = {}
+
+        spec["components"]["schemas"] = self.components
 
         if save_to_file:
             self._save_openapi_spec(spec, file_format=file_format)

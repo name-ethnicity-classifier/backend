@@ -48,7 +48,7 @@ def delete_models_route():
 
 @model_routes.route("/models", methods=["GET"])
 @register_route(
-    description="Get all models available to you.",
+    description="Get all models.",
     tags=["Models"],
     responses=[
         OAIResponse(200, "Successfully retrieved models.", ModelsResponseSchema),
@@ -77,7 +77,7 @@ def get_models_route():
 
 @model_routes.route("/default-models", methods=["GET"])
 @register_route(
-    description="Get all available default models.",
+    description="Get all default models.",
     tags=["Models"],
     responses=[
         OAIResponse(200, "Successfully retrieved models.", DefaultModelsResponseSchema),

@@ -1,0 +1,63 @@
+---
+id: get-models-route
+title: "Get all models."
+description: "Get all models."
+sidebar_label: "Get all models."
+hide_title: true
+hide_table_of_contents: true
+api: eJztV01v2zgQ/SvEnGVJ9m42iU6bTY0gQDctGvcUGAFNjSy2FKmSVFLB0H9fDKXIjuwsetnLIhcbHs7Hm3kzY3IHnm8dZA/wt8lROVhHkKMTVtZeGg0Z3KBnXClWhfMYIjA1Wk6ntzlksEX/2J89WtN4hAgsutpohw6yHSzSlL5eO71vhEDnikaplln0VuIT5gcxhNEetSdLXtdKihAw+ebIfAdOlFjxE36DnHnDnriSOffIfIks6R2zm+WKvYBjOfecQQT4k1e1QnImGudNNVQie9gBF6KxXLSQpfHFeQTCYgCykhVCBul8ls5ni3RxtkrPs8U8S1OY1u9acedkIdGxDfpnRM1+Y+hLLYX0EkO2mgd3opQaHT5u0VZcPxYWtSjDMfniKugTV4MiRNCrQgSD8joCJ4wNaml8eR6l8cUZfczXXaC24I3yb2R4ufjXDP/49QxdzbV0JTOWaeNffh6kOkgeUYU0jjIczoke0nid1sVllMaXZ+tu3UVQW+rH3m7K4A6kx8r9Up/cLZYs2J1qjP9VH0xr1kfdgZeesoU7+h2Bb+vAlLdSb6Gb5LMDrttPReihqeYo0Y1ScNB3kJEkGiN9OPDYHeV3wN4Rlj3WQ5MRNLeWt6S3J+4EYN1UG7QnAb/4v3qx7/YFPfQ0RTi6nCJ5O8R977abdtWekOtB7uUpYjpauD8aaTGnntA9e3pSmLEQYx6TeAeI7hbLMAn7WGbzDYU/LPx1GLR+r56o+2TRvA/i+yC+D+J/MogfekbfmMQJpld/j9MpPQjcS74MV6V+SI9BdOT+93R+PNZXjS9R++HaxgouFeaE+uzUbfBWe7SaK+bQPqFlaK2xAXuFvjTDLRMiqLkvIYNkTLY36G8yjVWQQel97bIk4bWMiYGZN7OX4W5jYarkaCF8tiZvRADa+wtdsneXJYkygqvSOJ9dpBfHK+UjHY/GNPIoGit9G4D9hdyipZJA9hCuYVIX5rCvjoCyq8+3R1FWpXRMunCjNUUhheSKfVner0ib5UY0FWo/VNxY9vz8fLoEMfvqpN4y01hWNxslRfDQmoYJrpnoF2TLyNgxqb2hmNKyyjjPlPyOqmV7rFzn4x2ecaak88wU4dHQUoj9rd6jrdyn4h7tkxR4wNabUJNgMjPFzA1G/duAi/A2wIpLosmXaHJja5QF2j+3JCVr6jglBWqH+/0KVzUXJbJFTES+oplg8HAaG7tNBlOXfLy9Xt7dL2eLOI1LXynyS33X8zKP0zglUW2cp+W/D3X8eJrs7vGdc0J1mDaPP31SKy7Dag54d8MkPEA1ji51J0l2uw13+NWqriPxjwYtteE6giduJd9Qwz3Qf0+JPEcbOvQ7tv2KxZrG7ImrJuyQ6cuLenccyZvlCrruHzrH2HA=
+sidebar_class_name: "get api-method"
+info_path: n2e/name-to-ethnicity-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get all models."}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/models"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get all models.
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successfully retrieved models.","content":{"application/json":{"schema":{"description":"Schema to validate the /models GET response data ","example":{"customModels":[{"accuracy":0.87,"creationTime":"01-01-2025T07:21:00","description":"Classifies between 3 ethnicities.","name":"chinese_german_french","nationalities":["chinese","german","french"],"scores":[0.97,0.85,0.81]}],"defaultModels":[{"accuracy":0.92,"creationTime":"01-01-2025T06:21:00","description":"Classifies between spanish or not spanish.","name":"spanish_else","nationalities":["spanish","else"],"scores":[0.89,0.95]}]},"properties":{"customModels":{"items":{"description":"Schema to validate N2E Model data ","example":{"accuracy":0.87,"creationTime":"01-01-2025T07:21:00","description":"Classifies between 3 ethnicities.","name":"chinese_german_french","nationalities":["chinese","german","french"],"scores":[0.97,0.85,0.81]},"properties":{"name":{"title":"Name","type":"string"},"description":{"anyOf":[{"type":"string"},{"type":"null"}],"default":null,"title":"Description"},"nationalities":{"items":{"type":"string"},"title":"Nationalities","type":"array"},"accuracy":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Accuracy"},"scores":{"anyOf":[{"items":{"type":"number"},"type":"array"},{"type":"null"}],"title":"Scores"},"creationTime":{"title":"Creationtime","type":"string"}},"required":["name","nationalities","accuracy","scores","creationTime"],"title":"N2EModel","type":"object"},"title":"Custommodels","type":"array"},"defaultModels":{"items":{"description":"Schema to validate N2E Model data ","example":{"accuracy":0.87,"creationTime":"01-01-2025T07:21:00","description":"Classifies between 3 ethnicities.","name":"chinese_german_french","nationalities":["chinese","german","french"],"scores":[0.97,0.85,0.81]},"properties":{"name":{"title":"Name","type":"string"},"description":{"anyOf":[{"type":"string"},{"type":"null"}],"default":null,"title":"Description"},"nationalities":{"items":{"type":"string"},"title":"Nationalities","type":"array"},"accuracy":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Accuracy"},"scores":{"anyOf":[{"items":{"type":"number"},"type":"array"},{"type":"null"}],"title":"Scores"},"creationTime":{"title":"Creationtime","type":"string"}},"required":["name","nationalities","accuracy","scores","creationTime"],"title":"N2EModel","type":"object"},"title":"Defaultmodels","type":"array"}},"required":["customModels","defaultModels"],"title":"ModelsResponseSchema","type":"object"}}}},"401":{"description":"Authentication failed"},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      

@@ -1,0 +1,63 @@
+---
+id: get-nationalities-route
+title: "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset."
+description: "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset."
+sidebar_label: "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset."
+hide_title: true
+hide_table_of_contents: true
+api: eJzNVU1v2zgQ/SvEnFpAkWQ7zYdOm10ERYCiGzTJqTAKmhpZ01KkSo7sCob/+2Jop43t9LSXngzPcOa9+XraAOtlhOozPDFZYsII8wxqjCZQz+QdVPAJeQguKq0sRVa+UdpapVearF5YVE7LQ70LV2/Or98q7Wox52oZ/NBH9ebqrdLWu6VaE7eKW1S684NL2aLueotRrVG1eoVi4hY7RU75Iahas47IOWTgewwJ7K6GCpbIXw6wvwQ/MEIGAWPvXcQI1QamZSk/hzU9DMZgjM1g7agCciBcYX1YCmRgvGN0LPG67y2Z5C++RkmygWha7PQr2ZN9X4gqDhv0TE5BBvgj1S4ZDqGrDSwCMcUWqovJ7Px6NsuAXE3aQXVdzs4vM3A+rHGZLNPZ9bTcZi+TjO9T6xP1JpCRZ5Py/OJyloF2S+tvOnw2T6aX02kGqCPfxJTwYjYpJ++22wz6IF1/JnXCUtc17Uz3Bw957BEqIMe4xADbDJhYKoWPRz3ev/SLr2gYDop4WcP/wBl3W3iKtZVV+T5QwFpu4Hj6p0TmvyljN/BXAATi3WsLeOcYg9NWRQwrDApD8CEx6pBbv99vyKDX3EIFxTG5XZzc7gaGYKGClrmPVVHonnKnOzxjf4bcOjLEY258V8Dxad8HXw9G/ux5wDZ7ma4qCuuNtq2PXF2VV+VJhg/i/hk8F15mCMRjIvY36oDhZpASPs/FTa7xaW77Np4QVTf3dycojy1FRTGdk28aMqSt+nT78CivVe3N0KHj1CHV+KDW6/XrLcjVUyS3TMLSDwtLJmUY/aCMdspYHSM1o5LgqMixF0wKqvORlaVvaEf1i6vo3LN6HOnjKBCdr9FGkS7G0MV/mwcMKzL4Ylq/pVqkkDPfnMV90E6PtEl6hJ0mGRO36GsfeqQGw19LsUq0XIIlgy7u1aUT0JtemxbVNJdBHoxZaOjkzX1YFvvQWHy4++f248Pt2TQv85Y7K3ll73ZzmeRlXoqp95E77V5A/TlfjYNV2vzS9D+I4l42GH9w0VtNTnqa5rPZC8CxOs0zkKMUx2az0BGfgt1uxfx9wCDXN89gpQNJJen4MmhR1xjSYX7DUdbBGOxFZFbaDkLg5CMnJ/tTkN7fPsJ2+x/aI9yG
+sidebar_class_name: "get api-method"
+info_path: n2e/name-to-ethnicity-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset."}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/nationalities"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successfully retrieved nationalities","content":{"application/json":{"schema":{"description":"Schema of the /nationalities response ","example":{"nationalities":{"british":6134933,"indian":90347,"norwegian":23920},"nationalitiyGroups":{"african":104673,"angloAmerican":112722,"eastAsian":631015}},"properties":{"nationalities":{"additionalProperties":{"type":"integer"},"title":"Nationalities","type":"object"},"nationalityGroups":{"additionalProperties":{"type":"integer"},"title":"Nationalitygroups","type":"object"}},"required":["nationalities","nationalityGroups"],"title":"NationalitiesSchema","type":"object"}}}},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      

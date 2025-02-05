@@ -1,0 +1,35 @@
+{
+  "id": "n2e/classification-route",
+  "title": "Classify names.",
+  "description": "Classify names.",
+  "source": "@site/versioned_docs/version-1.0.0/n2e/classification-route.api.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/classification-route",
+  "permalink": "/n2e/classification-route",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "1.0.0",
+  "frontMatter": {
+    "id": "classification-route",
+    "title": "Classify names.",
+    "description": "Classify names.",
+    "sidebar_label": "Classify names.",
+    "hide_title": true,
+    "hide_table_of_contents": true,
+    "api": "eJzFVk1v4zYQ/SvEnGXJMXaxqU7NpkHhIs0GcbaXQAjG1MjiLkVqSSqOYfi/F0PJdhy5296aS+D5fOR7M9QWAq485E9wrdF7VSmJQVkDRQIleelUG3/me/9GGGzIp5CAbcnF4HkJOciT/Gdnu0CQgCPfWuPJQ76F2XTK/04LLzopyfuq0+K0BiQgrQlkAidh2+rBkX3znLkFL2tqMHrLUrEL9b1jXEH1HRt8nQdqPOSzBBpljj9aR5XaO5+2EDYtQQ4+OGVWsEsOFtM1S3KwK5K9BZ3DDeze39AiohHBihfUqsRAItQkMrm/ufsvi0exvxBRYkABCdArNq0mRnutXpURt6pjQmStDHmCZJr+clEk8EenyYu/yBlid+XIyJq9nz4WCazZ7kRNypNZkltxzIpcg4ZjLj8VuwSCCtwI5qYiTqeHAUwPHQ4ntMtvJAPsdrtdAh+mF2PWrrpQkwkDI6JCpamEGP1hHP2nLUkLY4OobGf6uNlsHPdorWjQDCLjsI/nJDM3gZxBLTy5F3KCnLMOGKujHx358NmWG077z/r5VyYZ0Dt9iqHZOSZXFH5TrKVl19esUHtKoOGLuMOGL3kg+Lln6XlPKPRn55E8yOEcv6eKYHrbU+kfW20PzEciuMGR64Pi9423oPqpGA/Foc5dDB1PxOjcx9a/Uyjfug7JS2s1oTnwpxyVfPzjAfbQxvWLM6L+qZgbCrXlfdVaHyCBFkMNORyGFBLoRdVvhc5pyKEOofV5lmGrUkYyCXZCoTZKqrBJpW0yeL8M7p0tOxll0teLK+VYLs8ybSXq2vqQX04vp6MKt+w+JBeMS3ZOhU0E9pnQkeMphPypYDeL+uEo/5v/WYzKVPYt/aN7E1f389GhH2vlhfJxcdqqUlKhFg83i0eOFqWVXUMmDDvHOrFer88zkoqvXpmVsJ0TbbfUSsYKG9sJiUbIk9dMKBMs91RONNYHodV30htxxIqmFI6CU/RCAoVWPghbCdSaS3JWSTq+ioFc479UC3IvStIb8fwj1CymTGw18UNS//ChjIuLGlSsmlCTLa1rSVXkfl2xlbN56rSSZHzk2vR0XrUoaxKzlHV1ojqGgdGbWrfKhlSf3c6vb+4WN5NZOk3r0Giuy2PQ83KRTtMpm3hs+E05thp/GJxQ+mYJnwkdRjTQa8hajcpwj4h3O4zmExxGs0iAx4Vt2+0SPX11erdj84+OHM9FkcALOoVLltwTy7AmLMnFkflOG8bQo5k8cmcO113cYO+fBx7XPuNKSmrDT2OLN4uFX3lIYDk8QawMyMHhmr+GcA05xG8nzo47Ntq2oNGsOlxxbF+T//4GCTVXOg==",
+    "sidebar_class_name": "post api-method",
+    "info_path": "n2e/name-to-ethnicity-api",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Classification",
+    "permalink": "/n2e/classification"
+  },
+  "next": {
+    "title": "Models",
+    "permalink": "/n2e/models"
+  }
+}

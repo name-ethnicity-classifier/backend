@@ -1,0 +1,63 @@
+---
+id: get-default-models-route
+title: "Get all default models."
+description: "Get all default models."
+sidebar_label: "Get all default models."
+hide_title: true
+hide_table_of_contents: true
+api: eJyNVttu2zgQ/RVinmVJ8SJNoqfNpkYQoE2Lxn0KDIOmRhZbilRJyqlg6N8XQymWIztFXxJoOJczc+biPXi+dZA9w2eTo3KwiiBHJ6ysvTQaMrhHz7hSLMeCN8qzKujFEIGp0XLSesghgy369aCz7nXW1jQeIQKLrjbaoYNsD/M0pX9vgzw1QqBzRaNUyyx6K3GH+VEsYbRH7cmS17WSIgROfjgy34MTJVb8jN8gZ96wHVcy5x6ZL5ElA9BZH4DdL5bsFSTLuecMIsDfvKoVQva8By5EY7loIUvjm3kEwmIAsJQVQgbpxSy9mM3T+eUy/ZDNL7I0hWkd7xR3ThYSHdugf0HUzNVcS1cyY5k2/vWT0tU8+B0ka1QOg5R8cSW9xMDZ8E5gSWMVgRPGhrc0vr6J0vjmctWtIpAeK/dX5XmcL1hohdM6vC3D9dUfy3D192X4h6EvtRQhraPsRSk1Olxv0VZcrwuLWpTnyjAoQgS9KkQwKL+tyM1VlMbXl/TnYtVFUFtq4d7Lfoi6By89ZQuP9B2Bb+tAhbdSb6Gb5LMHrtsvRWiSqeZBohuloAuTFdoOMpJEh0gfjzx2J/ntR/ZOsIxYj00OoLm1vCW9kbgzgHVTbdCeBfzq//bVvhsLeuxpivDgcork/RBPvdtu2lUjIXeD3MtzxHS0Z3410mJOPaF79vSkMIdCHPKYxDtC9DhfhEkYY5nNDxT+uPAfe0b75fltWCH9WJ3Q0BHGy3Pr70F7tJor5tDu0DK01tiQUoW+NMN6hQhq7kvIYLK/KJlg6AIZjVWQQel97bIk4bWMqRgzb2avc9bGwlTJyWx+tSZvBH0MQAJho7ssSZQRXJXG+ew6vT6d7k/0fDCm6UPRWOnbAOw/5BbtbUM5PPd7SRfmmOIToOz268NJlGUpHZMurHJTFFJIrti3xdOStFluRFOh9oFTVhjLXl5ezpcgZt+d1FtmGsvqZqOkCB5a0zDBNRP9rmoZGTsmtTcUU1pWGeeZkj9RtWzEynV+OF6MMyWdZ6YI17OlEOM582gr96V4QruTAo/YehdqEkxmppi5wag/ilyEo4gVl0STL9HkxtYoC7T/bklK1tSySgrUDsdVB7c1FyWyeUxEvqGZYPDwGhu7TQZTl3x6uFs8Pi1m8ziNS18p8kt91/NyEadxSqLaOE97eAz1/q+IyTo9HPo/mAxj5fG3T2rFZdiaAf9+mJBnmEzIKgLqWnrZ7zfc4Xeruo7Evxq01J6rCHbcSr4JJ5/OQ4k8Rxs69ye2/RbEmsZwx1UTBnv6U4R6+jCy94sldN3/TeM1/Q==
+sidebar_class_name: "get api-method"
+info_path: n2e/name-to-ethnicity-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Get all default models."}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"get"}
+  path={"/default-models"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Get all default models.
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={undefined}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successfully retrieved models.","content":{"application/json":{"schema":{"description":"Schema to validate the /default-models GET response data ","example":[{"accuracy":0.92,"creationTime":"01-01-2025T06:21:00","description":"Classifies between spanish or not spanish.","name":"spanish_else","nationalities":["spanish","else"],"scores":[0.89,0.95]}],"items":{"description":"Schema to validate N2E Model data ","example":{"accuracy":0.87,"creationTime":"01-01-2025T07:21:00","description":"Classifies between 3 ethnicities.","name":"chinese_german_french","nationalities":["chinese","german","french"],"scores":[0.97,0.85,0.81]},"properties":{"name":{"title":"Name","type":"string"},"description":{"anyOf":[{"type":"string"},{"type":"null"}],"default":null,"title":"Description"},"nationalities":{"items":{"type":"string"},"title":"Nationalities","type":"array"},"accuracy":{"anyOf":[{"type":"number"},{"type":"null"}],"title":"Accuracy"},"scores":{"anyOf":[{"items":{"type":"number"},"type":"array"},{"type":"null"}],"title":"Scores"},"creationTime":{"title":"Creationtime","type":"string"}},"required":["name","nationalities","accuracy","scores","creationTime"],"title":"N2EModel","type":"object"},"title":"DefaultModelsResponseSchema","type":"array"}}}},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      
