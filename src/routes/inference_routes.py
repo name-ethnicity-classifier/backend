@@ -15,7 +15,7 @@ inference_routes = Blueprint("inference", __name__)
 
 @inference_routes.route("/classify", methods=["POST"])
 @register_route(
-    description="Route for classifiying names into their most likely ethnicity.",
+    description="Classify names.",
     tags=["Classification"],
     requests=[OAIRequest("Request body for classification", InferenceSchema)],
     responses=[

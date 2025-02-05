@@ -27,6 +27,7 @@ db_password = os.environ.get("POSTGRES_PASSWORD")
 app = Flask(__name__)
 
 app.config["OPENAPI_SPEC"] = json.load(open("./data/api_config.json", "r"))
+app.config["OPENAPI_SWAGGER_ENDPOINT"] = "swagger-ui"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{db_host}:{db_port}/{db_name}?user={db_user}&password={db_password}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
@@ -42,7 +43,7 @@ app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER")
 
 
-openai_generator = OpenAIGenerator(app)
+openapi_generator = OpenAIGenerator(app)
 
 CORS(app)
 jwt = JWTManager(app)

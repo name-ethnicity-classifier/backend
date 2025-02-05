@@ -1,0 +1,472 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Name-to-ethnicity API",
+        "description": "This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retrieve a list of all your models.",
+        "termsOfService": "https://www.name-to-ethnicity.com/terms-of-service",
+        "contact": {
+            "email": "theodorpeifer@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://api.name-to-ethnicity.com/",
+            "description": "Production server"
+        },
+        {
+            "url": "http://localhost:8080",
+            "description": "Local server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Classification",
+            "description": "API endpoints for name classification."
+        },
+        {
+            "name": "Models",
+            "description": "API endpoints model management."
+        },
+        {
+            "name": "Utilities",
+            "description": "Miscellaneous API endpoints."
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "For authorizing your requests, use the 'Authorization' header in the format of 'Bearer {token}'. To get your API token visit https://www.name-to-ethnicity.com and create an account."
+            }
+        },
+        "schemas": {
+            "N2EModel": {
+                "description": "Schema to validate N2E Model data ",
+                "example": {
+                    "accuracy": 0.87,
+                    "creationTime": "01-01-2025T07:21:00",
+                    "description": "Classifies between 3 ethnicities.",
+                    "name": "chinese_german_french",
+                    "nationalities": [
+                        "chinese",
+                        "german",
+                        "french"
+                    ],
+                    "scores": [
+                        0.97,
+                        0.85,
+                        0.81
+                    ]
+                },
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "type": "string"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "default": null,
+                        "title": "Description"
+                    },
+                    "nationalities": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "title": "Nationalities",
+                        "type": "array"
+                    },
+                    "accuracy": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Accuracy"
+                    },
+                    "scores": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "number"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Scores"
+                    },
+                    "creationTime": {
+                        "title": "Creationtime",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "nationalities",
+                    "accuracy",
+                    "scores",
+                    "creationTime"
+                ],
+                "title": "N2EModel",
+                "type": "object"
+            },
+            "ModelsResponseSchema": {
+                "description": "Schema to validate the /models GET response data ",
+                "example": {
+                    "customModels": [
+                        {
+                            "accuracy": 0.87,
+                            "creationTime": "01-01-2025T07:21:00",
+                            "description": "Classifies between 3 ethnicities.",
+                            "name": "chinese_german_french",
+                            "nationalities": [
+                                "chinese",
+                                "german",
+                                "french"
+                            ],
+                            "scores": [
+                                0.97,
+                                0.85,
+                                0.81
+                            ]
+                        }
+                    ],
+                    "defaultModels": [
+                        {
+                            "accuracy": 0.92,
+                            "creationTime": "01-01-2025T06:21:00",
+                            "description": "Classifies between spanish or not spanish.",
+                            "name": "spanish_else",
+                            "nationalities": [
+                                "spanish",
+                                "else"
+                            ],
+                            "scores": [
+                                0.89,
+                                0.95
+                            ]
+                        }
+                    ]
+                },
+                "properties": {
+                    "customModels": {
+                        "items": {
+                            "$ref": "#/components/schemas/N2EModel"
+                        },
+                        "title": "Custommodels",
+                        "type": "array"
+                    },
+                    "defaultModels": {
+                        "items": {
+                            "$ref": "#/components/schemas/N2EModel"
+                        },
+                        "title": "Defaultmodels",
+                        "type": "array"
+                    }
+                },
+                "required": [
+                    "customModels",
+                    "defaultModels"
+                ],
+                "title": "ModelsResponseSchema",
+                "type": "object"
+            },
+            "DefaultModelsResponseSchema": {
+                "description": "Schema to validate the /default-models GET response data ",
+                "example": [
+                    {
+                        "accuracy": 0.92,
+                        "creationTime": "01-01-2025T06:21:00",
+                        "description": "Classifies between spanish or not spanish.",
+                        "name": "spanish_else",
+                        "nationalities": [
+                            "spanish",
+                            "else"
+                        ],
+                        "scores": [
+                            0.89,
+                            0.95
+                        ]
+                    }
+                ],
+                "items": {
+                    "$ref": "#/components/schemas/N2EModel"
+                },
+                "title": "DefaultModelsResponseSchema",
+                "type": "array"
+            },
+            "InferenceSchema": {
+                "description": "Schema to validate name classification request data ",
+                "example": {
+                    "getDistribution": false,
+                    "modelName": "chinese_german_french",
+                    "names": [
+                        "Cixin Liu",
+                        "werner heisenberg",
+                        "Jules Verne"
+                    ]
+                },
+                "properties": {
+                    "modelName": {
+                        "title": "Modelname",
+                        "type": "string"
+                    },
+                    "names": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "title": "Names",
+                        "type": "array"
+                    },
+                    "getDistribution": {
+                        "title": "Getdistribution",
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "modelName",
+                    "names",
+                    "getDistribution"
+                ],
+                "title": "InferenceSchema",
+                "type": "object"
+            },
+            "InferenceResponseSchema": {
+                "additionalProperties": {
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "number"
+                        }
+                    ],
+                    "type": "array"
+                },
+                "description": "Schema to validate the /classify POST response data ",
+                "example": {
+                    "Cixin Liu": [
+                        "chinese",
+                        0.91
+                    ],
+                    "Jules Verne": [
+                        "french",
+                        0.75
+                    ],
+                    "werner heisenberg": [
+                        "german",
+                        0.87
+                    ]
+                },
+                "title": "InferenceResponseSchema",
+                "type": "object"
+            },
+            "NationalitiesSchema": {
+                "description": "Schema of the /nationalities response ",
+                "example": {
+                    "nationalities": {
+                        "british": 6134933,
+                        "indian": 90347,
+                        "norwegian": 23920
+                    },
+                    "nationalitiyGroups": {
+                        "african": 104673,
+                        "angloAmerican": 112722,
+                        "eastAsian": 631015
+                    }
+                },
+                "properties": {
+                    "nationalities": {
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "title": "Nationalities",
+                        "type": "object"
+                    },
+                    "nationalityGroups": {
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "title": "Nationalitygroups",
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "nationalities",
+                    "nationalityGroups"
+                ],
+                "title": "NationalitiesSchema",
+                "type": "object"
+            }
+        }
+    },
+    "security": [
+        {
+            "BearerAuth": []
+        }
+    ],
+    "paths": {
+        "/models": {
+            "get": {
+                "tags": [
+                    "Models"
+                ],
+                "description": "Get all models.",
+                "summary": "Get all models.",
+                "operationId": "get_models_route",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved models.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ModelsResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/default-models": {
+            "get": {
+                "tags": [
+                    "Models"
+                ],
+                "description": "Get all default models.",
+                "summary": "Get all default models.",
+                "operationId": "get_default_models_route",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved models.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefaultModelsResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/classify": {
+            "post": {
+                "tags": [
+                    "Classification"
+                ],
+                "description": "Classify names.",
+                "summary": "Classify names.",
+                "operationId": "classification_route",
+                "responses": {
+                    "200": {
+                        "description": "Successful classification",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InferenceResponseSchema"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed"
+                    },
+                    "404": {
+                        "description": "Model not found"
+                    },
+                    "422": {
+                        "description": "Too many names"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InferenceSchema"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/nationalities": {
+            "get": {
+                "tags": [
+                    "Utilities"
+                ],
+                "description": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+                "summary": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+                "operationId": "get_nationalities_route",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved nationalities",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NationalitiesSchema"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
+            }
+        }
+    }
+}

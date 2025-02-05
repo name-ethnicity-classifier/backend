@@ -1,0 +1,29 @@
+{
+  "id": "n2e/endpoints",
+  "title": "Endpoints",
+  "description": "Endpoints",
+  "source": "@site/versioned_docs/version-1.0.0/n2e/endpoints.tag.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/endpoints",
+  "permalink": "/n2e/endpoints",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "1.0.0",
+  "frontMatter": {
+    "id": "endpoints",
+    "title": "Endpoints",
+    "description": "Endpoints",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/n2e/name-to-ethnicity-api"
+  },
+  "next": {
+    "title": "Classifiy names into their ethnicities",
+    "permalink": "/n2e/classify-names"
+  }
+}

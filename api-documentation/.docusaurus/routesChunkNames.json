@@ -1,0 +1,137 @@
+{
+  "/__docusaurus/debug-5ff": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/config-5ba": {
+    "__comp": "__comp---theme-debug-config-23-a-2ff",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/content-a2b": {
+    "__comp": "__comp---theme-debug-contentba-8-ce7",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    },
+    "__props": "__props---docusaurus-debug-content-3-c-0-be2"
+  },
+  "/__docusaurus/debug/globalData-c3c": {
+    "__comp": "__comp---theme-debug-global-dataede-0fa",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/metadata-156": {
+    "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/registry-88c": {
+    "__comp": "__comp---theme-debug-registry-679-501",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/__docusaurus/debug/routes-000": {
+    "__comp": "__comp---theme-debug-routes-946-699",
+    "__context": {
+      "plugin": "plugin---docusaurus-debugb-38-ad3"
+    }
+  },
+  "/-86f": {
+    "__comp": "__comp---theme-docs-root-5-e-9-0b6",
+    "__context": {
+      "plugin": "plugin---aba-d70"
+    }
+  },
+  "/next-091": {
+    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
+    "__props": "__props---nextb-68-93e"
+  },
+  "/next-2cf": {
+    "__comp": "__comp---theme-doc-roota-94-67a"
+  },
+  "/next/-26c": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "__props": "__props---next-be-3-5c2"
+  },
+  "/next/n2e/classification-78e": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-classificationade-6a3"
+  },
+  "/next/n2e/classification-route-129": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-classification-route-41-c-f54"
+  },
+  "/next/n2e/get-default-models-route-97d": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-get-default-models-route-341-ef3"
+  },
+  "/next/n2e/get-models-route-c03": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-get-models-route-2-ce-a1e"
+  },
+  "/next/n2e/get-nationalities-route-a0d": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-get-nationalities-route-4-eb-9b7"
+  },
+  "/next/n2e/models-09f": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-models-402-918"
+  },
+  "/next/n2e/name-to-ethnicity-api-4be": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-name-to-ethnicity-api-514-57f"
+  },
+  "/next/n2e/utilities-5dc": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-utilitiesa-56-fb8"
+  },
+  "/-5fa": {
+    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
+    "__props": "__props---22-d-307"
+  },
+  "/-b69": {
+    "__comp": "__comp---theme-doc-roota-94-67a"
+  },
+  "/n2e/classification-e05": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-classificationb-9-e-096"
+  },
+  "/n2e/classification-route-556": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-classification-route-598-322"
+  },
+  "/n2e/get-default-models-route-bfa": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-get-default-models-route-0-f-2-531"
+  },
+  "/n2e/get-models-route-a3b": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-get-models-route-2-ff-71f"
+  },
+  "/n2e/get-nationalities-route-72b": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-get-nationalities-routeafc-594"
+  },
+  "/n2e/models-7b3": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-models-415-8de"
+  },
+  "/n2e/name-to-ethnicity-api-105": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-name-to-ethnicity-apifec-2aa"
+  },
+  "/n2e/utilities-e88": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---n-2-e-utilities-0-f-1-6f6"
+  },
+  "/-c94": {
+    "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",
+    "__props": "__props---7-bb-a89"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "n2e/get-default-models",
+  "title": "Retrieve all of our default models",
+  "description": "This endpoint will return a list containing all of our already trained default models along with the following information",
+  "source": "@site/versioned_docs/version-1.0.0/n2e/get-default-models.api.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/get-default-models",
+  "permalink": "/n2e/get-default-models",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "1.0.0",
+  "frontMatter": {
+    "id": "get-default-models",
+    "title": "Retrieve all of our default models",
+    "description": "This endpoint will return a list containing all of our already trained default models along with the following information",
+    "sidebar_label": "Retrieve all of our default models",
+    "hide_title": true,
+    "hide_table_of_contents": true,
+    "api": "eJzdVVFv2zYQ/iuHe5ZlxcDQRU/LWnfIsHVF42IPiVHQ1NliQ5EqebLrGfrvw1FyoiQtuuf5xRR59913x7uPJ2S1i1je4tJVrTeOI64zrCjqYFo23mGJq9pEoPEcDsZaCMRdcKDAmsigvWNlnHE7UNaC34LvAigbSFVH4KCMowoq2qrOMjS+IhtBWe92cDBcA9cEW2+tPwiEcVsfGiXB79wMiGtntGFDEQyDVg60VTGarTnChvhAlOz8noJEV1p3Qemj7J3X0FJ4ADpihr6lkCJcV1jijvjNQO7PxA0zDBRb7yJFLE+4KAr5e1qVm05rinHbWcxQKkCOxUq1rTU6gc8/RzE9YdQ1NUpWfGwJS1QhKOFhmJo42febz6QZM2yDUJSk5dSphiZWkYNxO8yQvqqmtbKla+Mo0iflqk9kI2H/7BZfOrvOWrURbw4dTcGWw2q4KZjA5AJ7LuoE03XNhsKUUJFf/txn6FIdlDXnTH6Q/0iunyDdnnMTeMls3WcYtQ//CXBk9gSwyC8vsyK/fCVIOlDiuDI/KnFxMSsuZoticbEqXpWLi7IosO8zZMPpPPUO9vLL8KdvtgyFPQWIpiKgEHxI/g1x7cc2lJtXXGOJ83FcZs25JWPylmE9YRcsllgzt7Gcz1VrcmmRGfvZQ5fn2jdzfD7L74OvOi0fMOBhvxZo3QWZDMH+lVSgcNUJjdv19PhG2ngo+9TooWjCR4gmMyxxk4wwGxdv01hjib//vXpB7K0PoDqufTD/iAocRUICfekocsygi5Rk4g6vRqNBIBBqUhUFMG6UEYkhEnQ3coQT+3ty/R3msPKwIx6wr95fQzqBvYmG4VzMw+Hw7WKCchWkdiFQTrTFd47zdIeiWakQYy+8GwGWZwAJ9yLnJKwmJuJ+uzXaKAsfljerRK7yumvIcUpUEoPvUsvv3McoVZPE2m5jjU4QR99NBfMI4h3BOPYS1ARofGSw5p7s8VEgc8yQKTTxr620rNE0abbvkpgnl5nfzuLoNOii0kkXqVFGmpZr8pUPLZkthV92siveMqLWaHKRHhUPr1qla4JFXmA2afqRhkqnuQ+7+ega539cv16+u1nOFnmR19xYwZWxGSp+kRd5IVutj9woNwn1gTgY2tP0CXv6ZD2/v9Oj7P8f38hxqJm+8ry1yjipW7qD0yhSt/hMpNYZ1j6ynJxOGxXpY7B9L9tfOgoiL+sM9yqY4d25FQEe5jcpzz0d5c61plaUcK9sl7T9+YsqmvSgmr8tV9j3/wJh6RLr",
+    "sidebar_class_name": "get api-method",
+    "info_path": "n2e/name-to-ethnicity-api",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Classifiy names into their ethnicities",
+    "permalink": "/n2e/classify-names"
+  },
+  "next": {
+    "title": "Retrieve all of your custom models",
+    "permalink": "/n2e/get-custom-models"
+  }
+}
