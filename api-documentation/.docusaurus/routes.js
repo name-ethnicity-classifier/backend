@@ -39,15 +39,15 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '86f'),
+    component: ComponentCreator('/', 'f1d'),
     routes: [
       {
         path: '/next',
-        component: ComponentCreator('/next', '091'),
+        component: ComponentCreator('/next', '51c'),
         routes: [
           {
             path: '/next',
-            component: ComponentCreator('/next', '2cf'),
+            component: ComponentCreator('/next', '3a6'),
             routes: [
               {
                 path: '/next/',
@@ -86,20 +86,20 @@ export default [
                 sidebar: "openApiSidebar"
               },
               {
-                path: '/next/n2e/models',
-                component: ComponentCreator('/next/n2e/models', '09f'),
+                path: '/next/n2e/miscellaneous',
+                component: ComponentCreator('/next/n2e/miscellaneous', 'af3'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/next/n2e/model-management',
+                component: ComponentCreator('/next/n2e/model-management', 'ab4'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/next/n2e/name-to-ethnicity-api',
                 component: ComponentCreator('/next/n2e/name-to-ethnicity-api', '4be'),
-                exact: true,
-                sidebar: "openApiSidebar"
-              },
-              {
-                path: '/next/n2e/utilities',
-                component: ComponentCreator('/next/n2e/utilities', '5dc'),
                 exact: true,
                 sidebar: "openApiSidebar"
               }
@@ -109,57 +109,57 @@ export default [
       },
       {
         path: '/',
-        component: ComponentCreator('/', '5fa'),
+        component: ComponentCreator('/', '56b'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', 'b69'),
+            component: ComponentCreator('/', '853'),
             routes: [
               {
                 path: '/n2e/classification',
-                component: ComponentCreator('/n2e/classification', 'e05'),
+                component: ComponentCreator('/n2e/classification', '538'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/classification-route',
-                component: ComponentCreator('/n2e/classification-route', '556'),
+                component: ComponentCreator('/n2e/classification-route', '048'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/get-default-models-route',
-                component: ComponentCreator('/n2e/get-default-models-route', 'bfa'),
+                component: ComponentCreator('/n2e/get-default-models-route', '6f2'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/get-models-route',
-                component: ComponentCreator('/n2e/get-models-route', 'a3b'),
+                component: ComponentCreator('/n2e/get-models-route', '4bc'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/get-nationalities-route',
-                component: ComponentCreator('/n2e/get-nationalities-route', '72b'),
+                component: ComponentCreator('/n2e/get-nationalities-route', '7e8'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
-                path: '/n2e/models',
-                component: ComponentCreator('/n2e/models', '7b3'),
+                path: '/n2e/miscellaneous',
+                component: ComponentCreator('/n2e/miscellaneous', 'c46'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/n2e/model-management',
+                component: ComponentCreator('/n2e/model-management', '79a'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/name-to-ethnicity-api',
-                component: ComponentCreator('/n2e/name-to-ethnicity-api', '105'),
-                exact: true,
-                sidebar: "openApiSidebar"
-              },
-              {
-                path: '/n2e/utilities',
-                component: ComponentCreator('/n2e/utilities', 'e88'),
+                component: ComponentCreator('/n2e/name-to-ethnicity-api', '5a0'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },

@@ -36,18 +36,18 @@
               "sidebar": "openApiSidebar"
             },
             {
-              "id": "n2e/models",
-              "path": "/next/n2e/models",
+              "id": "n2e/miscellaneous",
+              "path": "/next/n2e/miscellaneous",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/model-management",
+              "path": "/next/n2e/model-management",
               "sidebar": "openApiSidebar"
             },
             {
               "id": "n2e/name-to-ethnicity-api",
               "path": "/next/n2e/name-to-ethnicity-api",
-              "sidebar": "openApiSidebar"
-            },
-            {
-              "id": "n2e/utilities",
-              "path": "/next/n2e/utilities",
               "sidebar": "openApiSidebar"
             },
             {
@@ -73,8 +73,8 @@
           }
         },
         {
-          "name": "1.0.0",
-          "label": "1.0.0",
+          "name": "0.1.0",
+          "label": "0.1.0",
           "isLast": true,
           "path": "/",
           "mainDocId": "n2e/name-to-ethnicity-api",
@@ -105,18 +105,18 @@
               "sidebar": "openApiSidebar"
             },
             {
-              "id": "n2e/models",
-              "path": "/n2e/models",
+              "id": "n2e/miscellaneous",
+              "path": "/n2e/miscellaneous",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/model-management",
+              "path": "/n2e/model-management",
               "sidebar": "openApiSidebar"
             },
             {
               "id": "n2e/name-to-ethnicity-api",
               "path": "/n2e/name-to-ethnicity-api",
-              "sidebar": "openApiSidebar"
-            },
-            {
-              "id": "n2e/utilities",
-              "path": "/n2e/utilities",
               "sidebar": "openApiSidebar"
             },
             {

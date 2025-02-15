@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>N2E Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="/swagger-static/swagger-ui-bundle.min.css"/>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="/swagger-static/swagger-ui-bundle.min.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "/openapi.json",
+                dom_id: "#swagger-ui"
+            });
+        }
+    </script>
+</body>
+</html>

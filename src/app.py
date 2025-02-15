@@ -6,14 +6,13 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
+from flask_spec_gen import openapi_generator as og
 
 from db.database import db
 from routes.model_routes import model_routes
 from routes.user_routes import user_routes
 from routes.util_routes import util_routes
 from routes.inference_routes import inference_routes
-
-from openapi_generator import OpenAIGenerator, register_route
 
 load_dotenv()
 
@@ -26,8 +25,8 @@ db_password = os.environ.get("POSTGRES_PASSWORD")
 
 app = Flask(__name__)
 
-app.config["OPENAPI_SPEC"] = json.load(open("./data/api_config.json", "r"))
-app.config["OPENAPI_SWAGGER_ENDPOINT"] = "swagger-ui"
+with open("./data/config.json", "r") as f:
+    app.config["OPENAPI_CONFIG"] = json.load(f)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{db_host}:{db_port}/{db_name}?user={db_user}&password={db_password}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
@@ -42,8 +41,8 @@ app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER")
 
-
-openapi_generator = OpenAIGenerator(app)
+openapi_base_config = json.load(open("./data/config.json", "r"))
+openapi_generator = og.OpenAPIGenerator(app, openapi_base_config)
 
 CORS(app)
 jwt = JWTManager(app)
@@ -59,8 +58,7 @@ app.register_blueprint(model_routes)
 app.register_blueprint(inference_routes)
 app.register_blueprint(util_routes)
 
-
-app.openapi_generator.generate_openapi_spec(app)
+openapi_generator.generate()
 
 if __name__ == "__main__":
     app.run()

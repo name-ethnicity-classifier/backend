@@ -1,7 +1,8 @@
 {
     "openapi": "3.0.3",
     "info": {
-        "title": "name-to-ethnicity API",
+        "title": "Name-to-ethnicity API",
+        "version": "1.0.0",
         "description": "This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retrieve a list of all your models.",
         "termsOfService": "https://www.name-to-ethnicity.com/terms-of-service",
         "contact": {
@@ -10,8 +11,7 @@
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0.0"
+        }
     },
     "servers": [
         {
@@ -19,7 +19,7 @@
             "description": "Production server"
         },
         {
-            "url": "http://localhost:8080",
+            "url": "http://localhost:8080/",
             "description": "Local server"
         }
     ],
@@ -29,11 +29,11 @@
             "description": "API endpoints for name classification."
         },
         {
-            "name": "Models",
+            "name": "Model Management",
             "description": "API endpoints model management."
         },
         {
-            "name": "Utilities",
+            "name": "Miscellaneous",
             "description": "Miscellaneous API endpoints."
         }
     ],
@@ -311,18 +311,21 @@
                 "title": "NationalitiesSchema",
                 "type": "object"
             }
+        },
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "description": "For authorizing your requests, use the 'Authorization' header in the format of 'Bearer {token}'. To get your API token visit https://www.name-to-ethnicity.com and create an account.",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
         }
     },
-    "security": [
-        {
-            "BearerAuth": []
-        }
-    ],
     "paths": {
         "/models": {
             "get": {
                 "tags": [
-                    "Models"
+                    "Model Management"
                 ],
                 "description": "Get all models.",
                 "summary": "Get all models.",
@@ -344,13 +347,18 @@
                     "500": {
                         "description": "Internal server error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
             }
         },
         "/default-models": {
             "get": {
                 "tags": [
-                    "Models"
+                    "Model Management"
                 ],
                 "description": "Get all default models.",
                 "summary": "Get all default models.",
@@ -369,7 +377,12 @@
                     "500": {
                         "description": "Internal server error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
             }
         },
         "/classify": {
@@ -404,6 +417,11 @@
                         "description": "Internal server error"
                     }
                 },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -418,7 +436,7 @@
         "/nationalities": {
             "get": {
                 "tags": [
-                    "Utilities"
+                    "Miscellaneous"
                 ],
                 "description": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
                 "summary": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
@@ -437,7 +455,12 @@
                     "500": {
                         "description": "Internal server error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ]
             }
         }
     }

@@ -1,0 +1,29 @@
+{
+  "id": "n2e/model-management",
+  "title": "Model Management",
+  "description": "Model Management",
+  "source": "@site/docs/n2e/model-management.tag.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/model-management",
+  "permalink": "/next/n2e/model-management",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "model-management",
+    "title": "Model Management",
+    "description": "Model Management",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Classify names.",
+    "permalink": "/next/n2e/classification-route"
+  },
+  "next": {
+    "title": "Get all models.",
+    "permalink": "/next/n2e/get-models-route"
+  }
+}

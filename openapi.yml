@@ -256,7 +256,7 @@ paths:
       - BearerAuth: []
       summary: Get all default models.
       tags:
-      - Models
+      - Model Management
   /models:
     get:
       description: Get all models.
@@ -276,7 +276,7 @@ paths:
       - BearerAuth: []
       summary: Get all models.
       tags:
-      - Models
+      - Model Management
   /nationalities:
     get:
       description: Returns a list of all available nationalities (49) and nat. groups
@@ -296,18 +296,16 @@ paths:
       summary: Returns a list of all available nationalities (49) and nat. groups
         (8) along with the amount of samples we have of them in our dataset.
       tags:
-      - Utilities
-security:
-- BearerAuth: []
+      - Miscellaneous
 servers:
 - description: Production server
   url: https://api.name-to-ethnicity.com/
 - description: Local server
-  url: http://localhost:8080
+  url: http://localhost:8080/
 tags:
 - description: API endpoints for name classification.
   name: Classification
 - description: API endpoints model management.
-  name: Models
+  name: Model Management
 - description: Miscellaneous API endpoints.
-  name: Utilities
+  name: Miscellaneous

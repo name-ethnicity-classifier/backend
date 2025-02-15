@@ -188,6 +188,14 @@ components:
       - nationalityGroups
       title: NationalitiesSchema
       type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      description: For authorizing your requests, use the 'Authorization' header in
+        the format of 'Bearer {token}'. To get your API token visit https://www.name-to-ethnicity.com
+        and create an account.
+      scheme: bearer
+      type: http
 info:
   contact:
     email: theodorpeifer@gmail.com
@@ -198,7 +206,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: https://www.name-to-ethnicity.com/terms-of-service
-  title: name-to-ethnicity API
+  title: Name-to-ethnicity API
   version: 1.0.0
 openapi: 3.0.3
 paths:
@@ -226,6 +234,8 @@ paths:
           description: Too many names
         '500':
           description: Internal server error
+      security:
+      - BearerAuth: []
       summary: Classify names.
       tags:
       - Classification
@@ -242,9 +252,11 @@ paths:
           description: Successfully retrieved models.
         '500':
           description: Internal server error
+      security:
+      - BearerAuth: []
       summary: Get all default models.
       tags:
-      - Models
+      - Model Management
   /models:
     get:
       description: Get all models.
@@ -260,9 +272,11 @@ paths:
           description: Authentication failed
         '500':
           description: Internal server error
+      security:
+      - BearerAuth: []
       summary: Get all models.
       tags:
-      - Models
+      - Model Management
   /nationalities:
     get:
       description: Returns a list of all available nationalities (49) and nat. groups
@@ -277,21 +291,21 @@ paths:
           description: Successfully retrieved nationalities
         '500':
           description: Internal server error
+      security:
+      - BearerAuth: []
       summary: Returns a list of all available nationalities (49) and nat. groups
         (8) along with the amount of samples we have of them in our dataset.
       tags:
-      - Utilities
-security:
-- BearerAuth: []
+      - Miscellaneous
 servers:
 - description: Production server
   url: https://api.name-to-ethnicity.com/
 - description: Local server
-  url: http://localhost:8080
+  url: http://localhost:8080/
 tags:
 - description: API endpoints for name classification.
   name: Classification
 - description: API endpoints model management.
-  name: Models
+  name: Model Management
 - description: Miscellaneous API endpoints.
-  name: Utilities
+  name: Miscellaneous

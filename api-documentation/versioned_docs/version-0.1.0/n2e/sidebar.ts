@@ -24,10 +24,10 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Models",
+      label: "Model Management",
       link: {
         type: "doc",
-        id: "n2e/models",
+        id: "n2e/model-management",
       },
       items: [
         {
@@ -46,10 +46,10 @@ const sidebar: SidebarsConfig = {
     },
     {
       type: "category",
-      label: "Utilities",
+      label: "Miscellaneous",
       link: {
         type: "doc",
-        id: "n2e/utilities",
+        id: "n2e/miscellaneous",
       },
       items: [
         {
