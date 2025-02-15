@@ -1,8 +1,7 @@
-
 from errors import error_handler
 from flask import Blueprint, current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from openapi_generator import OAIRequest, OAIResponse, register_route
+from flask_spec_gen import openapi_generator as og
 from services.user_services import check_user_existence
 from utils import success_response
 from schemas.inference_schema import InferenceSchema, InferenceResponseSchema, InferenceDistributionResponseSchema
@@ -10,20 +9,21 @@ from inference import inference
 from services.model_services import get_model_id_by_name
 from services.inference_services import increment_request_counter
 
+
 inference_routes = Blueprint("inference", __name__)
 
 
 @inference_routes.route("/classify", methods=["POST"])
-@register_route(
+@og.register_route(
     description="Classify names.",
     tags=["Classification"],
-    requests=[OAIRequest("Request body for classification", InferenceSchema)],
+    requests=[og.OAIRequest("Request body for classification", InferenceSchema)],
     responses=[
-        OAIResponse(200, "Successful classification", InferenceResponseSchema),
-        OAIResponse(401, "Authentication failed"),
-        OAIResponse(404, "Model not found"),
-        OAIResponse(422, "Too many names"),
-        OAIResponse(500, "Internal server error"),
+        og.OAIResponse(200, "Successful classification", InferenceResponseSchema),
+        og.OAIResponse(401, "Authentication failed"),
+        og.OAIResponse(404, "Model not found"),
+        og.OAIResponse(422, "Too many names"),
+        og.OAIResponse(500, "Internal server error"),
     ]
 )
 @jwt_required()

@@ -42,17 +42,17 @@
       "plugin": "plugin---docusaurus-debugb-38-ad3"
     }
   },
-  "/-86f": {
+  "/-f1d": {
     "__comp": "__comp---theme-docs-root-5-e-9-0b6",
     "__context": {
       "plugin": "plugin---aba-d70"
     }
   },
-  "/next-091": {
+  "/next-51c": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---nextb-68-93e"
   },
-  "/next-2cf": {
+  "/next-3a6": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
   "/next/-26c": {
@@ -79,56 +79,56 @@
     "__comp": "__comp---theme-api-item-4-c-5-a29",
     "content": "content---next-n-2-e-get-nationalities-route-4-eb-9b7"
   },
-  "/next/n2e/models-09f": {
+  "/next/n2e/miscellaneous-af3": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---next-n-2-e-models-402-918"
+    "content": "content---next-n-2-e-miscellaneous-11-c-a22"
+  },
+  "/next/n2e/model-management-ab4": {
+    "__comp": "__comp---theme-api-item-4-c-5-a29",
+    "content": "content---next-n-2-e-model-management-7-ef-2e6"
   },
   "/next/n2e/name-to-ethnicity-api-4be": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
     "content": "content---next-n-2-e-name-to-ethnicity-api-514-57f"
   },
-  "/next/n2e/utilities-5dc": {
-    "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---next-n-2-e-utilitiesa-56-fb8"
-  },
-  "/-5fa": {
+  "/-56b": {
     "__comp": "__comp---theme-doc-version-roota-7-b-5de",
     "__props": "__props---22-d-307"
   },
-  "/-b69": {
+  "/-853": {
     "__comp": "__comp---theme-doc-roota-94-67a"
   },
-  "/n2e/classification-e05": {
+  "/n2e/classification-538": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-classificationb-9-e-096"
+    "content": "content---n-2-e-classification-24-f-b35"
   },
-  "/n2e/classification-route-556": {
+  "/n2e/classification-route-048": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-classification-route-598-322"
+    "content": "content---n-2-e-classification-routef-73-1c1"
   },
-  "/n2e/get-default-models-route-bfa": {
+  "/n2e/get-default-models-route-6f2": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-get-default-models-route-0-f-2-531"
+    "content": "content---n-2-e-get-default-models-routec-43-56f"
   },
-  "/n2e/get-models-route-a3b": {
+  "/n2e/get-models-route-4bc": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-get-models-route-2-ff-71f"
+    "content": "content---n-2-e-get-models-routecb-7-ca9"
   },
-  "/n2e/get-nationalities-route-72b": {
+  "/n2e/get-nationalities-route-7e8": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-get-nationalities-routeafc-594"
+    "content": "content---n-2-e-get-nationalities-route-2-cf-f3e"
   },
-  "/n2e/models-7b3": {
+  "/n2e/miscellaneous-c46": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-models-415-8de"
+    "content": "content---n-2-e-miscellaneous-9-d-7-894"
   },
-  "/n2e/name-to-ethnicity-api-105": {
+  "/n2e/model-management-79a": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-name-to-ethnicity-apifec-2aa"
+    "content": "content---n-2-e-model-management-07-e-e34"
   },
-  "/n2e/utilities-e88": {
+  "/n2e/name-to-ethnicity-api-5a0": {
     "__comp": "__comp---theme-api-item-4-c-5-a29",
-    "content": "content---n-2-e-utilities-0-f-1-6f6"
+    "content": "content---n-2-e-name-to-ethnicity-api-4-b-4-0ec"
   },
   "/-c94": {
     "__comp": "__comp---theme-doc-category-generated-index-page-14-e-640",

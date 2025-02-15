@@ -2,15 +2,15 @@
   "id": "n2e/get-models-route",
   "title": "Get all models.",
   "description": "Get all models.",
-  "source": "@site/docs/n2e/get-models-route.api.mdx",
+  "source": "@site/versioned_docs/version-0.1.0/n2e/get-models-route.api.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/get-models-route",
-  "permalink": "/next/n2e/get-models-route",
+  "permalink": "/n2e/get-models-route",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
   "tags": [],
-  "version": "current",
+  "version": "0.1.0",
   "frontMatter": {
     "id": "get-models-route",
     "title": "Get all models.",
@@ -26,10 +26,10 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Model Management",
-    "permalink": "/next/n2e/model-management"
+    "permalink": "/n2e/model-management"
   },
   "next": {
     "title": "Get all default models.",
-    "permalink": "/next/n2e/get-default-models-route"
+    "permalink": "/n2e/get-default-models-route"
   }
 }

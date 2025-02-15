@@ -1,12 +1,12 @@
-name: Test and Build
+name: Test, build and release
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main 
 
 jobs:
   test:
@@ -25,6 +25,7 @@ jobs:
       JWT_EXPIRATION_DAYS: 30
       MAX_NAMES: 10
       BATCH_SIZE: 30
+      MAX_MODELS: 3
 
     services:
       postgres:
@@ -54,12 +55,46 @@ jobs:
         run: |
           pytest
 
-  docker-push:
+  version-check:
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+
+    outputs:
+      bump_type: ${{ steps.check_version.outputs.bump_type }}
+
+    steps:
+      - name: Get previous version
+        id: previous_version
+        run: echo ::set-output name=version::$(cat VERSION)
+
+      - name: Get current version
+        id: current_version
+        run: echo ::set-output name=version::$(curl https://raw.githubusercontent.com/${{ github.repository }}/main/VERSION)
+
+      - name: Check version
+        id: check_version
+        run: |
+          python check_version.py ${{ steps.previous_version.outputs.version }} ${{ steps.current_version.outputs.version }}
+    
+  image-release:
+    needs: version-check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.version-check.outputs.bump_type != 'patch'
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get previous version
+        id: previous_version
+        run: echo ::set-output name=version::$(cat VERSION)
+
+      - name: Get current version
+        id: current_version
+        run: echo ::set-output name=version::$(cat VERSION)
+
+      - name: Check version
+        run: |
+          python check_version.py ${{ steps.previous_version.outputs.version }} ${{ steps.current_version.outputs.version }}
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -75,3 +110,21 @@ jobs:
 
       - name: Push image to GitHub Container Registry
         run: docker push ghcr.io/name-ethnicity-classifier/n2e-backend
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.current_version.outputs.version }}
+          release_name: 🎉 N2E Backend ${{ steps.current_version.outputs.version }}
+          draft: false
+          prerelease: false
+        id: create_release
+  
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}

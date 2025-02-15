@@ -1,32 +1,15 @@
 from dataclasses import dataclass
 import json
+import os
 import yaml
-from flask import Flask, jsonify, send_file, render_template_string
+from flask import Flask, jsonify, render_template_string, send_from_directory
 from pydantic import BaseModel
+from flask_spec_gen.models import *
 
-OPENAPI_SPEC_ENV = "OPENAPI_SPEC"
-OPENAPI_SWAGGER_ENDPOINT_ENV = "OPENAPI_SWAGGER_ENDPOINT"
-SWAGGER_UI_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui.min.css"/>
-</head>
-<body>
-    <div id="swagger-ui"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1/swagger-ui-bundle.min.js"></script>
-    <script>
-        window.onload = function() {
-            const ui = SwaggerUIBundle({
-                url: '/openapi.json',
-                dom_id: '#swagger-ui'
-            });
-        }
-    </script>
-</body>
-</html>
-"""
+
+with open(os.path.join(os.path.dirname(__file__), "static/swagger-ui.html"), "r") as f:
+    SWAGGER_UI_TEMPLATE = f.read()
+
 
 @dataclass
 class OAIRequest:
@@ -39,17 +22,45 @@ class OAIResponse:
     description: str
     model: BaseModel = None
 
-class OpenAIGenerator:
-    def __init__(self, app: Flask):
-        self.openapi_routes = {}
-        self.components = {}
+
+class OpenAPIGenerator:
+
+    def __init__(self, app: Flask, base_config: dict):
+        self.base_config = base_config
         self.openapi_specification = {}
+
+        if (version := app.config["API_VERSION"]):
+            base_config["info"]["version"] = version.strip()
+
+        self.served_specification = None
 
         self._init_app(app)
 
+    def _read_and_validate_base_config(self):
+        config = Config(**self.base_config)
+
+        self.openapi_specification = {
+            "openapi": config.openapi,
+            "info": config.info.model_dump(mode="json", exclude_none=True),
+            "servers": [server.model_dump(mode="json", exclude_none=True) for server in config.servers],
+            "tags": [],
+            "components": {
+                "schemas": {}
+            },
+            "paths": {}
+        }
+
+        if config.tags and len(config.tags) > 0:
+            self.openapi_specification["tags"] = [tag.model_dump(mode="json", exclude_none=True) for tag in config.tags]
+            
+        if config.securitySchemes and len(config.securitySchemes) > 0:
+            securitySchemes = {}
+            for name in config.securitySchemes:
+                securitySchemes[name] = config.securitySchemes[name].model_dump(mode="json", exclude_none=True)
+            self.openapi_specification["components"]["securitySchemes"] = securitySchemes
+
     def _init_app(self, app: Flask):
-        if OPENAPI_SPEC_ENV not in app.config:
-            raise ValueError(f"Basic OpenAPI configuration must be provided under app.config['{OPENAPI_SPEC_ENV}'].")
+        self._read_and_validate_base_config()
         
         app.openapi_generator = self
         original_add_url_rule = app.add_url_rule
@@ -64,11 +75,17 @@ class OpenAIGenerator:
         
         @app.route("/openapi.json")
         def serve_openapi_json():
-            return jsonify(self.openapi_specification)
+            return jsonify(self.served_specification)
 
-        @app.route(f"/{app.config[OPENAPI_SWAGGER_ENDPOINT_ENV]}")
-        def serve_swagger_ui():
-            return render_template_string(SWAGGER_UI_TEMPLATE)
+        if self.base_config["swaggerEnabled"]:
+            @app.route("/swagger-static/<path:filename>")
+            def serve_swagger_static(filename):
+                static_dir = os.path.join(os.path.dirname(__file__), "static/swagger-ui")
+                return send_from_directory(static_dir, filename)
+
+            @app.route(f"/{self.base_config['swaggerUrl']}")
+            def serve_swagger_ui():
+                return render_template_string(SWAGGER_UI_TEMPLATE)
 
     def _collect(self, rule, methods, view_func):
         method = methods[0].lower()
@@ -104,7 +121,7 @@ class OpenAIGenerator:
                 response_spec["content"] = {"application/json": {"schema": schema_ref}}
             route_spec["responses"][str(response.status_code)] = response_spec
 
-        self.openapi_routes.setdefault(rule, {})[method] = route_spec
+        self.openapi_specification["paths"].setdefault(rule, {})[method] = route_spec
     
     def _update_schema_ref(self, schema: dict) -> dict:
         if "items" in schema and "$ref" in schema["items"]:
@@ -135,33 +152,25 @@ class OpenAIGenerator:
         else:
             schema = self._update_schema_ref(schema)
 
-        self.components[model_name] = schema
+        self.openapi_specification["components"]["schemas"][model_name] = schema
 
         return {"$ref": f"#/components/schemas/{model_name}"}
 
-    def _save_openapi_spec(self, spec: dict, file_format: str = "both"):
+    def save_to_file(self, file_format: str = "both"):
         valid_formats = ["yml", "yaml", "json", "both"]
         if file_format not in valid_formats:
             raise ValueError(f"Valid formats are: {', '.join(valid_formats)}")
         
         if file_format == "json" or file_format == "both":
-            json.dump(spec, open("openapi.json", "w"), indent=4)
+            json.dump(self.served_specification, open("openapi.json", "w"), indent=4)
         if file_format in ["yml", "yaml"] or file_format == "both":
-            yaml.dump(spec, open("openapi.yml", "w"), default_flow_style=False)
+            yaml.dump(self.served_specification, open("openapi.yml", "w"), default_flow_style=False)
 
-    def generate_openapi_spec(self, app: Flask, save_to_file: bool = True, file_format: str = "both"):
-        spec = app.config[OPENAPI_SPEC_ENV]
-        spec["paths"] = self.openapi_routes
-
-        if "components" not in spec:
-            spec["components"] = {}
-
-        spec["components"]["schemas"] = self.components
+    def generate(self, save_to_file: bool = True, format: str = "both"):
+        self.served_specification = self.openapi_specification
 
         if save_to_file:
-            self._save_openapi_spec(spec, file_format=file_format)
-        
-        self.openapi_specification = spec
+            self.save_to_file(format)
 
 
 def register_route(description: str, tags: list[str], requests: list[OAIRequest] = None, responses: list[OAIResponse] = None):
@@ -173,3 +182,6 @@ def register_route(description: str, tags: list[str], requests: list[OAIRequest]
         func._response_models = responses if responses else []
         return func
     return decorator
+
+
+

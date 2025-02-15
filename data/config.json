@@ -13,6 +13,8 @@
         },
         "version": "1.0.0"
     },
+    "swaggerUrl": "/swagger-ui",
+    "swaggerEnabled": true,
     "servers": [
         {
             "url": "https://api.name-to-ethnicity.com/",
@@ -29,27 +31,20 @@
             "description": "API endpoints for name classification."
         },
         {
-            "name": "Models",
+            "name": "Model Management",
             "description": "API endpoints model management."
         },
         {
-            "name": "Utilities",
+            "name": "Miscellaneous",
             "description": "Miscellaneous API endpoints."
         }
     ],
-    "components": {
-        "securitySchemes": {
-            "BearerAuth": {
-                "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT",
-                "description": "For authorizing your requests, use the 'Authorization' header in the format of 'Bearer {token}'. To get your API token visit https://www.name-to-ethnicity.com and create an account."
-            }
+    "securitySchemes": {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "description": "For authorizing your requests, use the 'Authorization' header in the format of 'Bearer {token}'. To get your API token visit https://www.name-to-ethnicity.com and create an account."
         }
-    },
-    "security": [
-        {
-            "BearerAuth": []
-        }
-    ]
+    }
 }

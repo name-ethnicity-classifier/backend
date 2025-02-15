@@ -2,15 +2,15 @@
   "id": "n2e/classification-route",
   "title": "Classify names.",
   "description": "Classify names.",
-  "source": "@site/docs/n2e/classification-route.api.mdx",
+  "source": "@site/versioned_docs/version-0.1.0/n2e/classification-route.api.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/classification-route",
-  "permalink": "/next/n2e/classification-route",
+  "permalink": "/n2e/classification-route",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
   "tags": [],
-  "version": "current",
+  "version": "0.1.0",
   "frontMatter": {
     "id": "classification-route",
     "title": "Classify names.",
@@ -26,10 +26,10 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Classification",
-    "permalink": "/next/n2e/classification"
+    "permalink": "/n2e/classification"
   },
   "next": {
     "title": "Model Management",
-    "permalink": "/next/n2e/model-management"
+    "permalink": "/n2e/model-management"
   }
 }

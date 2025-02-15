@@ -5,7 +5,8 @@ from services.model_services import add_model, get_models, get_default_models, d
 from services.user_services import check_user_existence
 from utils import success_response
 from errors import error_handler
-from openapi_generator import OAIRequest, OAIResponse, register_route
+from flask_spec_gen import openapi_generator as og
+
 
 model_routes = Blueprint("models", __name__)
 
@@ -47,13 +48,13 @@ def delete_models_route():
 
 
 @model_routes.route("/models", methods=["GET"])
-@register_route(
+@og.register_route(
     description="Get all models.",
-    tags=["Models"],
+    tags=["Model Management"],
     responses=[
-        OAIResponse(200, "Successfully retrieved models.", ModelsResponseSchema),
-        OAIResponse(401, "Authentication failed"),
-        OAIResponse(500, "Internal server error"),
+        og.OAIResponse(200, "Successfully retrieved models.", ModelsResponseSchema),
+        og.OAIResponse(401, "Authentication failed"),
+        og.OAIResponse(500, "Internal server error"),
     ],
 )
 @jwt_required()
@@ -76,12 +77,12 @@ def get_models_route():
 
 
 @model_routes.route("/default-models", methods=["GET"])
-@register_route(
+@og.register_route(
     description="Get all default models.",
-    tags=["Models"],
+    tags=["Model Management"],
     responses=[
-        OAIResponse(200, "Successfully retrieved models.", DefaultModelsResponseSchema),
-        OAIResponse(500, "Internal server error"),
+        og.OAIResponse(200, "Successfully retrieved models.", DefaultModelsResponseSchema),
+        og.OAIResponse(500, "Internal server error"),
     ],
 )
 @error_handler
