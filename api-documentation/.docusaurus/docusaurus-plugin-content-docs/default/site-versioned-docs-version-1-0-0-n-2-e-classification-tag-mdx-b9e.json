@@ -1,0 +1,29 @@
+{
+  "id": "n2e/classification",
+  "title": "Classification",
+  "description": "Classification",
+  "source": "@site/versioned_docs/version-1.0.0/n2e/classification.tag.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/classification",
+  "permalink": "/n2e/classification",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "1.0.0",
+  "frontMatter": {
+    "id": "classification",
+    "title": "Classification",
+    "description": "Classification",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Introduction",
+    "permalink": "/n2e/name-to-ethnicity-api"
+  },
+  "next": {
+    "title": "Classify names.",
+    "permalink": "/n2e/classification-route"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "n2e/get-nationalities-route",
+  "title": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+  "description": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+  "source": "@site/versioned_docs/version-0.1.0/n2e/get-nationalities-route.api.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/get-nationalities-route",
+  "permalink": "/n2e/get-nationalities-route",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "0.1.0",
+  "frontMatter": {
+    "id": "get-nationalities-route",
+    "title": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+    "description": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+    "sidebar_label": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+    "hide_title": true,
+    "hide_table_of_contents": true,
+    "api": "eJzNVk1v2zgQ/SuDuaQFFMsfaT50qneRFll0u0HjYg+BUYypscWGIlWSsqsV9N8XpJXEH8mpl55sz5Bv3rwZPblFTyuH2T3+LZ1gpUizqR3OE8zZCSsrL43GDL+wr612QKCk82CWQEoBrUkqWigGTeEgKeklO3hzdvUWSOchPICVNXXl4M3lWyBl9Ao20hfgCwYqTa0jmqOyUuxgw1DQmkPIF1yC1GBqCzl5cuwHmKCp2MZiNzlmuGL/ba/2N2tqz5igZVcZ7dhh1uJ4OAwf+z3d1UKwc8taqQYseyt5zfl+K5igMNqz9uE+VZWSIubT7y6AtOhEwSW9gB7jfSOQ7gv0SA4wQf4Zew8I+6WzFhdWeukKzM5Hk7OrySRBqXNJGrOr4eTsIkFt7IZXMTKeXI2HXbIL0nyM0kfqSytFODYanp1fTBIkvVJmWvJjeDS+GI8TZHJ+6iLg+WQ0HL3rugQrG1R/JHXEkvJcbkO3ewd9UzFmKLXnFVvsEvTSh07x84HG/Umz+M7C414Tuz38Qp1mu4XHtbqwKj9qaTkPz8Hh9I+JzF9pYzvwFwqEEu9eWsAb7dlqUuDYrtkCW2tsZORY1Fb6BrP7Fv9gsmyntS8wu5938wRL9oXp1x8TrCikMD3kvoV1EaS2CjMsvK9clqZUyYGmkk+9OWVfaCmkbwbClCkePvm31uS1CD96mtglu3BZmiojSBXG+exyeDk8hvgU8k+358/tRcm2M9xt8mmiAf8I7YOxQLUvjJX/Sb2CJhhEGCE77xKoHccn7mTan4minEDBlLMNhhKyS2NLis5zsq0MrTcPrLuTAcwMrNhvcae3NxATsJZOengUcLPZvCxgtD1hmTwDaSAhgsUF44pGEbpaxIKY9F8+RCqY4V//zuLwpV6aKMLTlh3UCawwwTDbrSSjwXAwPBJqVkgH0sV+zXIphSQFX67vZrGr3Ii6ZO2jPEEPeLWnAXx1QekgSFUvlBQRoTE1CNIgFDknlw2Eyw6k9ibUlBZK4zwo+cCqgWf2QaFHuz14oUTNS5OzckEyz7Z0/yzv2K6l4J39fZVqGq+cmuWp6y9tDZxENHAuSYbF9QWb3NiK5ZLt+1WIhtvBOpQUrF1vx3Fe04pEwTCOEu8tfqBBMTswdpX2V1366ebP689316fjwXBQ+FLFsVbG+ZL0DvDv81LdW5z2+ZX3G1HsLcHzT59WiqQOw4rTaHsDPDTveYLBlEKibRfk+KtVXRfCP2q2wVvnCa7JytBJtNYEty4RHfOBmzB8IbgKJrsmVQcCR/8B9gz54/UME6R9Gzt44CN6nyLd7GC37fbELFpRh0lPIjoQdvOu6/4H6l5h7g==",
+    "sidebar_class_name": "get api-method",
+    "info_path": "n2e/name-to-ethnicity-api",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Miscellaneous",
+    "permalink": "/n2e/miscellaneous"
+  }
+}

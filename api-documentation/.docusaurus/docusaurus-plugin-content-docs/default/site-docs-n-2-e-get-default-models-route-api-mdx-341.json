@@ -1,0 +1,35 @@
+{
+  "id": "n2e/get-default-models-route",
+  "title": "Get all default models.",
+  "description": "Get all default models.",
+  "source": "@site/docs/n2e/get-default-models-route.api.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/get-default-models-route",
+  "permalink": "/next/n2e/get-default-models-route",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "get-default-models-route",
+    "title": "Get all default models.",
+    "description": "Get all default models.",
+    "sidebar_label": "Get all default models.",
+    "hide_title": true,
+    "hide_table_of_contents": true,
+    "api": "eJyNVktv2zgQ/iuDueQiy4oX2SY6bTZ1iyzatGhc7CEwApoaWWwpUiUpp1pB/31BSn7JTtFLHJHz+OabF1t0bG0xfcKPOiMJH5liaypJOVxGmJHlRlROaIUpvicHTErIKGe1dFB6DRtjhLoiw7zUfYYprsk9DzLPvcyz0bUjjNCQrbSyZDFtcZYk/ufYyWPNOVmb11I2YMgZQRvKDnxxrZyHl7bIqkoKHhxPv1mv3qLlBZXsjN1wDk7DhkmRMUfgCoLpAHTSO4D38wVsQULGHAOMkH6yspKE6VOLjPPaMN5gmsQ3swi5oQBgIUrCFJPLSXI5mSWzq0XyZzq7TJMExzzeSWatyAVZWJF7IVJgK6aELUAbUNptP324igW7w8kzSUvh1NtiUjhBIXvDvQfrJZYRWq5NuEvi65soiW+ult0yQuGotL9Fz8NsDn1RnPBwTMP1m1/S8Ob3afgDyBVK8BDWQfS8EIosPa/JlEw954YUL87RMAhihL0oRjgIHzNy8yZK4usr/+dy2UVYGV/CvZV28NqiE85Hiw/+O0LXVCEVzgi1xm4UT4tMNZ/yUCRjyd2JqqXELnRWKDtM/Um08/T2wGJ3El+7z94Jlj3WQ5UdaGYMa7zcPnFnAKu6XJE5C3hr/3ar3+0JPbQ0RrgzOUbyuovH3mw3rqp9Qu6GcyfOJabzc+ZHLQxlviZUnz01ImZHxC6Okb8DRA+zeeiEvS+9+kbcHRL/ts9okLNfhhHSt9VJGjqP8erc+LtXjoxiEiyZDRkgY7QJIVnitRGuCSz/TcyQua1dgelT6OuSXKGH6YsRVsxf4Wi8+ViDXRus1EZiioVzlU2nU1aJ2HM1cXqybcMm5rqcnrTuZ6OzmvuPAWfI595cOp1KzZkstHXpdXKdnJr44O932st9fIGyvqoOo9yVi7d/Yu2dNsBqV2gj/hNqDY2uDfgiIOtsBLXtp/3F7SATsnwBBbGMDAgVbnNtSuZA53DRe4bW6e+kuosYFhrW5Hq7t5/vIVzARljhYEvgy8vLeQKBqQxCbREwBYxzXSsXh8rzwWKKq+AQo+GfdwEKpvjPv4uQfaFyPR5JR348KozQ57an5DJO4tOhuyiEBWFDvDrPBRdMwpf54yJElWle+90f6PF8wKsxxfDVeqY9IVW9koIHC42ugTMFvB/uDXhlC0I57X0KA6W2DqT4TrKBPXrP0HbbAwMpbEiEf24Ezvf735Ep7af8kcxGcDqo31ehToPKROcTOyj1rwjGwyuCSiZ84bqCdKZNRSIn89fan3pt3+NScFKW9rsBbyvGC4JZoPio8D0MFm5jbdbTQdVOP9zfzR8e55NZnMSFK2VIa6Wt82tqb/j1R9Zo2+zeQb9QGVrG0U83rSQTYakEtO0wIZ5wNCGWEfqu9Tdtu2KWvhrZdf74R03GT59lhBtmBFuFF5Hfnn0bhZHynZp+SVDlx9CGyTrMvfFL7WhkvZ8v/EA+7vNRRxyuKaaaA9tt20ssQq92GA0gQotit+y67n9YTr1o",
+    "sidebar_class_name": "get api-method",
+    "info_path": "n2e/name-to-ethnicity-api",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Get all models.",
+    "permalink": "/next/n2e/get-models-route"
+  },
+  "next": {
+    "title": "Miscellaneous",
+    "permalink": "/next/n2e/miscellaneous"
+  }
+}

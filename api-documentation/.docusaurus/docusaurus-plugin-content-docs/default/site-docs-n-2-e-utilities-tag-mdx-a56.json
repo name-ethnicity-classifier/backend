@@ -1,0 +1,29 @@
+{
+  "id": "n2e/utilities",
+  "title": "Utilities",
+  "description": "Utilities",
+  "source": "@site/docs/n2e/utilities.tag.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/utilities",
+  "permalink": "/next/n2e/utilities",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "utilities",
+    "title": "Utilities",
+    "description": "Utilities",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Get all default models.",
+    "permalink": "/next/n2e/get-default-models-route"
+  },
+  "next": {
+    "title": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+    "permalink": "/next/n2e/get-nationalities-route"
+  }
+}

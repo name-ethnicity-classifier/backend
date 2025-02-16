@@ -1,10 +1,8 @@
+import hashlib
 import re
 from email_validator import validate_email, EmailNotValidError
 from flask import Response, jsonify
 import json
-
-from db.tables import User
-from errors import CustomError
 
 
 def error_response(error_code: str, message: str, status_code: int) -> Response:
@@ -108,6 +106,15 @@ def get_nationalities() -> dict:
     return load_json("./data/nationalities.json")
 
 
+def generate_model_id(nationalities: list[str]) -> str:
+    """
+    Generates a model ID based on its nationalities (sorted alphabetically)
+    :param nationalities: Nationalities the model should be able to classify
+    :return: SHA256 hash id, truncated to 20 characters
+    """
+    return hashlib.sha256(",".join(sorted(set(nationalities))).encode()).hexdigest()[:20]
+
+
 def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     """
     Checks weather a requested nationality configuration is valid, ie. all nationalities do exist
@@ -115,32 +122,20 @@ def check_requested_nationalities(requested_nationalities: list[str]) -> int:
     :param requested_nationalities: Request nationality configuration
     :return: 0 if valid normal nationalities, 1 if valid nationality groups, -1 if invalid
     """
-    
-    nationalities = get_nationalities()["nationalities"].keys()
-    nationality_groups = get_nationalities()["nationalityGroups"].keys()
 
-    if set(requested_nationalities).issubset(list(nationalities) + ["else"]):
+    existing_nationalities = get_nationalities()
+
+    if len(requested_nationalities) < 2 or len(requested_nationalities) > len(existing_nationalities["nationalities"]):
+        return -1
+        
+    nationalities = list(existing_nationalities["nationalities"].keys()) + ["else"]
+    nationality_groups = list(existing_nationalities["nationalityGroups"].keys()) + ["else"]
+
+    if set(requested_nationalities).issubset(nationalities):
         return 0
-    elif set(requested_nationalities).issubset(list(nationality_groups) + ["else"]):
+    elif set(requested_nationalities).issubset(nationality_groups):
         return 1
     return -1
-
-
-def check_user_existence(user_id) -> None:
-    """
-    Checks if user with given ID exists in the database, to make sure
-    that even when a user is deleted their JWT token doesn't work anymore.
-    :param user_id: User id to check
-    """
-    
-    user = User.query.filter_by(id=user_id).first()
-
-    if not user:
-        raise CustomError(
-            error_code="AUTHENTICATION_FAILED",
-            message="User does not exist.",
-            status_code=401
-        )
 
 
 def load_json(file_path: str) -> dict:

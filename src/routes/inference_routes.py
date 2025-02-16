@@ -1,79 +1,57 @@
-
-from errors import CustomError, InferenceError
+from errors import error_handler
 from flask import Blueprint, current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from pydantic import ValidationError
-import traceback
-from sqlalchemy.exc import SQLAlchemyError 
-from utils import success_response, error_response
-from schemas.inference_schema import InferenceSchema
+from flask_spec_gen import openapi_generator as og
+from services.user_services import check_user_existence
+from utils import success_response
+from schemas.inference_schema import InferenceSchema, InferenceResponseSchema, InferenceDistributionResponseSchema
 from inference import inference
 from services.model_services import get_model_id_by_name
 from services.inference_services import increment_request_counter
+
 
 inference_routes = Blueprint("inference", __name__)
 
 
 @inference_routes.route("/classify", methods=["POST"])
+@og.register_route(
+    description="Classify names.",
+    tags=["Classification"],
+    requests=[og.OAIRequest("Request body for classification", InferenceSchema)],
+    responses=[
+        og.OAIResponse(200, "Successful classification", InferenceResponseSchema),
+        og.OAIResponse(401, "Authentication failed"),
+        og.OAIResponse(404, "Model not found"),
+        og.OAIResponse(422, "Too many names"),
+        og.OAIResponse(500, "Internal server error"),
+    ]
+)
 @jwt_required()
+@error_handler
 def classification_route():
     """ Route for classiying names into ethnicities """
 
     current_app.logger.info(f"Received classification request.")
 
-    try:
-        # Retrieve user id by decoding JWT token
-        user_id = get_jwt_identity()
+    user_id = get_jwt_identity()
+    check_user_existence(user_id)
 
-        request_data = InferenceSchema(**request.json)
+    request_data = InferenceSchema(**request.json)
+    model_id = get_model_id_by_name(user_id, request_data.modelName)
 
-        # Get model id by name
-        model_id = get_model_id_by_name(user_id, request_data.modelName)
+    prediction = inference.predict(
+        model_id=model_id,
+        names=request_data.names,
+        get_distribution=request_data.getDistribution
+    )
+    response_data = dict(zip(request_data.names, prediction))
+    if request_data.getDistribution:
+        InferenceDistributionResponseSchema(**response_data)
+    else:
+        InferenceResponseSchema(**response_data)
 
-        # Classify names
-        prediction = inference.predict(
-            model_id=model_id,
-            names=request_data.names,
-            get_distribution=request_data.getDistribution
-        )
-        response_data = dict(zip(request_data.names, prediction))
+    increment_request_counter(user_id=user_id, model_id=model_id, name_amount=len(request_data.names))
 
-        increment_request_counter(user_id=user_id, model_id=model_id)
-
-        current_app.logger.info("Successfully classified names.")
-        return success_response(data=response_data)
-    
-    # Handle Pydantic schema validation errors
-    except ValidationError as e:
-        current_app.logger.error("Model data validation failed. Error:\n{e}")
-        return error_response(
-            error_code="INVALID_MODEL_DATA", message="Invalid model data.", status_code=422
-        )
-    
-    # Handle inference errors
-    except InferenceError as e:
-        current_app.logger.error(f"Classification failed. Error:\n{e}. Traceback:\n{traceback.format_exc()}")
-        return error_response(
-            error_code=e.error_code, message=e.message, status_code=300
-        )
-    
-    # Handle custom errors
-    except CustomError as e:
-        current_app.logger.error(f"Classification failed. Error:\n{e}. Traceback:\n{traceback.format_exc()}")
-        return error_response(
-            error_code=e.error_code, message=e.message, status_code=e.status_code
-        )
-    
-    # Handle SQLAlchemy errors
-    except SQLAlchemyError as e:
-        current_app.logger.error(f"Failed query model name. Error:\n{e}")
-        return error_response(
-            error_code="SERVER_SIDE_ERROR", message="Failed query model name.", status_code=500
-        )
-    
-    # Handle unexpected errors
-    except Exception as e:
-        current_app.logger.error(f"Unexpected error while classifying names. Error:\n{e}. Traceback:\n{traceback.format_exc()}")
-        return error_response(
-            error_code="UNEXPECTED_ERROR", message="Unexpected error.", status_code=500
-        )
+    current_app.logger.info("Successfully classified names.")
+    return success_response(data=response_data)
+  

@@ -1,0 +1,35 @@
+{
+  "id": "n2e/get-models-route",
+  "title": "Get all models.",
+  "description": "Get all models.",
+  "source": "@site/docs/n2e/get-models-route.api.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/get-models-route",
+  "permalink": "/next/n2e/get-models-route",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "get-models-route",
+    "title": "Get all models.",
+    "description": "Get all models.",
+    "sidebar_label": "Get all models.",
+    "hide_title": true,
+    "hide_table_of_contents": true,
+    "api": "eJztV0tz2zYQ/is7e/GFomi1rm2e6jqKx53EycTK9ODReCBoKSIBAQYA5agc/vcOQEqiKLmTSy+dXPQAdr/99gmgRsdWFtMnfK+XJOE9U2xFBSmH8wiXZLkRpRNaYYp35IBJCYWXtDFGqEsyzO/eLzHFFbnndu/Z6MoRRmjIllpZspjWOEkS/3UI+lhxTtZmlZQbMOSMoDUteza4Vs7TSWtkZSkFDwbHX6xXr9HynAp2Ajesg9OwZlIsmSNwOcG4BYa76Qy25GDJHAOMkL6zopTkwXhlnS5CTHx0amScV4bxDaZJfHUZITcUiMxEQZhicj5KzkeTZHIxSy7TyXmaJDiM361k1opMkIUFuRciBb8AuVwJLpyg4K1iAY7nQpGl5xWZgqnnzJDiedj2WEwGeZ+1ThAjbEUxwk54HqHl2gSxJL6+jJL46sJ/nM+bkNqMVdK94uH15F89/O3HPbQlU8LmoA0o7bZ/e652K88kgxtHHnb7Pj1e4tCtq+soia8v5s28ibA0vh5bvWEGaxSOCvtDdfIwmULbDScK439VB8OYtVZrdMJ5b/HB/4/QbcqQKWeEWmEz8KdGpjYfslBDQ8ndiqqkxF7dYepXop2lNz3E5si/XvaOuOy59lV2pJkxbOPl9ok7QVhVxYLMScJb/JutfrMPaB9pyHAHOWTyuonHFrYZVtU+IbfduhOnEtP4gfutEoaWviZUmz01CMwuEDs/BvZ6jB4m09AJe1t68YW46wf+NjRaO1dPxH0waH424s9G/NmI/0kjvmkz+konDjgdHI/DLu0Zblc+dVeltkmPSTQe/tfk/LitbyqXk3LdtQ0yJiQtPeuLU7fBe+XIKCbBklmTATJGm8DdEq+McJuQ4j+IGTIeGtOncJ0pyOW6u4RihCXzWzjexaLFay86lZGYYu5cadPxmJUi9gkaOT3a9v4m5roYH82Lj0YvKx78aPFCEe3h0vFYas5krq1Lr5Kr5Bjind/fac/3foXItqXc925Xox7/CO2tNsAql2sj/hZqBRtdGfBZJutsBJVtL71nN51MyMEZ5MSWZECosJtpUzAHOoOz1jLUTn8l1ZzFMNOwItfi3ny8h7ABa2GFg20AX15eTgcQmFpCKGgCpoBxrivl4lDu3llMcREMYtT9eBuoYIp//jULWRcq08M5eGDHs8IIfW7bkJzHSXw86We5sCBs8FdnmeCCSfg0fZwFr5aaV/7J05WoNvCqTzF8tj7SPiBltZCCB4SNroAzBbw9UTbglS0I5bS3KQwU2jqQ4ivJDezZ+whtHz3AQAobEuFfWSHm+2eQI1PYD9kjmbXg1KvfV6mOg8pIZyPbKbWPKcbDY4oKJnzhupz0UpuSREbm95Vf9dq+RaXgpCztDyS8KRnPCSYhxAeF72mwsBtrsxp3qnb87v52+vA4HU3iJM5dIUNaS22dPxv3wMdvy8HRtnsGnhDtWsTRdzcuJRPh5Ars6m4SPGGxm2y+O/1KXS+Ypc9GNo1f/laR8dNlHuGaGcEWvuCe/NHctksYHV9p055AVPoxs2ayCiN2+DA9GEl305mf9of9PKj8/hnI1KaHXdetxCz0ZINRRyK0Ijbzpmn+Ac7OX+o=",
+    "sidebar_class_name": "get api-method",
+    "info_path": "n2e/name-to-ethnicity-api",
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "Model Management",
+    "permalink": "/next/n2e/model-management"
+  },
+  "next": {
+    "title": "Get all default models.",
+    "permalink": "/next/n2e/get-default-models-route"
+  }
+}

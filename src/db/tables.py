@@ -1,6 +1,3 @@
-from sqlalchemy.orm import relationship
-from sqlalchemy.event import listens_for
-from flask_jwt_extended import jwt_required, get_jwt_identity
 import datetime
 from db.database import db
 
@@ -17,8 +14,8 @@ class User(db.Model):
     password = db.Column(db.String(64), nullable=False)
     verified = db.Column(db.Boolean, default=False)
     consented = db.Column(db.Boolean, default=False)
-
-    # models = relationship("Model", secondary="user_to_model")
+    request_count = db.Column(db.Integer, default=0, nullable=False)
+    names_classified = db.Column(db.Integer, default=0, nullable=False)
 
     def to_dict(self):
         return {
@@ -29,7 +26,9 @@ class User(db.Model):
             "role": self.role,
             "password": self.password,
             "verified": self.consented,
-            "consented": self.consented
+            "consented": self.consented,
+            "request_count": self.request_count,
+            "names_classified": self.names_classified
         }
 
 
@@ -43,7 +42,9 @@ class Model(db.Model):
     scores = db.Column(db.ARRAY(db.Float), nullable=True)
     is_trained = db.Column(db.Boolean, default=False, nullable=False)
     is_grouped = db.Column(db.Boolean, default=False, nullable=False)
-    is_custom = db.Column(db.Boolean, default=False, nullable=False)
+    is_public = db.Column(db.Boolean, default=False, nullable=False)
+    public_name = db.Column(db.String(40), nullable=False)
+    request_count = db.Column(db.Integer, default=0, nullable=False)
     creation_time = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     def to_dict(self):
@@ -54,7 +55,9 @@ class Model(db.Model):
             "scores": self.scores,
             "is_trained": self.is_trained,
             "is_grouped": self.is_grouped,
-            "is_custom": self.is_custom,
+            "is_public": self.is_public,
+            "public_name": self.public_name,
+            "request_count": self.request_count,
             "creation_time": self.creation_time,
         }
 
@@ -68,6 +71,7 @@ class UserToModel(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     request_count = db.Column(db.Integer, default=0, nullable=False)
     name = db.Column(db.String(40), nullable=False)
+    description = db.Column(db.String(512), nullable=True)
 
     def to_dict(self):
         return {
@@ -75,5 +79,6 @@ class UserToModel(db.Model):
             "model_id": self.model_id,
             "user_id": self.user_id,
             "request_count": self.request_count,
-            "name": self.name
+            "name": self.name,
+            "description": self.description
         }

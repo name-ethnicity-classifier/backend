@@ -1,65 +1,63 @@
+from unittest.mock import patch
 from flask import jsonify
+from flask_jwt_extended import create_access_token
 import pytest
 import json
+
+from sqlalchemy import text
 from utils import *
 from app import app
 from db.database import db
 from db.tables import User
 
 
-TEST_USER_DATA = {
+TEST_USER = {
     "name": "user",
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
+    "verified": True,
     "consented": True
 }
+TEST_USER_ID = 1
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture(scope="function")
 def app_context():
     with app.app_context():
-        
-        # Create all tables if they don't exist
-        # They will probably exist when you test locally and used the ``run_dev_db.sh`` script,
-        # but they won't exist in the CI/CD runner therefore we call it here
-        db.create_all()
-        
-        # Create a test user for which to test different CRUD operations
-        # But if such this test user already exists, delete it and its questionnaire data
-        test_user = User.query.filter_by(email=TEST_USER_DATA["email"]).first()
-        if test_user:
-            db.session.delete(test_user)
+        db.drop_all()
+        with open("./dev-database/init_test.sql", "r") as file:
+            init_sql_script = file.read()    
+            db.session.execute(text(init_sql_script))
+
+        db.session.add(User(**TEST_USER))
+        db.session.commit()
 
         yield app
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def test_client(app_context):
-    # Creates the test user and retrieves a JWT token to make /questionnaire requests with
-    response = app.test_client().post("/signup", json=TEST_USER_DATA)
-    assert response.status_code == 200
-
-    login_data = {
-        "email": TEST_USER_DATA["email"],
-        "password": TEST_USER_DATA["password"]
-    }
-    response = app.test_client().post("/login", json=login_data)
-    assert response.status_code == 200
-
-    token = json.loads(response.data)["data"]["accessToken"]
-
-    return app_context.test_client(), token
+    client = app.test_client()
+    return client
 
 
+@pytest.fixture(scope="function")
+def authenticated_client(test_client):
+    """Mocks user authentication for tests requiring it."""
+    user_id = 2
+    with patch("flask_jwt_extended.get_jwt_identity") as mock_identity:
+        mock_identity.return_value = user_id
+
+        with app.test_request_context():
+            token = create_access_token(identity=user_id)
+        test_client.token = token
+        yield test_client
+
+
+@pytest.mark.it("should retrieve a nationalities and nationality groups when not authenticated")
 def test_get_nationalities(test_client):
-    test_client, token = test_client
-
-    test_header = {
-        "Authorization": f"Bearer {token}"
-    }
-    response = test_client.get("/nationalities", headers=test_header)
-
-    expected_response_data = get_nationalities()
+    response = test_client.get("/nationalities")
                               
     assert response.status_code == 200
-    assert json.loads(response.data) == expected_response_data
+    assert json.loads(response.data) == get_nationalities()

@@ -2,14 +2,15 @@
 docker_compose_path="./dev-database/docker-compose.yml"
 
 
-if [ "$1" = "--remove" ]; then
-  echo "Removing dev. database, UI and data."
-  read -p "Are you sure [Yy]? " response
+if [ "$1" = "--init" ]; then
+    echo "This will reinitialize the entire dev. database and remove its data."
+    read -p "Are you sure [y/n]? " response
     if [ "$response" = "y" ] || [ "$response" = "Y" ]; then
         docker-compose -f $docker_compose_path down -v
     else
-        echo "Exiting..."
+        echo "Exiting."
+        exit 0
     fi
-else
-    docker-compose -f $docker_compose_path up
 fi
+
+docker-compose -f $docker_compose_path up

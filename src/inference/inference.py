@@ -85,7 +85,6 @@ def classify_names(input_batch: torch.tensor, model_config: dict, classes: dict,
         channels=model_config["cnn-parameters"][2]
     ).to(device=device)
 
-
     model_path = model_config["model-file"]
 
     if device != "cuda:0":
@@ -178,7 +177,9 @@ def predict(model_id: str, names: list[str], get_distribution: bool=False) -> li
     if len(names) > MAX_NAMES:
         raise InferenceError(
             error_code="TOO_MANY_NAMES",
-            message=f"Too many names (maximum {MAX_NAMES}.")
+            message=f"Too many names (maximum {MAX_NAMES}.",
+            status_code=405    
+        )
 
     # preprocess inputs
     input_batch = preprocess_names(names=names, batch_size=BATCH_SIZE)

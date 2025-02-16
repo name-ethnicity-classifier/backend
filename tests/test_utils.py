@@ -15,6 +15,7 @@ def app_context():
         yield app
 
 
+@pytest.mark.it("should return the correct error response data when returning an error response")
 def test_error_response(app_context):
     # Test error response
     response = error_response(
@@ -27,6 +28,7 @@ def test_error_response(app_context):
     assert response.status_code == 404
  
 
+@pytest.mark.it("should return the correct success response data when returning a success response")
 def test_success_response(app_context):
     # Test success response with message only and default status code
     response = success_response(message="Test success message.")
@@ -56,6 +58,7 @@ def test_success_response(app_context):
         assert str(e), "Provide a success message and/or a response body."
 
 
+@pytest.mark.it("should convert a string to snake-case when calling appropiate function")
 def test_to_snake_case():
     camel_case_str = "aTestString"
     assert to_snake_case(camel_case_str) == "a_test_string"
@@ -73,6 +76,7 @@ def test_to_snake_case():
     assert to_snake_case(camel_case_str) == "string"
 
 
+@pytest.mark.it("should convert a string to camel-case when calling appropiate function")
 def test_to_camel_case():
     snake_case_str = "a_test_string"
     assert to_camel_case(snake_case_str) == "aTestString"
@@ -90,6 +94,7 @@ def test_to_camel_case():
     assert to_camel_case(snake_case_str) == "camelCaseString"
 
 
+@pytest.mark.it("should return 'False' when a password is not strong enough")
 def test_is_strong_password():
     assert is_strong_password("StrongPass123") == True
     assert is_strong_password("WeakPwd") == False
@@ -97,6 +102,7 @@ def test_is_strong_password():
     assert is_strong_password("") == False
 
 
+@pytest.mark.it("should return 'False' when an email is invalid")
 def test_is_valid_email():
     assert is_valid_email("test@example.com") == True
     assert is_valid_email("invalid.email") == False
@@ -104,6 +110,14 @@ def test_is_valid_email():
     assert is_valid_email("test@missingdomain.") == False
 
 
+@pytest.mark.it("should generate an id for a model when given the classes the model is trained on")
+def test_generate_model_id():
+    nationalities = ["else", "chinese", "dutch"]
+    nationalities_scrambled = ["chinese", "dutch", "else"]
+    assert generate_model_id(nationalities) == generate_model_id(nationalities_scrambled)
+
+
+@pytest.mark.it("should return an appropiate code describing the validity of a nationality/-group configuration when provided a list of chosen classes")
 def test_check_requested_nationalities():
     requested_nationalities = ["chinese", "else"]
     assert check_requested_nationalities(requested_nationalities) == 0

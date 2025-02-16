@@ -1,0 +1,33 @@
+{
+  "id": "n2e/name-to-ethnicity-api",
+  "title": "Name-to-ethnicity API",
+  "description": "This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retrieve a list of all your models.",
+  "source": "@site/docs/n2e/name-to-ethnicity-api.info.mdx",
+  "sourceDirName": "n2e",
+  "slug": "/n2e/name-to-ethnicity-api",
+  "permalink": "/next/n2e/name-to-ethnicity-api",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": null,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 0,
+  "frontMatter": {
+    "id": "name-to-ethnicity-api",
+    "title": "Name-to-ethnicity API",
+    "description": "This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retrieve a list of all your models.",
+    "sidebar_label": "Introduction",
+    "sidebar_position": 0,
+    "hide_title": true,
+    "custom_edit_url": null
+  },
+  "sidebar": "openApiSidebar",
+  "previous": {
+    "title": "N2E API",
+    "permalink": "/next/"
+  },
+  "next": {
+    "title": "Classification",
+    "permalink": "/next/n2e/classification"
+  }
+}
