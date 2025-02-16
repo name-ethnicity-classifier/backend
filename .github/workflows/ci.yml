@@ -57,44 +57,35 @@ jobs:
 
   version-check:
     needs: test
-    if: github.event.pull_request.base.ref == 'main'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
 
     outputs:
       bump_type: ${{ steps.check_version.outputs.bump_type }}
 
     steps:
-      - name: Get previous version
-        id: previous_version
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get new version
+        id: new_version
         run: echo ::set-output name=version::$(cat VERSION)
 
-      - name: Get current version
-        id: current_version
+      - name: Get previous version
+        id: previous_version
         run: echo ::set-output name=version::$(curl https://raw.githubusercontent.com/${{ github.repository }}/main/VERSION)
 
       - name: Check version
         id: check_version
         run: |
-          python check_version.py ${{ steps.previous_version.outputs.version }} ${{ steps.current_version.outputs.version }}
+          python .github/version_check.py ${{ steps.previous_version.outputs.version }} ${{ steps.new_version.outputs.version }}
     
   image-release:
     needs: version-check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.version-check.outputs.bump_type != 'patch'
+    if: github.event_name == 'push' && github.ref == 'main' && needs.version-check.outputs.bump_type != 'patch'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get previous version
-        id: previous_version
-        run: echo ::set-output name=version::$(cat VERSION)
-
-      - name: Get current version
-        id: current_version
-        run: echo ::set-output name=version::$(cat VERSION)
-
-      - name: Check version
-        run: |
-          python check_version.py ${{ steps.previous_version.outputs.version }} ${{ steps.current_version.outputs.version }}
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -116,8 +107,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.current_version.outputs.version }}
-          release_name: 🎉 N2E Backend ${{ steps.current_version.outputs.version }}
+          tag_name: v${{ needs.version-check.outputs.bump_type }}
+          release_name: 🎉 N2E Backend ${{ needs.version-check.outputs.bump_type }}
           draft: false
           prerelease: false
         id: create_release

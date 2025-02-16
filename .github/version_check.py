@@ -26,6 +26,8 @@ def validate_semver_bump(previous_version: str, next_version: str) -> BumpType:
     if previous_version == next_version:
         raise ValueError("Version has to be bumped!")
     
+    print(f"Comparing next version {next_version} with previous version {previous_version}.")
+    
     previous_version = list(map(int, previous_version.split(".")))
     next_version = list(map(int, next_version.split(".")))
 
@@ -36,6 +38,7 @@ def validate_semver_bump(previous_version: str, next_version: str) -> BumpType:
             lower_levels_reset = all(next_version[jdx] == 0 for jdx in range(idx + 1, len(semver_parts)))
 
             if correct_bump and lower_levels_reset:
+                print(f"{semver_parts[idx].value} version bump.")
                 return semver_parts[idx]
             
             raise_semver_exception()
