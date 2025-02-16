@@ -84,7 +84,7 @@ jobs:
 
   image-release:
     needs: version-check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.version-check.outputs.bump_type != 'patch' && needs.version-check.outputs.bump_type != 'no-bump'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
@@ -99,10 +99,19 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create image from repository
-        run: docker build -t ghcr.io/name-ethnicity-classifier/n2e-backend .
+        run: |
+          IMAGE_VERSION=${{ needs.version-check.outputs.new_version }}
+          IMAGE_NAME=ghcr.io/name-ethnicity-classifier/n2e-backend
+
+          docker build -t $IMAGE_NAME:$IMAGE_VERSION -t $IMAGE_NAME:latest .
 
       - name: Push image to GitHub Container Registry
-        run: docker push ghcr.io/name-ethnicity-classifier/n2e-backend
+        run: |
+          IMAGE_VERSION=${{ needs.version-check.outputs.new_version }}
+          IMAGE_NAME=ghcr.io/name-ethnicity-classifier/n2e-backend
+
+          docker push $IMAGE_NAME:$IMAGE_VERSION
+          docker push $IMAGE_NAME:latest
 
       - name: Create Release
         uses: actions/create-release@v1
