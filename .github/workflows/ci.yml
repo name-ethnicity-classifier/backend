@@ -73,7 +73,7 @@ jobs:
 
       - name: Get previous version
         id: previous_version
-        run: echo ::set-output name=version::$(curl https://raw.githubusercontent.com/${{ github.repository }}/main/VERSION)
+        run: echo ::set-output name=version::$(git describe --tags --abbrev=0 || echo '0.0.0')
 
       - name: Check version
         id: check_version
@@ -82,7 +82,7 @@ jobs:
     
   image-release:
     needs: version-check
-    if: github.event_name == 'push' && github.ref == 'main' && needs.version-check.outputs.bump_type != 'patch'
+    if: github.event_name == 'push' && github.ref == 'main' && needs.version-check.outputs.bump_type != 'patch' && needs.version-check.outputs.bump_type != 'no-bump'
     runs-on: ubuntu-latest
 
     steps:
@@ -107,7 +107,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ needs.version-check.outputs.bump_type }}
+          tag_name: ${{ needs.version-check.outputs.bump_type }}
           release_name: 🎉 N2E Backend ${{ needs.version-check.outputs.bump_type }}
           draft: false
           prerelease: false

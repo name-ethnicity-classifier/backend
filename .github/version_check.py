@@ -8,6 +8,7 @@ class BumpType(Enum):
     MAJOR = "major"
     MINOR = "minor"
     PATCH = "patch"
+    NO_BUMP = "no-bump"
 
 
 def is_valid_semver(version: str) -> bool:
@@ -24,7 +25,8 @@ def validate_semver_bump(previous_version: str, next_version: str) -> BumpType:
         raise_semver_exception()
 
     if previous_version == next_version:
-        raise ValueError("Version has to be bumped!")
+        print(f"No version bump.")
+        return BumpType.NO_BUMP
     
     print(f"Comparing next version {next_version} with previous version {previous_version}.")
     
