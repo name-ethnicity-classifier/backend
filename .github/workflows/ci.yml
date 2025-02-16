@@ -112,11 +112,3 @@ jobs:
           release_name: 🎉 N2E Backend ${{ needs.version-check.outputs.bump_type }}
           draft: false
           prerelease: false
-        id: create_release
-  
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
