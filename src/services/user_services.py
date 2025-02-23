@@ -1,7 +1,9 @@
-from flask import current_app, render_template, request
+import traceback
+from flask import current_app, request
 from flask_jwt_extended import create_access_token, decode_token
-from flask_mail import Mail, Message
 import bcrypt
+import resend
+
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
 from db.tables import User
 from db.database import db
@@ -9,7 +11,7 @@ from utils import is_strong_password, is_valid_email
 from errors import GeneralError, GeneralError
 
 
-def check_user_login(data: LoginSchema) -> str:
+def check_user_login(data: LoginSchema):
     """
     Checks user email and password validity
     :param data: User email and password
@@ -34,11 +36,11 @@ def check_user_login(data: LoginSchema) -> str:
             message="Email or password not found.",
             status_code=401
         )
+    
+    return user
 
-    return user.id
 
-
-def check_user_existence(user_id) -> None:
+def check_user_existence(user_id):
     """
     Checks if user with given ID exists in the database, to make sure
     that even when a user is deleted their JWT token doesn't work anymore.
@@ -55,7 +57,7 @@ def check_user_existence(user_id) -> None:
         )
     
 
-def add_user(data: SignupSchema) -> None:
+def add_user(data: SignupSchema):
     """
     Adds a new user to the database
     :param data: User sign up data
@@ -108,22 +110,26 @@ def add_user(data: SignupSchema) -> None:
             status_code=422
         )
 
-    # Check if given password matches password in database
     hashed_password = bcrypt.hashpw(data.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") 
+
+    send_verification_email(data.email)
+
+    auto_verify_user = not current_app.config["USER_VERIFICATION_ACTIVE"]
 
     new_user = User(
         name=data.name,
         email=data.email,
         password=hashed_password,
         role=data.role,
-        consented=data.consented
+        consented=data.consented,
+        verified=auto_verify_user
     )
     
     db.session.add(new_user)
     db.session.commit()
 
 
-def delete_user(user_id: str, data: DeleteUser) -> None:
+def delete_user(user_id: str, data: DeleteUser):
     """
     Deletes a user from the database
     :param user_id: ID of the user to delete
@@ -147,29 +153,36 @@ def delete_user(user_id: str, data: DeleteUser) -> None:
     db.session.commit()
 
 
-def send_verification_email(email: str) -> None:
+def send_verification_email(email: str):
     """
     Sends a verification email to the user
     :param email: Email to which to send
     :return: None
     """
 
+    if not current_app.config["USER_VERIFICATION_ACTIVE"]:
+        current_app.logger.warning(f"Skipping user email verification.")
+        return
+
     try:
-        mail = Mail(current_app)
-
         token = create_access_token(email)
-        confirmation_url = f"{request.base_url}/verify/{token}"
+        confirmation_url = f"{request.url_root}/verify/{token}"
 
-        email_subject = "Account confirmation for name-to-ethnicity.com."
-        msg = Message(
-            email_subject,
-            recipients=[email],
-            html=render_template("./src/templates/emailVerification.html", confirmation_url=confirmation_url)
-        )
-        mail.send(msg)
+        with open("./src/templates/email-verification.html", "r") as f:
+            email_template = f.read().replace("{{ confirmation_url }}", confirmation_url)
+
+        params = {
+            "from": "name-to-ethnicity <noreply@name-to-ethnicity.com>",
+            "to": [email],
+            "subject": "Account verification.",
+            "html": email_template
+        }
+        email = resend.Emails.send(params)
+
+        current_app.logger.error(f"Verification email sent (resend id: {email['id']}).")
         
     except Exception as e:
-        current_app.logger.error(f"Failed to send verification email. Error:\n{e}")
+        current_app.logger.error(f"Failed to send verification email. Error:\n{traceback.format_exc()}")
         raise GeneralError(
             error_code="SIGNUP_FAILED",
             message="Error while sending verification email.",
@@ -177,7 +190,7 @@ def send_verification_email(email: str) -> None:
         )
 
 
-def handle_email_verification(token: str) -> None:
+def handle_email_verification(token: str):
     """
     Handles a click on the verification url
     :param token: JWT token which was added to the verification url
@@ -185,7 +198,7 @@ def handle_email_verification(token: str) -> None:
     """
 
     data = decode_token(token)
-    email = data["email"]
+    email = data["sub"]
 
     user = User.query.filter_by(email=email).first()
     if not user:
@@ -194,5 +207,8 @@ def handle_email_verification(token: str) -> None:
             message="User does not exist.",
             status_code=404
         )
+
+    current_app.logger.error(f"Email verified.")
+
     user.verified = True
     db.session.commit()

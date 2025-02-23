@@ -5,14 +5,12 @@ class InferenceSchema(BaseModel):
     """ Schema to validate name classification request data """
     modelName: str
     names: list[str]
-    getDistribution: bool
 
     class Config:
         json_schema_extra = {
             "example": {
                 "modelName": "chinese_german_french",
                 "names": ["Cixin Liu", "werner heisenberg", "Jules Verne"],
-                "getDistribution": False
             }
         }
 
@@ -31,7 +29,7 @@ class InferenceResponseSchema(RootModel):
 
 
 class InferenceDistributionResponseSchema(RootModel):
-    """ Schema to validate the /classify POST response data with 'getDistribution' set to 'True' """ 
+    """ Schema to validate the /classify-distribution POST response data """ 
     root: dict[str, dict[str, float]]
 
     class Config:
