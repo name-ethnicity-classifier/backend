@@ -1,11 +1,10 @@
-from flask import jsonify
 import pytest
 import json
 from sqlalchemy import text
 from utils import *
 from app import app
 from db.database import db
-from db.tables import User, UserToModel
+from db.tables import User
 
 
 TEST_USER = {
@@ -34,6 +33,16 @@ def app_context():
 @pytest.fixture(scope="function")
 def test_client(app_context):
     return app_context.test_client()
+
+
+@pytest.fixture(scope="function")
+def signup_verify_user(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
+    user = db.session.query(User).filter_by(email=TEST_USER["email"]).first()
+    user.verified = True
+    db.session.commit()
 
 
 @pytest.mark.it("should fail to signup user when signup data is invalid")
@@ -66,7 +75,7 @@ def test_signup_user_with_invalid_data(test_client):
 @pytest.mark.it("should fail to signup user when signup schema is invalid")
 def test_signup_user_with_invalid_schema(test_client):
     signup_data = TEST_USER.copy()
-    signup_data["mail"] = TEST_USER["email"]    # 'mail' instead of 'email'
+    signup_data["E-Mail"] = TEST_USER["email"]
     del signup_data["email"]
 
     response = test_client.post("/signup", json=signup_data)
@@ -113,8 +122,8 @@ def test_signup_user_with_existing_email_uppercase(test_client):
     assert json.loads(response.data)["errorCode"] == "EMAIL_EXISTS"
 
 
-@pytest.mark.it("should return JWT token when user logs in successully")
-def test_login_user(test_client):
+@pytest.mark.it("should fail to login and resend email when user is not verified")
+def test_login_user_not_verified(test_client):
     response = test_client.post("/signup", json=TEST_USER)
     assert response.status_code == 200
 
@@ -122,21 +131,28 @@ def test_login_user(test_client):
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
     )
+    assert response.status_code == 401
+    assert json.loads(response.data)["errorCode"] == "VERIFICATION_ERROR"
+
+
+@pytest.mark.it("should return JWT token when user logs in successully")
+def test_login_user(test_client, signup_verify_user):
+    response = test_client.post(
+        "/login",
+        json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
+    )
     assert response.status_code == 200
-    assert "accessToken" in json.loads(response.data)["data"]
+    assert "accessToken" in json.loads(response.data)
 
 
 @pytest.mark.it("should return JWT token when user logs in successully but with different email casing")
-def test_login_user_email_uppercase(test_client):
-    response = test_client.post("/signup", json=TEST_USER)
-    assert response.status_code == 200
-
+def test_login_user_email_uppercase(test_client, signup_verify_user):
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"].upper(), "password": TEST_USER["password"]}
     )
     assert response.status_code == 200
-    assert "accessToken" in json.loads(response.data)["data"]
+    assert "accessToken" in json.loads(response.data)
 
 
 @pytest.mark.it("should fail to login user when email does not exist")
@@ -152,7 +168,7 @@ def test_login_not_existing_user(test_client):
 @pytest.mark.it("should fail to login user when login schema is invalid")
 def test_login_invalid_user_schema(test_client):
     login_data = {
-        "mail": TEST_USER["email"], # 'mail' instead of 'email'
+        "E-Mail": TEST_USER["email"],
         "password": TEST_USER["password"]
     }
 
@@ -162,10 +178,7 @@ def test_login_invalid_user_schema(test_client):
 
 
 @pytest.mark.it("should fail to login user when password is wrong")
-def test_login_with_wrong_password(test_client):
-    response = test_client.post("/signup", json=TEST_USER)
-    assert response.status_code == 200
-
+def test_login_with_wrong_password(test_client, signup_verify_user):
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": "wrongpassword"}
@@ -175,17 +188,14 @@ def test_login_with_wrong_password(test_client):
 
 
 @pytest.mark.it("should fail to remove user when trying to delete their account with invalid password")
-def test_delete_user_with_wrong_password(test_client):
-    response = test_client.post("/signup", json=TEST_USER)
-    assert response.status_code == 200
-
+def test_delete_user_with_wrong_password(test_client, signup_verify_user):
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
     )
     assert response.status_code == 200
     
-    token = json.loads(response.data)["data"]["accessToken"]
+    token = json.loads(response.data)["accessToken"]
     response = test_client.delete(
         "/delete-user",
         json={"password": "invalidpassword"},
@@ -198,10 +208,7 @@ def test_delete_user_with_wrong_password(test_client):
 
 
 @pytest.mark.it("should fail to remove user when trying to delete their account with invalid token")
-def test_delete_user_with_invalid_token(test_client):
-    response = test_client.post("/signup", json=TEST_USER)
-    assert response.status_code == 200
-
+def test_delete_user_with_invalid_token(test_client, signup_verify_user):
     invalid_token = str(hashlib.sha256("random-long-sequence".encode("utf-8")))
     response = test_client.delete(
         "/delete-user",
@@ -214,17 +221,14 @@ def test_delete_user_with_invalid_token(test_client):
 
 
 @pytest.mark.it("should remove user entry when user deletes their account")
-def test_delete_user(test_client):
-    response = test_client.post("/signup", json=TEST_USER)
-    assert response.status_code == 200
-
+def test_delete_user(test_client, signup_verify_user):
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
     )
     assert response.status_code == 200
     
-    token = json.loads(response.data)["data"]["accessToken"]
+    token = json.loads(response.data)["accessToken"]
     response = test_client.delete(
         "/delete-user",
         json={"password": TEST_USER["password"]},
