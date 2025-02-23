@@ -41,16 +41,12 @@ components:
     InferenceSchema:
       description: 'Schema to validate name classification request data '
       example:
-        getDistribution: false
         modelName: chinese_german_french
         names:
         - Cixin Liu
         - werner heisenberg
         - Jules Verne
       properties:
-        getDistribution:
-          title: Getdistribution
-          type: boolean
         modelName:
           title: Modelname
           type: string
@@ -62,7 +58,6 @@ components:
       required:
       - modelName
       - names
-      - getDistribution
       title: InferenceSchema
       type: object
     ModelsResponseSchema:
@@ -237,6 +232,35 @@ paths:
       security:
       - BearerAuth: []
       summary: Classify names.
+      tags:
+      - Classification
+  /classify-distribution:
+    post:
+      description: Classify names (entire distribution).
+      operationId: classification_distribution_route
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InferenceSchema'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferenceResponseSchema'
+          description: Successful classification
+        '401':
+          description: Authentication failed
+        '404':
+          description: Model not found
+        '422':
+          description: Too many names
+        '500':
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Classify names (entire distribution).
       tags:
       - Classification
   /default-models:
