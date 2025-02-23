@@ -1,10 +1,9 @@
 import os
 from unittest.mock import patch
-from flask import jsonify
 from flask_jwt_extended import create_access_token
 import pytest
 import json
-from schemas.model_schema import ModelsResponseSchema, N2EModel
+from schemas.model_schema import ModelsResponseSchema
 from utils import *
 from app import app
 from db.database import db

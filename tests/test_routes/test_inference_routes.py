@@ -112,8 +112,7 @@ def test_custom_model_classification(authenticated_client):
         "/classify",
         json={
             "modelName": USER_TO_MODEL["name"],
-            "names": ["peter schmidt", "cixin liu"],
-            "getDistribution": False
+            "names": ["peter schmidt", "cixin liu"]
         },
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
@@ -134,11 +133,10 @@ def test_custom_model_classification(authenticated_client):
 @pytest.mark.it("should respond with a output distribution for all classes when classfiying using 'getDistribution' set to 'True'")
 def test_custom_model_classification_distribution(authenticated_client):
     response = authenticated_client.post(
-        "/classify",
+        "/classify-distribution",
         json={
             "modelName": USER_TO_MODEL["name"],
             "names": ["peter schmidt", "cixin liu"],
-            "getDistribution": True
         },
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
@@ -167,7 +165,6 @@ def test_custom_same_as_default_model_classification(authenticated_client):
         json={
             "modelName": USER_TO_DEFAULT_MODEL["name"],
             "names": ["peter schmidt", "cixin liu"],
-            "getDistribution": False
         },
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
@@ -192,7 +189,6 @@ def test_default_model_classification(authenticated_client):
         json={
             "modelName": DEFAULT_MODEL["public_name"],
             "names": ["peter schmidt", "cixin liu"],
-            "getDistribution": False
         },
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
