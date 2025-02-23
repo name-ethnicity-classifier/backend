@@ -18,32 +18,30 @@ def error_response(error_code: str, message: str, status_code: int) -> Response:
     return response
 
 
-def success_response(message: str = None, data: dict = None, status_code: int = 200) -> Response:
+def success_response(message: str = None, data: dict | list = None, status_code: int = 200) -> Response:
     """
     Creates a JSON serialized Flask success response
     :param message: Success message
     :param status_code: Success status Code
     :return: Flask response
     """
+
+    data_exists = isinstance(data, dict | list)
     
-    # Only response message (for GET requests)
-    if message and not data:
+    if message and not data_exists:
         response_data = {
             "message": message
         }
 
-    # Only response data
-    elif data and not message:
+    elif data_exists and not message:
         response_data = data
 
-    # Both, response message and data
-    elif data and message:
+    elif data_exists and message:
         response_data = {
             "message": message,
             "data": data
         }
 
-    # Response message and/or body must be set
     else:
         raise ValueError("Provide a success message and/or a response body.")
 

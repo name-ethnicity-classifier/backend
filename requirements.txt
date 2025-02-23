@@ -15,4 +15,4 @@ bcrypt==4.1.2
 torch==1.12.1
 numpy==1.26.4
 pyyaml==6.0.1
-flask-mail==0.10.0
+resend==2.6.0

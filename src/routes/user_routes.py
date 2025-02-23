@@ -1,10 +1,10 @@
-from flask import Blueprint, request, current_app
+from flask import Blueprint, redirect, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import create_access_token
 
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from services.user_services import add_user, check_user_login, delete_user, send_verification_email, handle_email_verification, check_user_existence
-from utils import success_response
+from services.user_services import add_user, check_user_login, delete_user, handle_email_verification, check_user_existence, send_verification_email
+from utils import error_response, success_response
 from errors import error_handler
 
 user_routes = Blueprint("user", __name__)
@@ -18,12 +18,7 @@ def register_user_route():
     current_app.logger.info(f"Received signup request.")
 
     request_data = SignupSchema(**request.json)
-
-    # Validates name, email and password and adds user
     add_user(request_data)
-
-    # Send verification email
-    # send_verification_email(request_data.email)
 
     return success_response("Registration successful.")
 
@@ -36,13 +31,15 @@ def login_user_route():
     current_app.logger.info(f"Received login request.")
 
     request_data = LoginSchema(**request.json)
-    user_id = check_user_login(request_data)
+    user = check_user_login(request_data)
+
+    if not user.verified:
+        current_app.logger.info(f"User not verified, resending confirmation email.")
+        send_verification_email(user.email)
+        return error_response("VERIFICATION_ERROR", "User not verified.", 401)
 
     return success_response(
-        "Authentication successful.", 
-        {
-            "accessToken": create_access_token(identity=user_id)
-        }
+        data={"accessToken": create_access_token(identity=user.id)}
     )
 
 
@@ -54,7 +51,6 @@ def delete_user_route():
 
     current_app.logger.info(f"Received user deletion request.")
 
-    # Retrieve user id by decoding JWT token and check if the user still exists
     user_id = get_jwt_identity()
     check_user_existence(user_id)
 
@@ -66,4 +62,8 @@ def delete_user_route():
 
 @user_routes.route("/verify/<token>", methods=["GET"])
 def verify_email(token: str):
+    """ Route verifying a user """
+
     handle_email_verification(token)
+
+    return redirect(f"{current_app.config['FRONTEND_URL']}/login", code=302)
