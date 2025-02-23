@@ -42,16 +42,54 @@ def classification_route():
     prediction = inference.predict(
         model_id=model_id,
         names=request_data.names,
-        get_distribution=request_data.getDistribution
+        get_distribution=False
     )
+
     response_data = dict(zip(request_data.names, prediction))
-    if request_data.getDistribution:
-        InferenceDistributionResponseSchema(**response_data)
-    else:
-        InferenceResponseSchema(**response_data)
+    InferenceResponseSchema(**response_data)
 
     increment_request_counter(user_id=user_id, model_id=model_id, name_amount=len(request_data.names))
 
     current_app.logger.info("Successfully classified names.")
     return success_response(data=response_data)
   
+
+@inference_routes.route("/classify-distribution", methods=["POST"])
+@og.register_route(
+    description="Classify names (entire distribution).",
+    tags=["Classification"],
+    requests=[og.OAIRequest("Request body for classification", InferenceSchema)],
+    responses=[
+        og.OAIResponse(200, "Successful classification", InferenceResponseSchema),
+        og.OAIResponse(401, "Authentication failed"),
+        og.OAIResponse(404, "Model not found"),
+        og.OAIResponse(422, "Too many names"),
+        og.OAIResponse(500, "Internal server error"),
+    ]
+)
+@jwt_required()
+@error_handler
+def classification_distribution_route():
+    """ Route for classiying names into an ethnicity condfidence distribution """
+
+    current_app.logger.info(f"Received distribution classification request.")
+
+    user_id = get_jwt_identity()
+    check_user_existence(user_id)
+
+    request_data = InferenceSchema(**request.json)
+    model_id = get_model_id_by_name(user_id, request_data.modelName)
+
+    prediction = inference.predict(
+        model_id=model_id,
+        names=request_data.names,
+        get_distribution=True
+    )
+
+    response_data = dict(zip(request_data.names, prediction))
+    InferenceDistributionResponseSchema(**response_data)
+ 
+    increment_request_counter(user_id=user_id, model_id=model_id, name_amount=len(request_data.names))
+
+    current_app.logger.info("Successfully classified names.")
+    return success_response(data=response_data)
