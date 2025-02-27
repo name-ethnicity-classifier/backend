@@ -2,15 +2,15 @@
   "id": "n2e/miscellaneous",
   "title": "Miscellaneous",
   "description": "Miscellaneous",
-  "source": "@site/docs/n2e/miscellaneous.tag.mdx",
+  "source": "@site/versioned_docs/version-0.2.0/n2e/miscellaneous.tag.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/miscellaneous",
-  "permalink": "/next/n2e/miscellaneous",
+  "permalink": "/n2e/miscellaneous",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
   "tags": [],
-  "version": "current",
+  "version": "0.2.0",
   "frontMatter": {
     "id": "miscellaneous",
     "title": "Miscellaneous",
@@ -20,10 +20,10 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Get all default models.",
-    "permalink": "/next/n2e/get-default-models-route"
+    "permalink": "/n2e/get-default-models-route"
   },
   "next": {
     "title": "Get nationalities.",
-    "permalink": "/next/n2e/get-nationalities-route"
+    "permalink": "/n2e/get-nationalities-route"
   }
 }

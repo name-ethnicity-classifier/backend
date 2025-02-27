@@ -5,7 +5,7 @@
   "source": "@site/versioned_docs/version-0.1.0/n2e/miscellaneous.tag.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/miscellaneous",
-  "permalink": "/n2e/miscellaneous",
+  "permalink": "/0.1.0/n2e/miscellaneous",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
@@ -20,10 +20,10 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Get all default models.",
-    "permalink": "/n2e/get-default-models-route"
+    "permalink": "/0.1.0/n2e/get-default-models-route"
   },
   "next": {
     "title": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
-    "permalink": "/n2e/get-nationalities-route"
+    "permalink": "/0.1.0/n2e/get-nationalities-route"
   }
 }

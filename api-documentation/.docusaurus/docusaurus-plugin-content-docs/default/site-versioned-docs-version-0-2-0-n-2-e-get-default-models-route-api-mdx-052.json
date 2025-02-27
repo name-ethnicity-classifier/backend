@@ -2,15 +2,15 @@
   "id": "n2e/get-default-models-route",
   "title": "Get all default models.",
   "description": "Using this endpoint you can receive all models that N2E provides by default.",
-  "source": "@site/docs/n2e/get-default-models-route.api.mdx",
+  "source": "@site/versioned_docs/version-0.2.0/n2e/get-default-models-route.api.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/get-default-models-route",
-  "permalink": "/next/n2e/get-default-models-route",
+  "permalink": "/n2e/get-default-models-route",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
   "tags": [],
-  "version": "current",
+  "version": "0.2.0",
   "frontMatter": {
     "id": "get-default-models-route",
     "title": "Get all default models.",
@@ -26,10 +26,10 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Get all models.",
-    "permalink": "/next/n2e/get-models-route"
+    "permalink": "/n2e/get-models-route"
   },
   "next": {
     "title": "Miscellaneous",
-    "permalink": "/next/n2e/miscellaneous"
+    "permalink": "/n2e/miscellaneous"
   }
 }

@@ -1,0 +1,71 @@
+---
+id: classification-distribution-route
+title: "Classify names, predicting entire distribution."
+description: "Classifying names using this endpoint will return the predicted confidence for each ethnicity."
+sidebar_label: "Classify names, predicting entire distribution."
+hide_title: true
+hide_table_of_contents: true
+api: eJy9Vktz2zYQ/is7e/GFesRNmpSnOq4z40zqeGKlPXg0HghcikhAgAFAKyyH/72zIGVRD6e9tCeJwL7322/RYhBrj+k9XmrhvcqVFEFZg8sEM/LSqSp+ptv7Rpk1GFGSh9rz/1AoD2SyyioTYKO0BkehdgZCQVA5ypQMlIG0JlcZGUmQWwckZAEUCqOkCs0UE7QVuej7OsMU5V44D5nywalVHT+crQNhgo58ZY0nj2mL5/M5/+wHfVdLSd7ntYZ9g5igtCaQCawkqkoPF7MvnjVb9LKgUsTbLFN8JfSt4yCD6j0+dx6aijBFU5crctgl2wO7+kIy8MFBkNETBAuPQqtMBIqlmw0RN5Nx8nD78W4B28whE0EAJkjfRVlpYveX6rsy8EHV/CELZcgTpvPpLy8SzB0ZWfDX/GWCa3KlMPHrVZfg+1qThz/IGTpQPR9rvn411nzxU5fghnUcFKQ8mRW59YH+/Oc916/HBt687rhEKnD0eG1yYkH6bZTzpyHbvlB4VNCOLbycvzju/0UdCjJh6C3kQmnKMEq/PJb+3WakwdgAua1NL3d+fiy3sBZKYZp+Dljs1SnwXZtAzggNntwjOSDnrEOO1ZOsnQoNpvctviXhyHGkmN4vuyXj+ltNPry1WRML+W+B+o+w4ngPBgEGZ6eQVHI9bkTJtR66+dA37mHoZoJ9CZg/nmB3Cg/76Fp2CVZ7MzNy1T6BIfaDHexazqAway754LhFFagcz91OZGvnJoo+2RDOiSb2gXNXjjKOfxfB1vbyBCx/CMGSQmGZvCrrAyZYCe4pnh5kZBgwLnxEQe00pliEUPl0NhOVmnIQk2AnO5KUtpzhIXvcOpvVMrayt4ddMjaXzmbaSqEL60P6Zv5mfmziA98/aS93+IzZ9lUeo/Sp1Gz/yNo760DUobBO/cULorG126LMJ1D7nt7OLgaZCMMzKEhk5ED1eyO3rhQBbA5nvWdog/1KpjubwsLCmkJv9+L2GuIFPCqvAmwLuNlsThcQhMlAOuJxEAaElLY2gfdPnCPOahUdYjL8eRdDwRTf/7mIqOHB+7Qb0av/aWCUye14Om4O0+NiYIIMqb4T8+n5dH7UnwUvbOVjmW2eK6mEhk9Xd4tYzMzKuiQTBsK0Dp4t5RQ+xxcA96GqV1rJaKGxNUhhtjwzsCQoEyz7VA5K6wNo9ZV0s3sCxMY4Ck7RI4EArXzsv9C6b3UsrudOBXKl/5jfkXtUkkZj82yos6gysfnED0r9/hcy0iqVQvG8hIJsZl1FKif365pPWZu5RCtJxscum77BF5WQBUFf4r154zBEvJ1at54Nqn724fry6ubuanI+nU+LUOqIJuaKuAqfDF/uFS7ZvqG41LzLHMGYR6aHDR4tjP/+0TYQQaDvYVZpoQzXKhajHejvHk/T3zJBpiQWaNuV8PTZ6a7j4281OV6NywQfhVNixXC/5xHoOSLy5VdqOL8+08mCw2BxXUeGP1yTTIm9xoWUVIUfyi5HTM6vLWaCYRUzBjFFJzb8/BQbTDG+XFk70mQ8a1ELs67FmmV7m9xpsU+eBzQTs9puKNOMImzbXmIRCbDDZEgl8h52y67r/gb9jxwU
+sidebar_class_name: "post api-method"
+info_path: n2e/name-to-ethnicity-api
+custom_edit_url: null
+---
+
+import MethodEndpoint from "@theme/ApiExplorer/MethodEndpoint";
+import ParamsDetails from "@theme/ParamsDetails";
+import RequestSchema from "@theme/RequestSchema";
+import StatusCodes from "@theme/StatusCodes";
+import OperationTabs from "@theme/OperationTabs";
+import TabItem from "@theme/TabItem";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Classify names, predicting entire distribution."}
+>
+</Heading>
+
+<MethodEndpoint
+  method={"post"}
+  path={"/classify-distribution"}
+  context={"endpoint"}
+>
+  
+</MethodEndpoint>
+
+
+
+Classifying names using this endpoint will return the predicted confidence for each ethnicity.
+
+<Heading
+  id={"request"}
+  as={"h2"}
+  className={"openapi-tabs__heading"}
+  children={"Request"}
+>
+</Heading>
+
+<ParamsDetails
+  parameters={undefined}
+>
+  
+</ParamsDetails>
+
+<RequestSchema
+  title={"Body"}
+  body={{"content":{"application/json":{"schema":{"description":"Schema to validate name classification request data ","example":{"modelName":"chinese_german_french","names":["Cixin Liu","werner heisenberg","Jules Verne"]},"properties":{"modelName":{"title":"Modelname","type":"string"},"names":{"items":{"type":"string"},"title":"Names","type":"array"}},"required":["modelName","names"],"title":"InferenceSchema","type":"object"}}}}}
+>
+  
+</RequestSchema>
+
+<StatusCodes
+  id={undefined}
+  label={undefined}
+  responses={{"200":{"description":"Successful classification","content":{"application/json":{"schema":{"additionalProperties":{"additionalProperties":{"type":"number"},"type":"object"},"description":"Schema to validate the /classify-distribution POST response data ","example":{"Cixin Liu":{"chinese":0.91,"french":0.04,"german":0.05},"Jules Verne":{"chinese":0.2,"french":0.75,"german":0.13},"werner heisenberg":{"chinese":0.06,"french":0.07,"german":0.87}},"title":"InferenceDistributionResponseSchema","type":"object"}}}},"401":{"description":"Authentication failed"},"404":{"description":"Model not found"},"422":{"description":"Too many names"},"500":{"description":"Internal server error"}}}
+>
+  
+</StatusCodes>
+
+
+      

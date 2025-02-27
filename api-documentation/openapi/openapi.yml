@@ -17,6 +17,27 @@ components:
         $ref: '#/components/schemas/N2EModel'
       title: DefaultModelsResponseSchema
       type: array
+    InferenceDistributionResponseSchema:
+      additionalProperties:
+        additionalProperties:
+          type: number
+        type: object
+      description: 'Schema to validate the /classify-distribution POST response data '
+      example:
+        Cixin Liu:
+          chinese: 0.91
+          french: 0.04
+          german: 0.05
+        Jules Verne:
+          chinese: 0.2
+          french: 0.75
+          german: 0.13
+        werner heisenberg:
+          chinese: 0.06
+          french: 0.07
+          german: 0.87
+      title: InferenceDistributionResponseSchema
+      type: object
     InferenceResponseSchema:
       additionalProperties:
         maxItems: 2
@@ -41,16 +62,12 @@ components:
     InferenceSchema:
       description: 'Schema to validate name classification request data '
       example:
-        getDistribution: false
         modelName: chinese_german_french
         names:
         - Cixin Liu
         - werner heisenberg
         - Jules Verne
       properties:
-        getDistribution:
-          title: Getdistribution
-          type: boolean
         modelName:
           title: Modelname
           type: string
@@ -62,7 +79,6 @@ components:
       required:
       - modelName
       - names
-      - getDistribution
       title: InferenceSchema
       type: object
     ModelsResponseSchema:
@@ -207,12 +223,13 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: https://www.name-to-ethnicity.com/terms-of-service
   title: Name-to-ethnicity API
-  version: 1.0.0
+  version: 0.2.0
 openapi: 3.0.3
 paths:
   /classify:
     post:
-      description: Classify names.
+      description: Classifying names using this endpoint will return the predicted
+        confidence for the most likely ethnicity.
       operationId: classification_route
       requestBody:
         content:
@@ -239,9 +256,40 @@ paths:
       summary: Classify names.
       tags:
       - Classification
+  /classify-distribution:
+    post:
+      description: Classifying names using this endpoint will return the predicted
+        confidence for each ethnicity.
+      operationId: classification_distribution_route
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InferenceSchema'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferenceDistributionResponseSchema'
+          description: Successful classification
+        '401':
+          description: Authentication failed
+        '404':
+          description: Model not found
+        '422':
+          description: Too many names
+        '500':
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Classify names, predicting entire distribution.
+      tags:
+      - Classification
   /default-models:
     get:
-      description: Get all default models.
+      description: Using this endpoint you can receive all models that N2E provides
+        by default.
       operationId: get_default_models_route
       responses:
         '200':
@@ -259,7 +307,8 @@ paths:
       - Model Management
   /models:
     get:
-      description: Get all models.
+      description: Using this endpoint you can receive all your custom and N2Es default
+        models.
       operationId: get_models_route
       responses:
         '200':
@@ -279,8 +328,8 @@ paths:
       - Model Management
   /nationalities:
     get:
-      description: Returns a list of all available nationalities (49) and nat. groups
-        (8) along with the amount of samples we have of them in our dataset.
+      description: Returns a list of all available nationalities (49) and nationality
+        groups (8) along with the amount of samples we have of them in our dataset.
       operationId: get_nationalities_route
       responses:
         '200':
@@ -293,8 +342,7 @@ paths:
           description: Internal server error
       security:
       - BearerAuth: []
-      summary: Returns a list of all available nationalities (49) and nat. groups
-        (8) along with the amount of samples we have of them in our dataset.
+      summary: Get nationalities.
       tags:
       - Miscellaneous
 servers:

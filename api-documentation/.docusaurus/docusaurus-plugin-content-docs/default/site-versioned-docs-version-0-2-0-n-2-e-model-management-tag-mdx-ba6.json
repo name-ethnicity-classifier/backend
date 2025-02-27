@@ -2,15 +2,15 @@
   "id": "n2e/model-management",
   "title": "Model Management",
   "description": "Model Management",
-  "source": "@site/docs/n2e/model-management.tag.mdx",
+  "source": "@site/versioned_docs/version-0.2.0/n2e/model-management.tag.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/model-management",
-  "permalink": "/next/n2e/model-management",
+  "permalink": "/n2e/model-management",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
   "tags": [],
-  "version": "current",
+  "version": "0.2.0",
   "frontMatter": {
     "id": "model-management",
     "title": "Model Management",
@@ -20,10 +20,10 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Classify names, predicting entire distribution.",
-    "permalink": "/next/n2e/classification-distribution-route"
+    "permalink": "/n2e/classification-distribution-route"
   },
   "next": {
     "title": "Get all models.",
-    "permalink": "/next/n2e/get-models-route"
+    "permalink": "/n2e/get-models-route"
   }
 }
