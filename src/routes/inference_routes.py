@@ -15,7 +15,8 @@ inference_routes = Blueprint("inference", __name__)
 
 @inference_routes.route("/classify", methods=["POST"])
 @og.register_route(
-    description="Classify names.",
+    summary="Classify names.",
+    description="Classifying names using this endpoint will return the predicted confidence for the most likely ethnicity.",
     tags=["Classification"],
     requests=[og.OAIRequest("Request body for classification", InferenceSchema)],
     responses=[
@@ -56,11 +57,12 @@ def classification_route():
 
 @inference_routes.route("/classify-distribution", methods=["POST"])
 @og.register_route(
-    description="Classify names (entire distribution).",
+    summary="Classify names, predicting entire distribution.",
+    description="Classifying names using this endpoint will return the predicted confidence for each ethnicity.",
     tags=["Classification"],
     requests=[og.OAIRequest("Request body for classification", InferenceSchema)],
     responses=[
-        og.OAIResponse(200, "Successful classification", InferenceResponseSchema),
+        og.OAIResponse(200, "Successful classification", InferenceDistributionResponseSchema),
         og.OAIResponse(401, "Authentication failed"),
         og.OAIResponse(404, "Model not found"),
         og.OAIResponse(422, "Too many names"),

@@ -93,7 +93,7 @@ class OpenAPIGenerator:
         route_spec = {
             "tags": view_func._tags,
             "description": view_func._description,
-            "summary": view_func._description,
+            "summary": view_func._summary,
             "operationId": view_func.__name__,
             "responses": {},
             "security": [
@@ -173,9 +173,10 @@ class OpenAPIGenerator:
             self.save_to_file(format)
 
 
-def register_route(description: str, tags: list[str], requests: list[OAIRequest] = None, responses: list[OAIResponse] = None):
+def register_route(summary: str, description: str, tags: list[str], requests: list[OAIRequest] = None, responses: list[OAIResponse] = None):
     def decorator(func):
         func._registered = True
+        func._summary = summary
         func._description = description
         func._tags = tags
         func._request_models = requests if requests else []

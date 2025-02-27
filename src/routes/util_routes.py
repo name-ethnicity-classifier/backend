@@ -10,7 +10,8 @@ util_routes = Blueprint("utils", __name__)
 
 @util_routes.route("/nationalities", methods=["GET"])
 @og.register_route(
-    description="Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+    summary="Get nationalities.",
+    description="Returns a list of all available nationalities (49) and nationality groups (8) along with the amount of samples we have of them in our dataset.",
     tags=["Miscellaneous"],
     responses=[
         og.OAIResponse(200, "Successfully retrieved nationalities", NationalitiesSchema),

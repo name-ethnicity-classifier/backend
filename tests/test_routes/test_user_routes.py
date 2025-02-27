@@ -1,5 +1,6 @@
 import pytest
 import json
+from unittest.mock import patch
 from sqlalchemy import text
 from utils import *
 from app import app
@@ -9,7 +10,7 @@ from db.tables import User
 
 TEST_USER = {
     "name": "user",
-    "email": "user@test.com",
+    "email": "teddypeifer@gmail.com",
     "role": "else",
     "password": "StrongPassword123",
     "verified": True,
@@ -21,6 +22,9 @@ TEST_USER_ID = 1
 @pytest.fixture(scope="function")
 def app_context():
     with app.app_context():
+
+        app.config["USER_VERIFICATION_ACTIVE"] = False
+
         db.drop_all()
         with open("./dev-database/init_test.sql", "r") as file:
             init_sql_script = file.read()    
@@ -35,14 +39,13 @@ def test_client(app_context):
     return app_context.test_client()
 
 
-@pytest.fixture(scope="function")
-def signup_verify_user(test_client):
-    response = test_client.post("/signup", json=TEST_USER)
-    assert response.status_code == 200
+@pytest.fixture(scope="function", autouse=True)
+def mock_resend_email_send(request):
+    with patch("resend.Emails.send") as mock_send:
+        mock_send.return_value = {"id": 123}
+        request.node.mock_resend_email_send = mock_send
 
-    user = db.session.query(User).filter_by(email=TEST_USER["email"]).first()
-    user.verified = True
-    db.session.commit()
+        yield mock_send
 
 
 @pytest.mark.it("should fail to signup user when signup data is invalid")
@@ -88,15 +91,20 @@ def test_signup_user_given_no_consent(test_client):
     signup_data = TEST_USER.copy()
     signup_data["consented"] = False
     response = test_client.post("/signup", json=signup_data)
+
     assert response.status_code == 422
     assert json.loads(response.data)["errorCode"] == "NO_CONSENT"
 
 
-@pytest.mark.it("should create to user entry when user signs up successfully")
-def test_signup_user(test_client):
+@pytest.mark.it("should create to user entry and send verification email when user signs up successfully")
+def test_signup_user(test_client, request):
+    app.config["USER_VERIFICATION_ACTIVE"] = True
+
     response = test_client.post("/signup", json=TEST_USER)
+
     assert response.status_code == 200
     assert User.query.filter_by(email=TEST_USER["email"]).first() is not None
+    request.node.mock_resend_email_send.assert_called_once()
 
 
 @pytest.mark.it("should fail to signup user when other user already has same email address")
@@ -123,7 +131,9 @@ def test_signup_user_with_existing_email_uppercase(test_client):
 
 
 @pytest.mark.it("should fail to login and resend email when user is not verified")
-def test_login_user_not_verified(test_client):
+def test_login_user_not_verified(test_client, request):
+    app.config["USER_VERIFICATION_ACTIVE"] = True
+
     response = test_client.post("/signup", json=TEST_USER)
     assert response.status_code == 200
 
@@ -133,10 +143,15 @@ def test_login_user_not_verified(test_client):
     )
     assert response.status_code == 401
     assert json.loads(response.data)["errorCode"] == "VERIFICATION_ERROR"
+    request.node.mock_resend_email_send.assert_called()
+
 
 
 @pytest.mark.it("should return JWT token when user logs in successully")
-def test_login_user(test_client, signup_verify_user):
+def test_login_user(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
@@ -146,7 +161,10 @@ def test_login_user(test_client, signup_verify_user):
 
 
 @pytest.mark.it("should return JWT token when user logs in successully but with different email casing")
-def test_login_user_email_uppercase(test_client, signup_verify_user):
+def test_login_user_email_uppercase(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"].upper(), "password": TEST_USER["password"]}
@@ -178,7 +196,9 @@ def test_login_invalid_user_schema(test_client):
 
 
 @pytest.mark.it("should fail to login user when password is wrong")
-def test_login_with_wrong_password(test_client, signup_verify_user):
+def test_login_with_wrong_password(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200 
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": "wrongpassword"}
@@ -188,7 +208,10 @@ def test_login_with_wrong_password(test_client, signup_verify_user):
 
 
 @pytest.mark.it("should fail to remove user when trying to delete their account with invalid password")
-def test_delete_user_with_wrong_password(test_client, signup_verify_user):
+def test_delete_user_with_wrong_password(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
@@ -208,7 +231,10 @@ def test_delete_user_with_wrong_password(test_client, signup_verify_user):
 
 
 @pytest.mark.it("should fail to remove user when trying to delete their account with invalid token")
-def test_delete_user_with_invalid_token(test_client, signup_verify_user):
+def test_delete_user_with_invalid_token(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
     invalid_token = str(hashlib.sha256("random-long-sequence".encode("utf-8")))
     response = test_client.delete(
         "/delete-user",
@@ -221,7 +247,10 @@ def test_delete_user_with_invalid_token(test_client, signup_verify_user):
 
 
 @pytest.mark.it("should remove user entry when user deletes their account")
-def test_delete_user(test_client, signup_verify_user):
+def test_delete_user(test_client):
+    response = test_client.post("/signup", json=TEST_USER)
+    assert response.status_code == 200
+
     response = test_client.post(
         "/login",
         json={"email": TEST_USER["email"], "password": TEST_USER["password"]}
