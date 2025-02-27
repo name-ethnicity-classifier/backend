@@ -2,7 +2,7 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Name-to-ethnicity API",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "description": "This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity and retrieve a list of all your models.",
         "termsOfService": "https://www.name-to-ethnicity.com/terms-of-service",
         "contact": {
@@ -268,6 +268,34 @@
                 "title": "InferenceResponseSchema",
                 "type": "object"
             },
+            "InferenceDistributionResponseSchema": {
+                "additionalProperties": {
+                    "additionalProperties": {
+                        "type": "number"
+                    },
+                    "type": "object"
+                },
+                "description": "Schema to validate the /classify-distribution POST response data ",
+                "example": {
+                    "Cixin Liu": {
+                        "chinese": 0.91,
+                        "french": 0.04,
+                        "german": 0.05
+                    },
+                    "Jules Verne": {
+                        "chinese": 0.2,
+                        "french": 0.75,
+                        "german": 0.13
+                    },
+                    "werner heisenberg": {
+                        "chinese": 0.06,
+                        "french": 0.07,
+                        "german": 0.87
+                    }
+                },
+                "title": "InferenceDistributionResponseSchema",
+                "type": "object"
+            },
             "NationalitiesSchema": {
                 "description": "Schema of the /nationalities response ",
                 "example": {
@@ -321,7 +349,7 @@
                 "tags": [
                     "Model Management"
                 ],
-                "description": "Get all models.",
+                "description": "Using this endpoint you can receive all your custom and N2Es default models.",
                 "summary": "Get all models.",
                 "operationId": "get_models_route",
                 "responses": {
@@ -354,7 +382,7 @@
                 "tags": [
                     "Model Management"
                 ],
-                "description": "Get all default models.",
+                "description": "Using this endpoint you can receive all models that N2E provides by default.",
                 "summary": "Get all default models.",
                 "operationId": "get_default_models_route",
                 "responses": {
@@ -384,7 +412,7 @@
                 "tags": [
                     "Classification"
                 ],
-                "description": "Classify names.",
+                "description": "Classifying names using this endpoint will return the predicted confidence for the most likely ethnicity.",
                 "summary": "Classify names.",
                 "operationId": "classification_route",
                 "responses": {
@@ -432,8 +460,8 @@
                 "tags": [
                     "Classification"
                 ],
-                "description": "Classify names (entire distribution).",
-                "summary": "Classify names (entire distribution).",
+                "description": "Classifying names using this endpoint will return the predicted confidence for each ethnicity.",
+                "summary": "Classify names, predicting entire distribution.",
                 "operationId": "classification_distribution_route",
                 "responses": {
                     "200": {
@@ -441,7 +469,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/InferenceResponseSchema"
+                                    "$ref": "#/components/schemas/InferenceDistributionResponseSchema"
                                 }
                             }
                         }
@@ -480,8 +508,8 @@
                 "tags": [
                     "Miscellaneous"
                 ],
-                "description": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
-                "summary": "Returns a list of all available nationalities (49) and nat. groups (8) along with the amount of samples we have of them in our dataset.",
+                "description": "Returns a list of all available nationalities (49) and nationality groups (8) along with the amount of samples we have of them in our dataset.",
+                "summary": "Get nationalities.",
                 "operationId": "get_nationalities_route",
                 "responses": {
                     "200": {

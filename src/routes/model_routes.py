@@ -49,7 +49,8 @@ def delete_models_route():
 
 @model_routes.route("/models", methods=["GET"])
 @og.register_route(
-    description="Get all models.",
+    summary="Get all models.",
+    description="Using this endpoint you can receive all your custom and N2Es default models.",
     tags=["Model Management"],
     responses=[
         og.OAIResponse(200, "Successfully retrieved models.", ModelsResponseSchema),
@@ -78,7 +79,8 @@ def get_models_route():
 
 @model_routes.route("/default-models", methods=["GET"])
 @og.register_route(
-    description="Get all default models.",
+    summary="Get all default models.",
+    description="Using this endpoint you can receive all models that N2E provides by default.",
     tags=["Model Management"],
     responses=[
         og.OAIResponse(200, "Successfully retrieved models.", DefaultModelsResponseSchema),
