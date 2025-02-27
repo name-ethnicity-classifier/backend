@@ -2,15 +2,15 @@
   "id": "n2e/get-nationalities-route",
   "title": "Get nationalities.",
   "description": "Returns a list of all available nationalities (49) and nationality groups (8) along with the amount of samples we have of them in our dataset.",
-  "source": "@site/docs/n2e/get-nationalities-route.api.mdx",
+  "source": "@site/versioned_docs/version-0.2.0/n2e/get-nationalities-route.api.mdx",
   "sourceDirName": "n2e",
   "slug": "/n2e/get-nationalities-route",
-  "permalink": "/next/n2e/get-nationalities-route",
+  "permalink": "/n2e/get-nationalities-route",
   "draft": false,
   "unlisted": false,
   "editUrl": null,
   "tags": [],
-  "version": "current",
+  "version": "0.2.0",
   "frontMatter": {
     "id": "get-nationalities-route",
     "title": "Get nationalities.",
@@ -26,6 +26,6 @@
   "sidebar": "openApiSidebar",
   "previous": {
     "title": "Miscellaneous",
-    "permalink": "/next/n2e/miscellaneous"
+    "permalink": "/n2e/miscellaneous"
   }
 }

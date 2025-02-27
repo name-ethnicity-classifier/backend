@@ -16,6 +16,11 @@
               "sidebar": "openApiSidebar"
             },
             {
+              "id": "n2e/classification-distribution-route",
+              "path": "/next/n2e/classification-distribution-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
               "id": "n2e/classification-route",
               "path": "/next/n2e/classification-route",
               "sidebar": "openApiSidebar"
@@ -73,8 +78,8 @@
           }
         },
         {
-          "name": "0.1.0",
-          "label": "0.1.0",
+          "name": "0.2.0",
+          "label": "0.2.0",
           "isLast": true,
           "path": "/",
           "mainDocId": "n2e/name-to-ethnicity-api",
@@ -82,6 +87,11 @@
             {
               "id": "n2e/classification",
               "path": "/n2e/classification",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/classification-distribution-route",
+              "path": "/n2e/classification-distribution-route",
               "sidebar": "openApiSidebar"
             },
             {
@@ -136,6 +146,75 @@
             "openApiSidebar": {
               "link": {
                 "path": "/",
+                "label": "N2E API"
+              }
+            }
+          }
+        },
+        {
+          "name": "0.1.0",
+          "label": "0.1.0",
+          "isLast": false,
+          "path": "/0.1.0",
+          "mainDocId": "n2e/name-to-ethnicity-api",
+          "docs": [
+            {
+              "id": "n2e/classification",
+              "path": "/0.1.0/n2e/classification",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/classification-route",
+              "path": "/0.1.0/n2e/classification-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-default-models-route",
+              "path": "/0.1.0/n2e/get-default-models-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-models-route",
+              "path": "/0.1.0/n2e/get-models-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/get-nationalities-route",
+              "path": "/0.1.0/n2e/get-nationalities-route",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/miscellaneous",
+              "path": "/0.1.0/n2e/miscellaneous",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/model-management",
+              "path": "/0.1.0/n2e/model-management",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "n2e/name-to-ethnicity-api",
+              "path": "/0.1.0/n2e/name-to-ethnicity-api",
+              "sidebar": "openApiSidebar"
+            },
+            {
+              "id": "/",
+              "path": "/0.1.0/",
+              "sidebar": "openApiSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/0.1.0/n2e/name-to-ethnicity-api",
+                "label": "n2e/name-to-ethnicity-api"
+              }
+            },
+            "openApiSidebar": {
+              "link": {
+                "path": "/0.1.0/",
                 "label": "N2E API"
               }
             }

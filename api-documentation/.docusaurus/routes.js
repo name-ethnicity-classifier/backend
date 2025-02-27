@@ -39,15 +39,81 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', 'f1d'),
+    component: ComponentCreator('/', 'de0'),
     routes: [
       {
+        path: '/0.1.0',
+        component: ComponentCreator('/0.1.0', '01c'),
+        routes: [
+          {
+            path: '/0.1.0',
+            component: ComponentCreator('/0.1.0', 'c2d'),
+            routes: [
+              {
+                path: '/0.1.0/',
+                component: ComponentCreator('/0.1.0/', 'cc8'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/classification',
+                component: ComponentCreator('/0.1.0/n2e/classification', '9dd'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/classification-route',
+                component: ComponentCreator('/0.1.0/n2e/classification-route', '667'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/get-default-models-route',
+                component: ComponentCreator('/0.1.0/n2e/get-default-models-route', 'db1'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/get-models-route',
+                component: ComponentCreator('/0.1.0/n2e/get-models-route', '51d'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/get-nationalities-route',
+                component: ComponentCreator('/0.1.0/n2e/get-nationalities-route', 'ea3'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/miscellaneous',
+                component: ComponentCreator('/0.1.0/n2e/miscellaneous', 'b37'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/model-management',
+                component: ComponentCreator('/0.1.0/n2e/model-management', '2a6'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/0.1.0/n2e/name-to-ethnicity-api',
+                component: ComponentCreator('/0.1.0/n2e/name-to-ethnicity-api', '453'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              }
+            ]
+          }
+        ]
+      },
+      {
         path: '/next',
-        component: ComponentCreator('/next', '51c'),
+        component: ComponentCreator('/next', '478'),
         routes: [
           {
             path: '/next',
-            component: ComponentCreator('/next', '3a6'),
+            component: ComponentCreator('/next', '81f'),
             routes: [
               {
                 path: '/next/',
@@ -58,6 +124,12 @@ export default [
               {
                 path: '/next/n2e/classification',
                 component: ComponentCreator('/next/n2e/classification', '78e'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/next/n2e/classification-distribution-route',
+                component: ComponentCreator('/next/n2e/classification-distribution-route', 'a59'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
@@ -109,57 +181,63 @@ export default [
       },
       {
         path: '/',
-        component: ComponentCreator('/', '56b'),
+        component: ComponentCreator('/', '476'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', '853'),
+            component: ComponentCreator('/', 'f46'),
             routes: [
               {
                 path: '/n2e/classification',
-                component: ComponentCreator('/n2e/classification', '538'),
+                component: ComponentCreator('/n2e/classification', 'f44'),
+                exact: true,
+                sidebar: "openApiSidebar"
+              },
+              {
+                path: '/n2e/classification-distribution-route',
+                component: ComponentCreator('/n2e/classification-distribution-route', '1ed'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/classification-route',
-                component: ComponentCreator('/n2e/classification-route', '048'),
+                component: ComponentCreator('/n2e/classification-route', '104'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/get-default-models-route',
-                component: ComponentCreator('/n2e/get-default-models-route', '6f2'),
+                component: ComponentCreator('/n2e/get-default-models-route', 'ebc'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/get-models-route',
-                component: ComponentCreator('/n2e/get-models-route', '4bc'),
+                component: ComponentCreator('/n2e/get-models-route', 'a1f'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/get-nationalities-route',
-                component: ComponentCreator('/n2e/get-nationalities-route', '7e8'),
+                component: ComponentCreator('/n2e/get-nationalities-route', '466'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/miscellaneous',
-                component: ComponentCreator('/n2e/miscellaneous', 'c46'),
+                component: ComponentCreator('/n2e/miscellaneous', 'ce5'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/model-management',
-                component: ComponentCreator('/n2e/model-management', '79a'),
+                component: ComponentCreator('/n2e/model-management', '5fb'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
               {
                 path: '/n2e/name-to-ethnicity-api',
-                component: ComponentCreator('/n2e/name-to-ethnicity-api', '5a0'),
+                component: ComponentCreator('/n2e/name-to-ethnicity-api', 'f75'),
                 exact: true,
                 sidebar: "openApiSidebar"
               },
