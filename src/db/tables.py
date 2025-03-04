@@ -16,6 +16,7 @@ class User(db.Model):
     consented = db.Column(db.Boolean, default=False)
     request_count = db.Column(db.Integer, default=0, nullable=False)
     names_classified = db.Column(db.Integer, default=0, nullable=False)
+    usage_description = db.Column(db.String(500), nullable=False)
 
     def to_dict(self):
         return {
@@ -28,7 +29,8 @@ class User(db.Model):
             "verified": self.consented,
             "consented": self.consented,
             "request_count": self.request_count,
-            "names_classified": self.names_classified
+            "names_classified": self.names_classified,
+            "usage_description": self.usage_description
         }
 
 

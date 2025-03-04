@@ -27,8 +27,9 @@ EXISTING_USER = {
     "email": "existing.user@test.com",
     "role": "student",
     "password": "Hashedpassword123",
+    "consented": True,
+    "usage_description": "Lorem Ipsum" * 10,
     "verified": True,
-    "consented": True
 }
 EXISTING_USER_ID = 1
 EXISTING_CUSTOM_MODEL = {
@@ -54,8 +55,9 @@ TEST_USER = {
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
-    "verified": True,
-    "consented": True
+    "consented": True,
+    "usage_description": "Lorem Ipsum" * 10,
+    "verified": True
 }
 TEST_USER_ID = 2
 

@@ -2,8 +2,8 @@ from flask import Blueprint, redirect, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import create_access_token
 
-from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from services.user_services import add_user, check_user_login, delete_user, handle_email_verification, check_user_existence, send_verification_email
+from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser, UpdateUsageDescriptionSchema
+from services.user_services import add_user, check_user_login, delete_user, handle_email_verification, check_user_existence, send_verification_email, update_usage_description
 from utils import error_response, success_response
 from errors import error_handler
 
@@ -41,6 +41,23 @@ def login_user_route():
     return success_response(
         data={"accessToken": create_access_token(identity=user.id)}
     )
+
+
+@user_routes.route("/update-usage-description", methods=["PUT"])
+@jwt_required()
+@error_handler
+def update_usage_description_route():
+    """ Route for updating the usage description """
+    
+    current_app.logger.info(f"Received update usage description request.")
+
+    user_id = get_jwt_identity()
+    request_data = UpdateUsageDescriptionSchema(**request.json)
+
+    update_usage_description(user_id, request_data.usageDescription)
+
+    return success_response("Usage description updated successfully.")
+
 
 
 @user_routes.route("/delete-user", methods=["DELETE"])

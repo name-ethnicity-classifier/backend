@@ -12,16 +12,17 @@ CREATE TABLE model (
 );
 
 CREATE TABLE "user" (
-    email            VARCHAR(320)           NOT NULL,
-    password         VARCHAR(64)            NOT NULL,
-    name             VARCHAR(64)            NOT NULL,
-    role             VARCHAR(32)            NOT NULL,
-    signup_time      VARCHAR(64)            NOT NULL,
-    verified         BOOLEAN DEFAULT false  NOT NULL,
-    consented        BOOLEAN DEFAULT false  NOT NULL,
-    request_count    INTEGER DEFAULT 0      NOT NULL,
-    names_classified INTEGER DEFAULT 0      NOT NULL,
-    id               SERIAL                 NOT NULL CONSTRAINT user_pk PRIMARY KEY
+    email             VARCHAR(320)           NOT NULL,
+    password          VARCHAR(64)            NOT NULL,
+    name              VARCHAR(64)            NOT NULL,
+    role              VARCHAR(32)            NOT NULL,
+    signup_time       VARCHAR(64)            NOT NULL,
+    verified          BOOLEAN DEFAULT false  NOT NULL,
+    consented         BOOLEAN DEFAULT false  NOT NULL,
+    request_count     INTEGER DEFAULT 0      NOT NULL,
+    names_classified  INTEGER DEFAULT 0      NOT NULL,
+    usage_description VARCHAR(500)           NOT NULL,
+    id                SERIAL                 NOT NULL CONSTRAINT user_pk PRIMARY KEY
 );
 
 

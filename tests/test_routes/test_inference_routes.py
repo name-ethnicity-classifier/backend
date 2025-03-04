@@ -32,8 +32,9 @@ TEST_USER = {
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
-    "verified": True,
-    "consented": True
+    "consented": True,
+    "usage_description": "Lorem Ipsum" * 20,
+    "verified": True
 }
 TEST_USER_ID = 1
 

@@ -14,6 +14,11 @@ class SignupSchema(BaseModel):
     name: str
     role: str
     consented: bool
+    usageDescription: str
+
+
+class UpdateUsageDescriptionSchema(BaseModel):
+    usageDescription: str
 
 
 class DeleteUser(BaseModel):
