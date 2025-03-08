@@ -7,7 +7,7 @@ from schemas.model_schema import ModelsResponseSchema
 from utils import *
 from app import app
 from db.database import db
-from db.tables import User, Model, UserToModel
+from db.tables import User, Model, UserToModel, AccessLevel
 from sqlalchemy import text
 
 
@@ -29,6 +29,7 @@ EXISTING_USER = {
     "password": "Hashedpassword123",
     "consented": True,
     "usage_description": "Lorem Ipsum" * 10,
+    "access": AccessLevel.FULL.value,
     "verified": True,
 }
 EXISTING_USER_ID = 1
@@ -57,6 +58,7 @@ TEST_USER = {
     "password": "StrongPassword123",
     "consented": True,
     "usage_description": "Lorem Ipsum" * 10,
+    "access": AccessLevel.FULL.value,
     "verified": True
 }
 TEST_USER_ID = 2
@@ -298,6 +300,24 @@ def test_add_custom_model_with_no_description(authenticated_client):
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, model_id=model_id, name=model_name).first() is not None
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, model_id=model_id, name=model_name).first().description == None
     assert Model.query.filter_by(id=model_id).first() is not None
+
+
+@pytest.mark.it("should fail to create new model when access is RESTRICTED")
+def test_add_custom_model_with_restricted_access(authenticated_client):
+    user = User.query.filter_by(id=TEST_USER_ID).first()
+    user.access = AccessLevel.RESTRICTED.value
+
+    model_name = "new_model"
+    classes = ["german", "else"]
+    
+    response = authenticated_client.post(
+        "/models",
+        json={"name": model_name, "nationalities": classes},
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    
+    assert response.status_code == 403
+    assert json.loads(response.data)["errorCode"] == "RESTRICTED_ACCESS"
 
 
 @pytest.mark.it("should retrieve all custom and default models the user has access to")

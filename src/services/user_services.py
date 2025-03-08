@@ -5,7 +5,7 @@ import bcrypt
 import resend
 
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from db.tables import User
+from db.tables import User, AccessLevel
 from db.database import db
 from utils import is_strong_password, is_valid_email
 from errors import GeneralError, GeneralError
@@ -247,3 +247,14 @@ def handle_email_verification(token: str):
 
     user.verified = True
     db.session.commit()
+
+
+def check_user_restriction(user_id: str):
+    user = User.query.filter_by(id=user_id).first()
+
+    if user.access.lower() == AccessLevel.RESTRICTED.value:
+        raise GeneralError(
+            error_code="RESTRICTED_ACCESS",
+            message="Your account access is restricted.",
+            status_code=403
+        )

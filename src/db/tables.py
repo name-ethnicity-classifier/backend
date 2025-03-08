@@ -1,5 +1,12 @@
 import datetime
+from enum import Enum
 from db.database import db
+from sqlalchemy.dialects.postgresql import ENUM
+
+class AccessLevel(Enum):
+    ADMIN = "admin"
+    FULL = "full"
+    RESTRICTED = "restricted"
 
 
 class User(db.Model):
@@ -14,6 +21,7 @@ class User(db.Model):
     password = db.Column(db.String(64), nullable=False)
     verified = db.Column(db.Boolean, default=False)
     consented = db.Column(db.Boolean, default=False)
+    access = db.Column(ENUM(*[a.value for a in AccessLevel], name="access_level"), default=AccessLevel.FULL.value, nullable=False)
     request_count = db.Column(db.Integer, default=0, nullable=False)
     names_classified = db.Column(db.Integer, default=0, nullable=False)
     usage_description = db.Column(db.String(500), nullable=False)

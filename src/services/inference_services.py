@@ -1,8 +1,9 @@
 from db.tables import  Model, User, UserToModel
 from db.database import db
+from errors import GeneralError
 
 
-def increment_request_counter(user_id: str, model_id: str, name_amount: int) -> None:
+def increment_request_counter(user_id: str, model_id: str, name_amount: int):
     """
     Increments the 'request_count' value for certain model of a user.
     :param user_id: The user id who owns the model
@@ -24,3 +25,4 @@ def increment_request_counter(user_id: str, model_id: str, name_amount: int) -> 
     if user_to_model:
         user_to_model.request_count += 1
         db.session.commit()
+

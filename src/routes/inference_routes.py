@@ -2,7 +2,7 @@ from errors import error_handler
 from flask import Blueprint, current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_spec_gen import openapi_generator as og
-from services.user_services import check_user_existence
+from services.user_services import check_user_existence, check_user_restriction
 from utils import success_response
 from schemas.inference_schema import InferenceSchema, InferenceResponseSchema, InferenceDistributionResponseSchema
 from inference import inference
@@ -36,6 +36,7 @@ def classification_route():
 
     user_id = get_jwt_identity()
     check_user_existence(user_id)
+    check_user_restriction(user_id)
 
     request_data = InferenceSchema(**request.json)
     model_id = get_model_id_by_name(user_id, request_data.modelName)
@@ -78,6 +79,7 @@ def classification_distribution_route():
 
     user_id = get_jwt_identity()
     check_user_existence(user_id)
+    check_user_restriction(user_id)
 
     request_data = InferenceSchema(**request.json)
     model_id = get_model_id_by_name(user_id, request_data.modelName)

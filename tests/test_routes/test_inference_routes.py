@@ -1,8 +1,4 @@
-import hashlib
-import os
 from unittest.mock import patch
-import bcrypt
-from flask import jsonify
 from flask_jwt_extended import create_access_token
 import pytest
 import json
@@ -12,7 +8,7 @@ from schemas.inference_schema import InferenceDistributionResponseSchema, Infere
 from utils import *
 from app import app
 from db.database import db
-from db.tables import User, Model, UserToModel
+from db.tables import AccessLevel, User, Model, UserToModel
 
 
 # Ensure this model configuration exist inside model_configuration/
@@ -34,6 +30,7 @@ TEST_USER = {
     "password": "StrongPassword123",
     "consented": True,
     "usage_description": "Lorem Ipsum" * 20,
+    "access": AccessLevel.FULL.value,
     "verified": True
 }
 TEST_USER_ID = 1
@@ -131,7 +128,7 @@ def test_custom_model_classification(authenticated_client):
     assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2
 
 
-@pytest.mark.it("should respond with a output distribution for all classes when classfiying using 'getDistribution' set to 'True'")
+@pytest.mark.it("should respond with a output distribution for all classes when doing distribution classification")
 def test_custom_model_classification_distribution(authenticated_client):
     response = authenticated_client.post(
         "/classify-distribution",
@@ -204,3 +201,41 @@ def test_default_model_classification(authenticated_client):
     assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2
+
+
+@pytest.mark.it("should fail to do classification with restricted access")
+def test_classification_with_restricted_access(authenticated_client):
+    user = User.query.filter_by(id=TEST_USER_ID).first()
+    user.access = AccessLevel.RESTRICTED.value
+
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt", "cixin liu"],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 403
+    assert json.loads(response.data)["errorCode"] == "RESTRICTED_ACCESS"
+
+
+@pytest.mark.it("should fail to do distribution classification with restricted access")
+def test_classification_distribution_with_restricted_access(authenticated_client):
+    user = User.query.filter_by(id=TEST_USER_ID).first()
+    user.access = AccessLevel.RESTRICTED.value
+
+    response = authenticated_client.post(
+        "/classify-distribution",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt", "cixin liu"],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 403
+    assert json.loads(response.data)["errorCode"] == "RESTRICTED_ACCESS"
+
+    
