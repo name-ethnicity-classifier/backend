@@ -35,6 +35,10 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=int(os.environ.get("JWT_
 app.config["FRONTEND_URL"] = os.environ.get("FRONTEND_URL")
 app.config["API_VERSION"] = VERSION
 app.config["USER_VERIFICATION_ACTIVE"] = os.environ.get("USER_VERIFICATION_ACTIVE", default="True").lower() == "true"
+app.config["MAX_NAMES"] = os.environ.get("MAX_NAMES", default=10e4)
+app.config["BATCH_SIZE"] = os.environ.get("BATCH_SIZE", default=64)
+app.config["DAILY_QUOTA"] = os.environ.get("DAILY_QUOTA", default=10e4)
+
 
 with open("./data/config.json", "r") as f:
     openapi_base_config = json.load(f)

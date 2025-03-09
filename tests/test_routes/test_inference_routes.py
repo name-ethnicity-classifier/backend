@@ -1,4 +1,7 @@
+from datetime import timedelta
+import os
 from unittest.mock import patch
+from flask import current_app
 from flask_jwt_extended import create_access_token
 import pytest
 import json
@@ -8,7 +11,7 @@ from schemas.inference_schema import InferenceDistributionResponseSchema, Infere
 from utils import *
 from app import app
 from db.database import db
-from db.tables import AccessLevel, User, Model, UserToModel
+from db.tables import AccessLevel, User, Model, UserQuota, UserToModel
 
 
 # Ensure this model configuration exist inside model_configuration/
@@ -102,6 +105,22 @@ def authenticated_client(test_client):
             token = create_access_token(identity=TEST_USER_ID)
         test_client.token = token
         yield test_client
+
+
+@pytest.fixture
+def mock_max_names(app_context):
+    max_names = 10
+    with app.app_context():
+        with patch.dict(current_app.config, {"MAX_NAMES": max_names}, clear=False):
+            yield max_names
+
+
+@pytest.fixture
+def mock_daily_quota(app_context):
+    daily_quota = 10
+    with app.app_context():
+        with patch.dict(current_app.config, {"DAILY_QUOTA": daily_quota}, clear=False):
+            yield daily_quota
 
 
 @pytest.mark.it("should respond with correct predictions when classfiying using a custom model")
@@ -238,4 +257,92 @@ def test_classification_distribution_with_restricted_access(authenticated_client
     assert response.status_code == 403
     assert json.loads(response.data)["errorCode"] == "RESTRICTED_ACCESS"
 
-    
+
+@pytest.mark.it("should fail to do classification when requesting too many names")
+def test_classification_with_too_many_names(mock_max_names, authenticated_client):
+    max_names = mock_max_names
+
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(max_names + 1)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 405
+    assert json.loads(response.data)["errorCode"] == "TOO_MANY_NAMES"
+
+
+@pytest.mark.it("should fail to do distribution classification when requesting too many names")
+def test_classification_distribution_with_too_many_names(mock_max_names, authenticated_client):
+    max_names = mock_max_names
+
+    response = authenticated_client.post(
+        "/classify-distribution",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(max_names + 1)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 405
+    assert json.loads(response.data)["errorCode"] == "TOO_MANY_NAMES"
+
+
+@pytest.mark.it("should fail to do classification when exceeding quota")
+def test_classification_with_exceeded_quota(mock_daily_quota, authenticated_client):
+    first_request_name_amount = mock_daily_quota // 2    # reaching 50% of daily quota
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(first_request_name_amount)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    assert response.status_code == 200
+
+    second_request_name_amount = mock_daily_quota    # reaching 150% of daily quota
+    response = authenticated_client.post(
+        "/classify-distribution",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(second_request_name_amount)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 405
+    assert json.loads(response.data)["errorCode"] == "QUOTA_EXCEEDED"
+
+
+@pytest.mark.it("should reset daily quota when classifying over different days")
+def test_classification_after_quota_resets(mock_daily_quota, authenticated_client):
+    first_request_name_amount = mock_daily_quota // 2    # reaching 50% of daily quota
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(first_request_name_amount)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+    assert response.status_code == 200
+    current_user_quota = UserQuota.query.filter_by(user_id=TEST_USER_ID).first()
+    current_user_quota.last_updated -= timedelta(days=1)    # change date to yesterday
+
+    # And in the very next morning... :)
+    second_request_name_amount = mock_daily_quota    # reaching 100% of daily quota
+    response = authenticated_client.post(
+        "/classify-distribution",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(second_request_name_amount)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 200

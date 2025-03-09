@@ -40,4 +40,12 @@ CREATE TABLE user_to_model (
 );
 
 
+CREATE TABLE user_quota (
+    user_id      INTEGER      NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    last_updated DATE         NOT NULL DEFAULT CURRENT_DATE,
+    name_count   INTEGER      NOT NULL DEFAULT 0,
+    id           SERIAL       NOT NULL CONSTRAINT user_quota_pk PRIMARY KEY
+);
+
+
 ALTER TABLE model OWNER TO postgres;

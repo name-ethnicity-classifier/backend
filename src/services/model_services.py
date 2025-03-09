@@ -1,5 +1,4 @@
 import os
-from sqlalchemy import and_, or_
 from errors import GeneralError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
 from db.tables import Model, UserToModel

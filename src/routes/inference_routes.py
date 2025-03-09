@@ -1,4 +1,4 @@
-from errors import error_handler
+from errors import GeneralError, error_handler
 from flask import Blueprint, current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_spec_gen import openapi_generator as og
@@ -7,7 +7,7 @@ from utils import success_response
 from schemas.inference_schema import InferenceSchema, InferenceResponseSchema, InferenceDistributionResponseSchema
 from inference import inference
 from services.model_services import get_model_id_by_name
-from services.inference_services import increment_request_counter
+from services.inference_services import check_name_amount, check_name_amount_and_quota, increment_request_counter
 
 
 inference_routes = Blueprint("inference", __name__)
@@ -39,11 +39,14 @@ def classification_route():
     check_user_restriction(user_id)
 
     request_data = InferenceSchema(**request.json)
+    check_name_amount_and_quota(user_id, len(request_data.names))
+
     model_id = get_model_id_by_name(user_id, request_data.modelName)
 
     prediction = inference.predict(
         model_id=model_id,
         names=request_data.names,
+        batch_size=int(current_app.config["BATCH_SIZE"]),
         get_distribution=False
     )
 
@@ -82,11 +85,14 @@ def classification_distribution_route():
     check_user_restriction(user_id)
 
     request_data = InferenceSchema(**request.json)
+    check_name_amount_and_quota(user_id, len(request_data.names))
+
     model_id = get_model_id_by_name(user_id, request_data.modelName)
 
     prediction = inference.predict(
         model_id=model_id,
         names=request_data.names,
+        batch_size=int(current_app.config["BATCH_SIZE"]),
         get_distribution=True
     )
 
