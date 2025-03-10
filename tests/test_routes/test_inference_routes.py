@@ -7,6 +7,7 @@ import pytest
 import json
 from pathlib import Path
 from sqlalchemy import text
+from errors import GeneralError
 from schemas.inference_schema import InferenceDistributionResponseSchema, InferenceResponseSchema
 from utils import *
 from app import app
@@ -292,6 +293,23 @@ def test_classification_distribution_with_too_many_names(mock_max_names, authent
     assert json.loads(response.data)["errorCode"] == "TOO_MANY_NAMES"
 
 
+@pytest.mark.it("should increase quota counter when classifying")
+def test_classification_quota_counter_increase(mock_daily_quota, authenticated_client):
+    request_name_amount = 3
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt" for _ in range(request_name_amount)],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 200
+    actual_user_quota = UserQuota.query.filter_by(user_id=TEST_USER_ID).first()
+    assert actual_user_quota.name_count == request_name_amount
+
+
 @pytest.mark.it("should fail to do classification when exceeding quota")
 def test_classification_with_exceeded_quota(mock_daily_quota, authenticated_client):
     first_request_name_amount = mock_daily_quota // 2    # reaching 50% of daily quota
@@ -318,6 +336,9 @@ def test_classification_with_exceeded_quota(mock_daily_quota, authenticated_clie
     assert response.status_code == 405
     assert json.loads(response.data)["errorCode"] == "QUOTA_EXCEEDED"
 
+    actual_user_quota = UserQuota.query.filter_by(user_id=TEST_USER_ID).first()
+    assert actual_user_quota.name_count == mock_daily_quota // 2
+
 
 @pytest.mark.it("should reset daily quota when classifying over different days")
 def test_classification_after_quota_resets(mock_daily_quota, authenticated_client):
@@ -331,6 +352,7 @@ def test_classification_after_quota_resets(mock_daily_quota, authenticated_clien
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
     assert response.status_code == 200
+
     current_user_quota = UserQuota.query.filter_by(user_id=TEST_USER_ID).first()
     current_user_quota.last_updated -= timedelta(days=1)    # change date to yesterday
 
@@ -346,3 +368,4 @@ def test_classification_after_quota_resets(mock_daily_quota, authenticated_clien
     )
 
     assert response.status_code == 200
+    assert current_user_quota.name_count == second_request_name_amount
