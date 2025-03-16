@@ -10,3 +10,4 @@ run_dev_db.sh
 .env
 **/__pycache__/
 .github/
+api-documentation/
