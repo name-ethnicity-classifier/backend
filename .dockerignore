@@ -5,8 +5,9 @@ tests/
 pytest.ini
 README.md
 dev-database/
-run_dev_db.sh
+start-dev-db.sh
 .gitignore
 .env
 **/__pycache__/
 .github/
+api-documentation/

@@ -101,7 +101,7 @@ def get_nationalities() -> dict:
     :return: Dictionary with all nationalities
     """
 
-    return load_json("./data/nationalities.json")
+    return load_json("./src/static/nationalities.json")
 
 
 def generate_model_id(nationalities: list[str]) -> str:

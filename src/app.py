@@ -36,7 +36,7 @@ app.config["FRONTEND_URL"] = os.environ.get("FRONTEND_URL")
 app.config["API_VERSION"] = VERSION
 app.config["USER_VERIFICATION_ACTIVE"] = os.environ.get("USER_VERIFICATION_ACTIVE", default="True").lower() == "true"
 
-with open("./data/config.json", "r") as f:
+with open("./api-config.json", "r") as f:
     openapi_base_config = json.load(f)
 
 openapi_generator = og.OpenAPIGenerator(app, openapi_base_config)

@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  backend:
+    image: n2e-backend
+    restart: always
+    environment:
+      POSTGRES_HOST: dev_database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_DAYS: ${JWT_EXPIRATION_DAYS}
+      MAX_MODELS: ${MAX_MODELS}
+      BATCH_SIZE: ${BATCH_SIZE}
+      MAX_NAMES: ${MAX_NAMES}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+      USER_VERIFICATION_ACTIVE: ${USER_VERIFICATION_ACTIVE}
+    ports:
+      - ${FLASK_RUN_PORT}:${FLASK_RUN_PORT}
+    depends_on:
+      - dev_database
+
+  dev_database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+
+  dev_adminer:
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+    restart: always
+    ports:
+      - ${ADMINER_PORT}:8080
