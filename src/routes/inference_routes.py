@@ -6,7 +6,7 @@ from services.user_services import check_user_existence
 from utils import success_response
 from schemas.inference_schema import InferenceSchema, InferenceResponseSchema, InferenceDistributionResponseSchema
 from inference import inference
-from services.model_services import get_model_id_by_name
+from services.model_services import get_inference_model_info
 from services.inference_services import increment_request_counter
 
 
@@ -38,10 +38,11 @@ def classification_route():
     check_user_existence(user_id)
 
     request_data = InferenceSchema(**request.json)
-    model_id = get_model_id_by_name(user_id, request_data.modelName)
+    model_id, classes = get_inference_model_info(user_id, request_data.modelName)
 
     prediction = inference.predict(
         model_id=model_id,
+        classes=classes,
         names=request_data.names,
         get_distribution=False
     )
@@ -80,10 +81,11 @@ def classification_distribution_route():
     check_user_existence(user_id)
 
     request_data = InferenceSchema(**request.json)
-    model_id = get_model_id_by_name(user_id, request_data.modelName)
+    model_id, classes = get_inference_model_info(user_id, request_data.modelName)
 
     prediction = inference.predict(
         model_id=model_id,
+        classes=classes,
         names=request_data.names,
         get_distribution=True
     )

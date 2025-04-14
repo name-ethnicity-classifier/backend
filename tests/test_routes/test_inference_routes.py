@@ -15,16 +15,16 @@ from db.database import db
 from db.tables import User, Model, UserToModel
 
 
-# Ensure this model configuration exist inside model_configuration/
+# Ensure this model configuration exist inside "models" bucket
 DEFAULT_MODEL = {
     "public_name": "default-model",
-    "nationalities": (classes := sorted(set(["chinese", "else"]))),
+    "nationalities": sorted(set(["chinese", "else"])),
     "accuracy": 98.5,
     "scores": [98.0, 99.0],
     "is_trained": True,
     "is_grouped": False,
     "is_public": True,
-    "id": generate_model_id(classes),
+    "id": "cf58c0536d2ab4fbd6a6",
 }
 
 TEST_USER = {
@@ -37,16 +37,16 @@ TEST_USER = {
 }
 TEST_USER_ID = 1
 
-# Ensure this model configuration exist inside model_configuration/
+# Ensure this model configuration exist inside "models" bucket
 CUSTOM_MODEL = {
     "public_name": None,
-    "nationalities": (classes := sorted(set(["japanese", "else"]))),
+    "nationalities": sorted(set(["japanese", "else"])),
     "accuracy": 98.5,
     "scores": [98.0, 99.0],
     "is_trained": True,
     "is_grouped": False,
     "is_public": False,
-    "id": generate_model_id(classes),
+    "id": "ad608e6f548aedaec632",
 }
 USER_TO_MODEL = {
     "model_id": CUSTOM_MODEL["id"],
@@ -66,7 +66,7 @@ USER_TO_DEFAULT_MODEL = {
 def app_context():
     with app.app_context():
         db.drop_all()
-        with open("./dev-database/init_test.sql", "r") as file:
+        with open("./dev-infrastructure/db-seed/init.sql", "r") as file:
             init_sql_script = file.read()    
             db.session.execute(text(init_sql_script))
 
@@ -79,12 +79,6 @@ def app_context():
         db.session.add(UserToModel(**USER_TO_DEFAULT_MODEL))
         db.session.commit()
 
-        if not Path(f"./model_configurations/{DEFAULT_MODEL['id']}").exists():
-            raise FileNotFoundError(f"For this test, the ./model_configurations/ folder is expected to have a folder with the 'model_id' ({DEFAULT_MODEL['id']}) as name! It must contain a valid model configuration with a .pt file, etc.")
-
-        if not Path(f"./model_configurations/{CUSTOM_MODEL['id']}").exists():
-            raise FileNotFoundError(f"For this test, the ./model_configurations/ folder is expected to have a folder with the 'model_id' ({CUSTOM_MODEL['id']}) as name! It must contain a valid model configuration with a .pt file, etc.")
-
         yield app
 
 
@@ -96,7 +90,7 @@ def test_client(app_context):
 
 @pytest.fixture(scope="function")
 def authenticated_client(test_client):
-    """Mocks user authentication for tests requiring it."""
+    # Mocks user authentication for tests requiring it.
     with patch("flask_jwt_extended.get_jwt_identity") as mock_identity:
         mock_identity.return_value = TEST_USER_ID
 
@@ -112,17 +106,16 @@ def test_custom_model_classification(authenticated_client):
         "/classify",
         json={
             "modelName": USER_TO_MODEL["name"],
-            "names": ["peter schmidt", "cixin liu"]
+            "names": ["peter schmidt", "Naoyuki Oi"]
         },
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
     classification_result = json.loads(response.data)
-
     InferenceResponseSchema(**classification_result)
 
     assert response.status_code == 200
     classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
-    assert classified_ethnicities == {"cixin liu": "japanese", "peter schmidt": "else"}
+    assert classified_ethnicities == {"Naoyuki Oi": "japanese", "peter schmidt": "else"}
 
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
@@ -136,7 +129,7 @@ def test_custom_model_classification_distribution(authenticated_client):
         "/classify-distribution",
         json={
             "modelName": USER_TO_MODEL["name"],
-            "names": ["peter schmidt", "cixin liu"],
+            "names": ["peter schmidt", "Naoyuki Oi"],
         },
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
@@ -151,7 +144,7 @@ def test_custom_model_classification_distribution(authenticated_client):
         ethnicity_dist = classification_result[name]
         top_one_ethnicities[name] = max(ethnicity_dist, key=ethnicity_dist.get)
 
-    assert top_one_ethnicities == {"cixin liu": "japanese", "peter schmidt": "else"}
+    assert top_one_ethnicities == {"Naoyuki Oi": "japanese", "peter schmidt": "else"}
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1

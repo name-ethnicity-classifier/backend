@@ -26,7 +26,7 @@ def app_context():
         app.config["USER_VERIFICATION_ACTIVE"] = False
 
         db.drop_all()
-        with open("./dev-database/init_test.sql", "r") as file:
+        with open("./dev-infrastructure/db-seed/init.sql", "r") as file:
             init_sql_script = file.read()    
             db.session.execute(text(init_sql_script))
         db.session.commit()

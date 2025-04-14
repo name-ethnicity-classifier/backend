@@ -1,42 +1,3 @@
-CREATE TABLE model (
-    nationalities TEXT[]                 NOT NULL,
-    accuracy      DOUBLE PRECISION,
-    scores        REAL[],
-    is_trained    BOOLEAN DEFAULT false  NOT NULL,
-    is_grouped    BOOLEAN DEFAULT false  NOT NULL,
-    is_public     BOOLEAN DEFAULT false  NOT NULL,
-    public_name   VARCHAR(64),
-    creation_time VARCHAR(64)            NOT NULL,
-    request_count INTEGER DEFAULT 0      NOT NULL,
-    id            VARCHAR(40)            NOT NULL CONSTRAINT model_pk PRIMARY KEY
-);
-
-CREATE TABLE "user" (
-    email            VARCHAR(320)           NOT NULL,
-    password         VARCHAR(64)            NOT NULL,
-    name             VARCHAR(64)            NOT NULL,
-    role             VARCHAR(32)            NOT NULL,
-    signup_time      VARCHAR(64)            NOT NULL,
-    verified         BOOLEAN DEFAULT false  NOT NULL,
-    consented        BOOLEAN DEFAULT false  NOT NULL,
-    request_count    INTEGER DEFAULT 0      NOT NULL,
-    names_classified INTEGER DEFAULT 0      NOT NULL,
-    id               SERIAL                 NOT NULL CONSTRAINT user_pk PRIMARY KEY
-);
-
-
-CREATE TABLE user_to_model (
-    user_id             INTEGER            NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
-    model_id            VARCHAR(40)        NOT NULL REFERENCES "model"(id) ON DELETE CASCADE,
-    name                VARCHAR(64)        NOT NULL,
-    description         VARCHAR(512),
-    request_count       INTEGER DEFAULT 0  NOT NULL,
-    id                  SERIAL             NOT NULL CONSTRAINT user_to_model_pk PRIMARY KEY
-);
-
-
-ALTER TABLE model OWNER TO postgres;
-
 INSERT INTO public.model (accuracy, nationalities, scores, is_trained, is_grouped, is_public, public_name, creation_time, id) 
 VALUES (83.55, '{african,celtic,eastAsian,european,hispanic,muslim,nordic,southAsia}', 
         '{0.762470006942749,0.7657300233840942,0.9311699867248535,0.7971600294113159,0.885129988193512,0.8356500267982483,0.8405900001525879,0.8633999824523926}', 
@@ -54,5 +15,5 @@ VALUES (78.41, '{british,else,indian,spanish,american,german,polish,pakistani,it
         '{0.5186200141906738,0.3864000141620636,0.8155099749565125,0.7952600121498108,0.47832000255584717,0.7324699759483337,0.9356499910354614,0.8660799860954285,0.8185700178146362,0.9142000079154968,0.7210900187492371,0.9594299793243408,0.8811600208282471,0.976360023021698,0.8934000134468079}', 
         true, false, true, '14_nationalities_and_else', '2021-07-20 12:34:00', '6308dade9c3c0dbc7f2f');
 INSERT INTO public.model (accuracy, nationalities, scores, is_trained, is_grouped, is_public, public_name, creation_time, id) 
-VALUES (98.55, '{else,chinese}', '{0.985450029373169,0.9855999946594238}', 
+VALUES (98.55, '{chinese,else}', '{0.985450029373169,0.9855999946594238}', 
         true, false, true, 'chinese_and_else', '2021-07-20 13:41:00', 'cf58c0536d2ab4fbd6a6');

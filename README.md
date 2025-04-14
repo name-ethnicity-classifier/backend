@@ -34,14 +34,14 @@ Make sure you have [docker](https://docs.docker.com/get-docker/) installed.
 
 To start the database and Adminer UI run:
 ```
-sh ./start-dev-db.sh
+sh ./start-dev-infrastructure.sh
 ```
 
 If you want to reinitialize the database and remove the current data, run:
 ```
-sh ./start-dev-db.sh --init
+sh ./start-dev-infrastructure.sh --init
 ```
-This script will run the docker-compose file inside the ``./dev-database`` folder. If you encount any errors that point to missing Postgres environment variables, you might need to copy the ``.env`` into the ``./dev-database`` folder.
+This script will run the docker-compose file inside the ``./dev-infrastructure`` folder. If you encount any errors that point to missing Postgres environment variables, you might need to copy the ``.env`` into the ``./dev-infrastructure`` folder.
 
 ## 🧪 Testing:
 For unit and integration tests make sure you have an instance of the development database running and run:

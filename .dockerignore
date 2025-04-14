@@ -4,8 +4,8 @@
 tests/
 pytest.ini
 README.md
-dev-database/
-start-dev-db.sh
+dev-infrastructure/
+start-dev-infrastructure.sh
 .gitignore
 .env
 **/__pycache__/
