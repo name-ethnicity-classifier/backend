@@ -6,6 +6,8 @@
 .vscode/
 
 api-documentation/node_modules/
+api-documentation/.docusaurus/
+api-documentation/build/
 
 dev-infrastructure/base-data/*
 !dev-infrastructure/base-data/.gitkeep
