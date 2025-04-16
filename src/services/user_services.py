@@ -5,7 +5,7 @@ import bcrypt
 import resend
 
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from db.tables import User
+from db.tables import User, AccessLevel
 from db.database import db
 from utils import is_strong_password, is_valid_email
 from errors import GeneralError, GeneralError
@@ -110,6 +110,13 @@ def add_user(data: SignupSchema):
             status_code=422
         )
 
+    if len(data.usageDescription) < 40 or len(data.usageDescription) > 500:
+        raise GeneralError(
+            error_code="INVALID_USAGE_DESCRIPTION",
+            message=f"Invalid usage description (min. 40, max. 500 characters).",
+            status_code=422
+        )
+
     hashed_password = bcrypt.hashpw(data.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") 
 
     send_verification_email(data.email)
@@ -122,10 +129,38 @@ def add_user(data: SignupSchema):
         password=hashed_password,
         role=data.role,
         consented=data.consented,
+        usage_description=data.usageDescription,
         verified=auto_verify_user
     )
     
     db.session.add(new_user)
+    db.session.commit()
+
+
+def update_usage_description(user_id: str, new_description: str):
+    """
+    Updates the usage description for a user
+    :param user_id: ID of the user
+    :param new_description: New usage description
+    """
+    
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        raise GeneralError(
+            error_code="USER_NOT_FOUND",
+            message="User does not exist.",
+            status_code=404
+        )
+
+    if len(new_description) < 40 or len(new_description) > 500:
+        raise GeneralError(
+            error_code="INVALID_USAGE_DESCRIPTION",
+            message="Invalid usage description (min. 40, max. 500 characters).",
+            status_code=422
+        )
+
+    user.usage_description = new_description
     db.session.commit()
 
 
@@ -212,3 +247,14 @@ def handle_email_verification(token: str):
 
     user.verified = True
     db.session.commit()
+
+
+def check_user_restriction(user_id: str):
+    user = User.query.filter_by(id=user_id).first()
+
+    if user.access.lower() == AccessLevel.RESTRICTED.value:
+        raise GeneralError(
+            error_code="RESTRICTED_ACCESS",
+            message="Your account access is restricted.",
+            status_code=403
+        )

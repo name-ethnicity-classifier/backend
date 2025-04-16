@@ -11,4 +11,4 @@ ENV FLASK_ENV=production
 
 COPY . .
 
-CMD ["gunicorn", "-w", "8", "-b", "0.0.0.0:8080", "src.app:app"]
+CMD [ "sh", "serve.sh"]

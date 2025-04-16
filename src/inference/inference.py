@@ -3,11 +3,9 @@ import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import numpy as np
 import string
-import os
 import unicodedata
 import re
 from dotenv import load_dotenv
-from errors import InferenceError
 from inference.model import ConvLSTM as Model
 from inference.inference_utils import device, get_model_checkpoint, load_model_config
 from io import BytesIO
@@ -146,33 +144,25 @@ def get_ethnicity_distributions(predictions: np.array, classes: list) -> list[di
     return predicted_ethnicites
 
 
-def predict(model_id: str, names: list[str], classes: list[str], get_distribution: bool=False) -> list[str]:
+def predict(model_id: str, names: list[str], classes: list[str], batch_size: int, get_distribution: bool=False) -> list[str]:
     """
     Preprocesses and predicts the names.
     :param model_id: The ID of the model to use
     :param names: A list of all names which are to classify
+    :param classes: List of all classes the model can classify
+    :param batch_size: Batch size
     :param get_distribution: Wether to return the entire distribution of the predicted nationalities
     :return: List of the predicted nationalities (and optionally the entire output distr.)
     """
 
     load_dotenv()
 
-    MAX_NAMES = int(os.getenv("MAX_NAMES"))
-    BATCH_SIZE = int(os.getenv("BATCH_SIZE"))
-
     model_config = load_model_config()
     
     device_map_location = "cuda:0" if device else {"cuda:0": "cpu"}
     model_checkpoint = torch.load(BytesIO(get_model_checkpoint(model_id)), map_location=device_map_location)
 
-    if len(names) > MAX_NAMES:
-        raise InferenceError(
-            error_code="TOO_MANY_NAMES",
-            message=f"Too many names (maximum {MAX_NAMES}.",
-            status_code=405    
-        )
-
-    input_batch = preprocess_names(names=names, batch_size=BATCH_SIZE)
+    input_batch = preprocess_names(names=names, batch_size=batch_size)
 
     model_config = {
         "amount-classes": len(classes),
