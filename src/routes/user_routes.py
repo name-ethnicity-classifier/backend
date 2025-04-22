@@ -2,10 +2,11 @@ from flask import Blueprint, redirect, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import create_access_token
 
-from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser, UpdateUsageDescriptionSchema
+from db.tables import AccessLevel, User
+from schemas.user_schema import LoginSchema, SignupSchema, DeleteUserSchema, UpdateUsageDescriptionSchema
 from services.user_services import add_user, check_user_login, delete_user, handle_email_verification, check_user_existence, send_verification_email, update_usage_description
 from utils import error_response, success_response
-from errors import error_handler
+from errors import GeneralError, error_handler
 
 user_routes = Blueprint("user", __name__)
 
@@ -71,7 +72,7 @@ def delete_user_route():
     user_id = get_jwt_identity()
     check_user_existence(user_id)
 
-    request_data = DeleteUser(**request.json)
+    request_data = DeleteUserSchema(**request.json)
     delete_user(user_id, request_data)
 
     return success_response("User deletion successful.")
@@ -84,3 +85,22 @@ def verify_email(token: str):
     handle_email_verification(token)
 
     return redirect(f"{current_app.config['FRONTEND_URL']}/login", code=302)
+
+
+@user_routes.route("/check", methods=["GET"])
+@jwt_required()
+@error_handler
+def check_user_authorization_and_access():
+    """ Route for checking if a user is authenticated and get their access level """
+    
+    current_app.logger.info(f"Received update usage description request.")
+
+    user_id = get_jwt_identity()
+    user = check_user_existence(user_id)
+    
+    access_level = user.access
+    access_level_reason = user.access_level_reason
+    
+    return success_response(
+        data={"accessLevel": access_level, "accessLevelReason": access_level_reason}
+    )

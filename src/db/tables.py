@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 class AccessLevel(Enum):
     ADMIN = "admin"
     FULL = "full"
+    PENDING = "pending"
     RESTRICTED = "restricted"
 
 
@@ -20,10 +21,11 @@ class User(db.Model):
     password = db.Column(db.String(64), nullable=False)
     verified = db.Column(db.Boolean, default=False)
     consented = db.Column(db.Boolean, default=False)
-    access = db.Column(ENUM(*[a.value for a in AccessLevel], name="access_level"), default=AccessLevel.FULL.value, nullable=False)
     request_count = db.Column(db.Integer, default=0, nullable=False)
     names_classified = db.Column(db.Integer, default=0, nullable=False)
     usage_description = db.Column(db.String(500), nullable=False)
+    access = db.Column(ENUM(*[a.value for a in AccessLevel], name="access_level"), default=AccessLevel.PENDING.value, nullable=False)
+    access_level_reason = db.Column(db.String(500), default="pending", nullable=False)
 
     def to_dict(self):
         return {
@@ -37,7 +39,9 @@ class User(db.Model):
             "consented": self.consented,
             "request_count": self.request_count,
             "names_classified": self.names_classified,
-            "usage_description": self.usage_description
+            "usage_description": self.usage_description,
+            "access": self.access,
+            "access_level_reason": self.access_level_reason
         }
 
 

@@ -4,7 +4,7 @@ from flask_jwt_extended import create_access_token, decode_token
 import bcrypt
 import resend
 
-from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
+from schemas.user_schema import LoginSchema, SignupSchema, DeleteUserSchema
 from db.tables import User, AccessLevel
 from db.database import db
 from utils import is_strong_password, is_valid_email
@@ -40,11 +40,12 @@ def check_user_login(data: LoginSchema):
     return user
 
 
-def check_user_existence(user_id):
+def check_user_existence(user_id) -> User:
     """
     Checks if user with given ID exists in the database, to make sure
     that even when a user is deleted their JWT token doesn't work anymore.
     :param user_id: User id to check
+    :return: User database entry if it exists
     """
     
     user = User.query.filter_by(id=user_id).first()
@@ -55,6 +56,8 @@ def check_user_existence(user_id):
             message="User does not exist.",
             status_code=401
         )
+    
+    return user
     
 
 def add_user(data: SignupSchema):
@@ -164,7 +167,7 @@ def update_usage_description(user_id: str, new_description: str):
     db.session.commit()
 
 
-def delete_user(user_id: str, data: DeleteUser):
+def delete_user(user_id: str, data: DeleteUserSchema):
     """
     Deletes a user from the database
     :param user_id: ID of the user to delete
@@ -192,7 +195,6 @@ def send_verification_email(email: str):
     """
     Sends a verification email to the user
     :param email: Email to which to send
-    :return: None
     """
 
     if not current_app.config["USER_VERIFICATION_ACTIVE"]:
@@ -223,7 +225,7 @@ def send_verification_email(email: str):
             message="Error while sending verification email.",
             status_code=500
         )
-
+ 
 
 def handle_email_verification(token: str):
     """
@@ -252,9 +254,16 @@ def handle_email_verification(token: str):
 def check_user_restriction(user_id: str):
     user = User.query.filter_by(id=user_id).first()
 
+    if user.access.lower() == AccessLevel.PENDING.value:
+        raise GeneralError(
+            error_code="PENDING_ACCESS",
+            message="Your account access request is being reviewed.",
+            status_code=403
+        )
+    
     if user.access.lower() == AccessLevel.RESTRICTED.value:
         raise GeneralError(
             error_code="RESTRICTED_ACCESS",
-            message="Your account access is restricted.",
+            message=f"Your account access is restricted. Reason: {user.access_level_reason}",
             status_code=403
         )

@@ -87,7 +87,6 @@ def classification_distribution_route():
 
     request_data = InferenceSchema(**request.json)
     model_id, classes = get_inference_model_info(user_id, request_data.modelName)
-
     check_name_amount_and_quota(user_id, len(request_data.names))
 
     prediction = inference.predict(

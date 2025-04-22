@@ -159,7 +159,7 @@ def predict(model_id: str, names: list[str], classes: list[str], batch_size: int
 
     model_config = load_model_config()
     
-    device_map_location = "cuda:0" if device else {"cuda:0": "cpu"}
+    device_map_location = {"cuda:0": "cpu"} if device.type == "cpu" else None
     model_checkpoint = torch.load(BytesIO(get_model_checkpoint(model_id)), map_location=device_map_location)
 
     input_batch = preprocess_names(names=names, batch_size=batch_size)

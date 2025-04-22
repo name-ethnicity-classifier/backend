@@ -140,7 +140,7 @@ def test_custom_model_classification(authenticated_client):
 
 
 @pytest.mark.it("should respond with a output distribution for all classes when doing distribution classification")
-def test_custom_model_classification_distribution(authenticated_client):
+def test_custom_model_distribution_classification(authenticated_client):
     response = authenticated_client.post(
         "/classify-distribution",
         json={
@@ -218,7 +218,8 @@ def test_default_model_classification(authenticated_client):
 def test_classification_with_restricted_access(authenticated_client):
     user = User.query.filter_by(id=TEST_USER_ID).first()
     user.access = AccessLevel.RESTRICTED.value
-
+    user.access_level_reason = "Insufficient usage description."
+    
     response = authenticated_client.post(
         "/classify",
         json={
@@ -233,7 +234,7 @@ def test_classification_with_restricted_access(authenticated_client):
 
 
 @pytest.mark.it("should fail to do distribution classification with restricted access")
-def test_classification_distribution_with_restricted_access(authenticated_client):
+def test_distribution_classification_with_restricted_access(authenticated_client):
     user = User.query.filter_by(id=TEST_USER_ID).first()
     user.access = AccessLevel.RESTRICTED.value
 
@@ -248,6 +249,24 @@ def test_classification_distribution_with_restricted_access(authenticated_client
 
     assert response.status_code == 403
     assert json.loads(response.data)["errorCode"] == "RESTRICTED_ACCESS"
+
+
+@pytest.mark.it("should fail to do classification with pending access")
+def test_classification_with_pending_access(authenticated_client):
+    user = User.query.filter_by(id=TEST_USER_ID).first()
+    user.access = AccessLevel.PENDING.value
+
+    response = authenticated_client.post(
+        "/classify",
+        json={
+            "modelName": USER_TO_MODEL["name"],
+            "names": ["peter schmidt", "cixin liu"],
+        },
+        headers={"Authorization": f"Bearer {authenticated_client.token}"}
+    )
+
+    assert response.status_code == 403
+    assert json.loads(response.data)["errorCode"] == "PENDING_ACCESS"
 
 
 @pytest.mark.it("should fail to do classification when requesting too many names")
@@ -268,7 +287,7 @@ def test_classification_with_too_many_names(mock_max_names, authenticated_client
 
 
 @pytest.mark.it("should fail to do distribution classification when requesting too many names")
-def test_classification_distribution_with_too_many_names(mock_max_names, authenticated_client):
+def test_distribution_classification_with_too_many_names(mock_max_names, authenticated_client):
     max_names = mock_max_names
 
     response = authenticated_client.post(
@@ -360,3 +379,4 @@ def test_classification_after_quota_resets(mock_daily_quota, authenticated_clien
 
     assert response.status_code == 200
     assert current_user_quota.name_count == second_request_name_amount
+

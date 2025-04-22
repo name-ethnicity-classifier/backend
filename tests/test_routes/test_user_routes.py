@@ -5,7 +5,7 @@ from sqlalchemy import text
 from utils import *
 from app import app
 from db.database import db
-from db.tables import User
+from db.tables import AccessLevel, User
 
 
 TEST_USER_REQUEST_BODY = {
@@ -106,15 +106,19 @@ def test_signup_user_with_invalid_usage_description(test_client):
     assert response.status_code == 422
     assert json.loads(response.data)["errorCode"] == "INVALID_USAGE_DESCRIPTION"
 
+
 @pytest.mark.it("should create to user entry and send verification email when user signs up successfully")
 def test_signup_user(test_client, request):
-    app.config["USER_VERIFICATION_ACTIVE"] = True
+    app.config["USER_VERIFICATION_ACTIVE"] = True   # in case this was deactived during developing
 
     response = test_client.post("/signup", json=TEST_USER_REQUEST_BODY)
 
     assert response.status_code == 200
-    assert User.query.filter_by(email=TEST_USER_REQUEST_BODY["email"]).first() is not None
-    request.node.mock_resend_email_send.assert_called_once()
+
+    user = User.query.filter_by(email=TEST_USER_REQUEST_BODY["email"]).first()
+    assert user is not None
+    assert user.access.lower() == AccessLevel.PENDING.value
+    request.node.mock_resend_email_send.assert_called_once()    # check if email would be sent
 
 
 @pytest.mark.it("should fail to signup user when other user already has same email address")
@@ -304,3 +308,24 @@ def test_delete_user(test_client):
     assert response.status_code == 200
     assert json.loads(response.data) == expected_response_data
     assert User.query.filter_by(email=TEST_USER_REQUEST_BODY["email"]).first() is None
+
+
+@pytest.mark.it("should return user access level and the reason for it when user is logged in")
+def test_check_user_access_level(test_client):
+    signup_response = test_client.post("/signup", json=TEST_USER_REQUEST_BODY)
+    assert signup_response.status_code == 200
+
+    login_response = test_client.post(
+        "/login",
+        json={"email": TEST_USER_REQUEST_BODY["email"], "password": TEST_USER_REQUEST_BODY["password"]}
+    )
+    assert login_response.status_code == 200
+    
+    token = json.loads(login_response.data)["accessToken"]
+    response = test_client.get(
+        "/check",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert json.loads(response.data)["accessLevel"] in [a.value for a in AccessLevel]
+    assert json.loads(response.data)["accessLevelReason"] == "pending"
