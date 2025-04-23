@@ -257,13 +257,13 @@ def check_user_restriction(user_id: str):
     if user.access.lower() == AccessLevel.PENDING.value:
         raise GeneralError(
             error_code="PENDING_ACCESS",
-            message="Your account access request is being reviewed.",
+            message="Your account access and/or usage description is currently being reviewed before granting you access.",
             status_code=403
         )
     
     if user.access.lower() == AccessLevel.RESTRICTED.value:
         raise GeneralError(
             error_code="RESTRICTED_ACCESS",
-            message=f"Your account access is restricted. Reason: {user.access_level_reason}",
+            message=f"Since May 2025, we require users to provide a description of how they are using our service to ensure ethical compliance. Your usage description is either missing or insufficient (see the reason below). Please update it in the user settings on our website. Reason: {user.access_level_reason}",
             status_code=403
         )
