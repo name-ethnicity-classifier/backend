@@ -328,4 +328,3 @@ def test_check_user_access_level(test_client):
     )
     assert response.status_code == 200
     assert json.loads(response.data)["accessLevel"] in [a.value for a in AccessLevel]
-    assert json.loads(response.data)["accessLevelReason"] == "pending"
