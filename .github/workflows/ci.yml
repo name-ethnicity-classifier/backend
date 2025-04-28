@@ -100,18 +100,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Create image from repository
+      - name: Build and push backend image to GitHub Container Registry
         run: |
           IMAGE_VERSION=${{ needs.version-check.outputs.new_version }}
           IMAGE_NAME=ghcr.io/name-ethnicity-classifier/n2e-backend
 
           docker build -t $IMAGE_NAME:$IMAGE_VERSION -t $IMAGE_NAME:latest .
+          docker push $IMAGE_NAME:$IMAGE_VERSION
+          docker push $IMAGE_NAME:latest
 
-      - name: Push image to GitHub Container Registry
+      - name: Build and push API documentation image to GitHub Container Registry
         run: |
           IMAGE_VERSION=${{ needs.version-check.outputs.new_version }}
-          IMAGE_NAME=ghcr.io/name-ethnicity-classifier/n2e-backend
+          IMAGE_NAME=ghcr.io/name-ethnicity-classifier/n2e-api-docs
 
+          docker build -t $IMAGE_NAME:$IMAGE_VERSION -t $IMAGE_NAME:latest ./api-documentation
           docker push $IMAGE_NAME:$IMAGE_VERSION
           docker push $IMAGE_NAME:latest
 
