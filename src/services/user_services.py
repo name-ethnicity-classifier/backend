@@ -164,6 +164,7 @@ def update_usage_description(user_id: str, new_description: str):
         )
 
     user.usage_description = new_description
+    user.access_level_reason = "We are currently reviewing your usage description. Please check in later."
     db.session.commit()
 
 

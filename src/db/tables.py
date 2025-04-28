@@ -25,7 +25,7 @@ class User(db.Model):
     names_classified = db.Column(db.Integer, default=0, nullable=False)
     usage_description = db.Column(db.String(500), nullable=False)
     access = db.Column(ENUM(*[a.value for a in AccessLevel], name="access_level"), default=AccessLevel.PENDING.value, nullable=False)
-    access_level_reason = db.Column(db.String(500), default="We are currently reviewing your account access and/or usage description. Please check in later.", nullable=False)
+    access_level_reason = db.Column(db.String(500), default="We are currently reviewing your account access and usage description. Please check in later.", nullable=False)
 
     def to_dict(self):
         return {
