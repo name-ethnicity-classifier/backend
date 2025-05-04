@@ -195,7 +195,8 @@ def test_custom_model_distribution_classification(authenticated_client):
     assert response.status_code == 200
     
     for _name, distribution in classification_result.items():
-        assert sum(distribution.values()) == 100.0
+        total = sum(distribution.values())
+        assert abs(100.0 - total) < 1e-3
 
     # assert top_one_ethnicities == {"Naoyuki Oi": "japanese", "peter schmidt": "else"}
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
