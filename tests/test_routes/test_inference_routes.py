@@ -1,11 +1,14 @@
 from datetime import timedelta
-import os
+from io import BytesIO
 from unittest.mock import patch
 from flask import current_app
 from flask_jwt_extended import create_access_token
 import pytest
 import json
 from sqlalchemy import text
+import torch
+from inference.inference_utils import load_model_config
+from inference.model import ConvLSTM
 from schemas.inference_schema import InferenceDistributionResponseSchema, InferenceResponseSchema
 from utils import *
 from app import app
@@ -116,6 +119,46 @@ def mock_daily_quota(app_context):
             yield daily_quota
 
 
+@pytest.fixture(scope="function", autouse=True)
+def mock_base_model_config():
+    with patch("inference.inference.load_model_config") as mock_config:
+        with open("./tests/mock/model_config.json", "r") as f:
+            mock_config.return_value = json.load(f)
+
+        yield mock_config
+
+
+@pytest.fixture(autouse=True)
+def mock_get_model_checkpoint():
+    # Creates new model .pt checkpoint in memory and directly returns it from the mocked 
+    # 'get_model_checkpoint' function instead of fetching .pt files from bucket
+    
+    model_config = load_json("./tests/mock/model_config.json")
+
+    def mock_checkpoint(model_id):
+        class_amount = 2
+        if model_id == CUSTOM_MODEL["id"]:
+            class_amount = len(CUSTOM_MODEL["nationalities"])
+        elif model_id == DEFAULT_MODEL["id"]:
+            class_amount = len(DEFAULT_MODEL["nationalities"])
+            
+        dummy_model = ConvLSTM(
+            class_amount=class_amount,
+            embedding_size=model_config["embedding-size"],
+            hidden_size=model_config["hidden-size"],
+            layers=model_config["rnn-layers"],
+            kernel_size=model_config["kernel-size"],
+            cnn_out_dim=model_config["cnn-out-dim"]
+        )
+        buffer = BytesIO()
+        torch.save(dummy_model.state_dict(), buffer)
+        buffer.seek(0)
+        return torch.load(buffer)
+
+    with patch("inference.inference.get_model_checkpoint", side_effect=mock_checkpoint):
+        yield
+
+
 @pytest.mark.it("should respond with correct predictions when classfiying using a custom model")
 def test_custom_model_classification(authenticated_client):
     response = authenticated_client.post(
@@ -127,12 +170,9 @@ def test_custom_model_classification(authenticated_client):
         headers={"Authorization": f"Bearer {authenticated_client.token}"}
     )
     classification_result = json.loads(response.data)
+    
     InferenceResponseSchema(**classification_result)
-
     assert response.status_code == 200
-    classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
-    assert classified_ethnicities == {"Naoyuki Oi": "japanese", "peter schmidt": "else"}
-
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
@@ -154,13 +194,10 @@ def test_custom_model_distribution_classification(authenticated_client):
     InferenceDistributionResponseSchema(**classification_result)
     assert response.status_code == 200
     
-    # Get the ethnicites with the highest confidence to check if they match expected predictions
-    top_one_ethnicities = {}
-    for name in classification_result:
-        ethnicity_dist = classification_result[name]
-        top_one_ethnicities[name] = max(ethnicity_dist, key=ethnicity_dist.get)
+    for _name, distribution in classification_result.items():
+        assert sum(distribution.values()) == 100.0
 
-    assert top_one_ethnicities == {"Naoyuki Oi": "japanese", "peter schmidt": "else"}
+    # assert top_one_ethnicities == {"Naoyuki Oi": "japanese", "peter schmidt": "else"}
     assert Model.query.filter_by(id=CUSTOM_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
@@ -180,11 +217,7 @@ def test_custom_same_as_default_model_classification(authenticated_client):
     classification_result = json.loads(response.data)
 
     InferenceResponseSchema(**classification_result)
-
     assert response.status_code == 200
-    classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
-    assert classified_ethnicities == {"cixin liu": "chinese", "peter schmidt": "else"}
-
     assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
     assert UserToModel.query.filter_by(user_id=TEST_USER_ID, name=USER_TO_DEFAULT_MODEL["name"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
@@ -204,11 +237,7 @@ def test_default_model_classification(authenticated_client):
     classification_result = json.loads(response.data)
 
     InferenceResponseSchema(**classification_result)
-
     assert response.status_code == 200
-    classified_ethnicities = {name: prediction[0] for name, prediction in classification_result.items()}
-    assert classified_ethnicities == {"cixin liu": "chinese", "peter schmidt": "else"}
-
     assert Model.query.filter_by(id=DEFAULT_MODEL["id"]).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().request_count == 1
     assert User.query.filter_by(id=TEST_USER_ID).first().names_classified == 2

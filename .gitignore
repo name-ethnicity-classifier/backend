@@ -14,5 +14,3 @@ dev-infrastructure/base-data/*
 
 dev-infrastructure/model-configurations/*
 !dev-infrastructure/model-configurations/.gitkeep
-!dev-infrastructure/model-configurations/ad608e6f548aedaec632/*
-!dev-infrastructure/model-configurations/cf58c0536d2ab4fbd6a6/*

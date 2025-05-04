@@ -1,0 +1,16 @@
+{   
+    "test-size": 0.1,
+    "optimizer": "Adam",
+    "loss-function": "NLLLoss",
+    "epochs": 1,
+    "batch-size": 32,
+    "kernel-size": 3,
+    "cnn-out-dim": 16,
+    "hidden-size": 6,
+    "rnn-layers": 1,
+    "lr-schedule": [0.001, 0.99, 200],
+    "weight-decay": 1e-5,
+    "dropout-chance": 0.2,
+    "embedding-size": 32,
+    "augmentation": 0.0
+}

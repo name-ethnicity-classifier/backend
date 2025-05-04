@@ -18,11 +18,11 @@ for BUCKET in $BUCKETS; do
   fi
 done
 
-echo "Syncing ./base-data/ to minio_instance/base-data/"
-mc mirror --overwrite --exclude ".gitkeep" ./base-data/ minio_instance/base-data/
-
 # Add some models to interact with during development
 echo "Syncing ./model-configurations/ to minio_instance/models/"
 mc mirror --overwrite --exclude ".gitkeep" ./model-configurations/ minio_instance/models/
+
+echo "Syncing ./base-data/ to minio_instance/base-data/"
+mc mirror --overwrite --exclude ".gitkeep" ./base-data/ minio_instance/base-data/
 
 echo "MinIO initialization completed."

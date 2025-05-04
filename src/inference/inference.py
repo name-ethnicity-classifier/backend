@@ -1,5 +1,4 @@
 import torch
-import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import numpy as np
 import string
@@ -8,7 +7,6 @@ import re
 from dotenv import load_dotenv
 from inference.model import ConvLSTM as Model
 from inference.inference_utils import device, get_model_checkpoint, load_model_config
-from io import BytesIO
 
 
 
@@ -157,11 +155,8 @@ def predict(model_id: str, names: list[str], classes: list[str], batch_size: int
 
     load_dotenv()
 
-    model_config = load_model_config()
-    
-    device_map_location = {"cuda:0": "cpu"} if device.type == "cpu" else None
-    model_checkpoint = torch.load(BytesIO(get_model_checkpoint(model_id)), map_location=device_map_location)
-
+    model_config = load_model_config()    
+    model_checkpoint = get_model_checkpoint(model_id)
     input_batch = preprocess_names(names=names, batch_size=batch_size)
 
     model_config = {
