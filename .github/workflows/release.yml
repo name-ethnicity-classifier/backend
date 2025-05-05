@@ -38,7 +38,7 @@ jobs:
 
   image-release:
     needs: version-check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.version-check.outputs.bump_type != 'patch' && needs.version-check.outputs.bump_type != 'no-bump'
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} && needs.version-check.outputs.bump_type != 'patch' && needs.version-check.outputs.bump_type != 'no-bump'
     runs-on: ubuntu-latest
 
     steps:
