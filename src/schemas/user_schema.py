@@ -14,8 +14,15 @@ class SignupSchema(BaseModel):
     name: str
     role: str
     consented: bool
+    usageDescription: str
 
 
-class DeleteUser(BaseModel):
+class UpdateUsageDescriptionSchema(BaseModel):
+    """ Schema to validate the /update-usage-description POST request data """
+    usageDescription: str
+
+
+class DeleteUserSchema(BaseModel):
     """ Schema to validate the /delete-user POST request data """
     password: str
+

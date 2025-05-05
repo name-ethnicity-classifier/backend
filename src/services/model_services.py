@@ -1,5 +1,4 @@
 import os
-from sqlalchemy import and_, or_
 from errors import GeneralError
 from schemas.model_schema import AddModelSchema, DeleteModelSchema
 from db.tables import Model, UserToModel
@@ -173,22 +172,23 @@ def delete_models(user_id: str, model_names: DeleteModelSchema) -> None:
     db.session.commit()
 
 
-def get_model_id_by_name(user_id: str, model_name: str) -> str:
+def get_inference_model_info(user_id: str, model_name: str) -> tuple[str, list[str]]:
     """
-    Retrieves the model ID given a model name
-    :param user_id: The user which searches for the model by name
-    :param model_name: The name the user gave the model
-    :return: The model ID
+    Retrieves the model ID and nationalities given a model name for a given user.
+    :param user_id: The user querying for the model
+    :param model_name: The user-defined name (custom or public)
+    :return: Tuple of (model ID, nationalities)
     """
-
     user_model = UserToModel.query.filter_by(user_id=user_id, name=model_name).first()
     if user_model:
-        return user_model.model_id
-    
+        model = Model.query.get(user_model.model_id)
+        if model:
+            return user_model.model_id, model.nationalities
+
     public_model = Model.query.filter_by(public_name=model_name).first()
     if public_model:
-        return public_model.id
-    
+        return public_model.id, public_model.nationalities
+
     raise GeneralError(
         error_code="MODEL_DOES_NOT_EXIST",
         message=f"Model with name '{model_name}' does not exist.",

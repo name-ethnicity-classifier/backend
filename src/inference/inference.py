@@ -1,19 +1,13 @@
-
 import torch
-import torch.utils.data
 from torch.nn.utils.rnn import pad_sequence
 import numpy as np
 import string
-import os
 import unicodedata
 import re
 from dotenv import load_dotenv
-from errors import InferenceError
 from inference.model import ConvLSTM as Model
-from utils import load_json
+from inference.inference_utils import device, get_model_checkpoint, load_model_config
 
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def replace_special_chars(name: str) -> str:
@@ -65,9 +59,10 @@ def preprocess_names(names: list=[str], batch_size: int=128) -> torch.tensor:
     return padded_batch
 
 
-def classify_names(input_batch: torch.tensor, model_config: dict, classes: dict, get_distribution: bool=False) -> str:
-    """ load model and predict preprocessed name
+def classify_names(model_checkpoint: dict, input_batch: torch.tensor, model_config: dict, classes: dict, get_distribution: bool=False) -> str:
+    """ Load model and predict preprocessed name
 
+    :param model_checkpoint: Trained model checkpoint
     :param torch.tensor input_batch: input-batch
     :param str model_path: path to saved model-paramters
     :param dict classes: a dictionary containing all countries with their class-number
@@ -75,28 +70,19 @@ def classify_names(input_batch: torch.tensor, model_config: dict, classes: dict,
     :return str: predicted ethnicities
     """
 
-    # prepare model (map model-file content from gpu to cpu if necessary)
     model = Model(
         class_amount=model_config["amount-classes"], 
         embedding_size=model_config["embedding-size"],
         hidden_size=model_config["hidden-size"],
         layers=model_config["rnn-layers"],
-        kernel_size=model_config["cnn-parameters"][1],
-        channels=model_config["cnn-parameters"][2]
+        kernel_size=model_config["kernel-size"],
+        cnn_out_dim=model_config["cnn-out-dim"]
     ).to(device=device)
 
-    model_path = model_config["model-file"]
-
-    if device != "cuda:0":
-        model.load_state_dict(torch.load(model_path, map_location={"cuda:0": "cpu"}))
-    else:
-        model.load_state_dict(torch.load(model_path))
-
+    model.load_state_dict(model_checkpoint)
     model = model.eval()
 
     total_predicted_ethncitities = []
-
-    # classify names and store results
     for batch in input_batch:
         predictions = model(batch.float()).cpu().detach().numpy()
 
@@ -156,43 +142,31 @@ def get_ethnicity_distributions(predictions: np.array, classes: list) -> list[di
     return predicted_ethnicites
 
 
-def predict(model_id: str, names: list[str], get_distribution: bool=False) -> list[str]:
+def predict(model_id: str, names: list[str], classes: list[str], batch_size: int, get_distribution: bool=False) -> list[str]:
     """
     Preprocesses and predicts the names.
     :param model_id: The ID of the model to use
     :param names: A list of all names which are to classify
+    :param classes: List of all classes the model can classify
+    :param batch_size: Batch size
     :param get_distribution: Wether to return the entire distribution of the predicted nationalities
     :return: List of the predicted nationalities (and optionally the entire output distr.)
     """
 
     load_dotenv()
 
-    MAX_NAMES = int(os.getenv("MAX_NAMES"))
-    BATCH_SIZE = int(os.getenv("BATCH_SIZE"))
-
-    model_config = load_json(f"model_configurations/{model_id}/config.json")
-    classes = load_json(f"model_configurations/{model_id}/dataset/nationalities.json")
-    model_file = f"model_configurations/{model_id}/model.pt"
-
-    if len(names) > MAX_NAMES:
-        raise InferenceError(
-            error_code="TOO_MANY_NAMES",
-            message=f"Too many names (maximum {MAX_NAMES}.",
-            status_code=405    
-        )
-
-    # preprocess inputs
-    input_batch = preprocess_names(names=names, batch_size=BATCH_SIZE)
+    model_config = load_model_config()    
+    model_checkpoint = get_model_checkpoint(model_id)
+    input_batch = preprocess_names(names=names, batch_size=batch_size)
 
     model_config = {
-        "model-file": model_file,
         "amount-classes": len(classes),
         "embedding-size": model_config["embedding-size"],
         "hidden-size": model_config["hidden-size"],
         "rnn-layers": model_config["rnn-layers"],
-        "cnn-parameters": model_config["cnn-parameters"]
+        "kernel-size": model_config["kernel-size"],
+        "cnn-out-dim": model_config["cnn-out-dim"]
     }
 
-    # predict ethnicities
-    return classify_names(input_batch, model_config, classes, get_distribution)
+    return classify_names(model_checkpoint, input_batch, model_config, classes, get_distribution)
 

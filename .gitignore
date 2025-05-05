@@ -4,4 +4,13 @@
 **/__pycache__/
 .fuse_*
 .vscode/
+
 api-documentation/node_modules/
+api-documentation/.docusaurus/
+api-documentation/build/
+
+dev-infrastructure/base-data/*
+!dev-infrastructure/base-data/.gitkeep
+
+dev-infrastructure/model-configurations/*
+!dev-infrastructure/model-configurations/.gitkeep

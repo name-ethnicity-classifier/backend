@@ -4,8 +4,8 @@ from flask_jwt_extended import create_access_token, decode_token
 import bcrypt
 import resend
 
-from schemas.user_schema import LoginSchema, SignupSchema, DeleteUser
-from db.tables import User
+from schemas.user_schema import LoginSchema, SignupSchema, DeleteUserSchema
+from db.tables import User, AccessLevel
 from db.database import db
 from utils import is_strong_password, is_valid_email
 from errors import GeneralError, GeneralError
@@ -40,11 +40,12 @@ def check_user_login(data: LoginSchema):
     return user
 
 
-def check_user_existence(user_id):
+def check_user_existence(user_id) -> User:
     """
     Checks if user with given ID exists in the database, to make sure
     that even when a user is deleted their JWT token doesn't work anymore.
     :param user_id: User id to check
+    :return: User database entry if it exists
     """
     
     user = User.query.filter_by(id=user_id).first()
@@ -55,6 +56,8 @@ def check_user_existence(user_id):
             message="User does not exist.",
             status_code=401
         )
+    
+    return user
     
 
 def add_user(data: SignupSchema):
@@ -110,6 +113,13 @@ def add_user(data: SignupSchema):
             status_code=422
         )
 
+    if len(data.usageDescription) < 40 or len(data.usageDescription) > 500:
+        raise GeneralError(
+            error_code="INVALID_USAGE_DESCRIPTION",
+            message=f"Invalid usage description (min. 40, max. 500 characters).",
+            status_code=422
+        )
+
     hashed_password = bcrypt.hashpw(data.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") 
 
     send_verification_email(data.email)
@@ -122,6 +132,7 @@ def add_user(data: SignupSchema):
         password=hashed_password,
         role=data.role,
         consented=data.consented,
+        usage_description=data.usageDescription,
         verified=auto_verify_user
     )
     
@@ -129,7 +140,35 @@ def add_user(data: SignupSchema):
     db.session.commit()
 
 
-def delete_user(user_id: str, data: DeleteUser):
+def update_usage_description(user_id: str, new_description: str):
+    """
+    Updates the usage description for a user
+    :param user_id: ID of the user
+    :param new_description: New usage description
+    """
+    
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        raise GeneralError(
+            error_code="USER_NOT_FOUND",
+            message="User does not exist.",
+            status_code=404
+        )
+
+    if len(new_description) < 40 or len(new_description) > 500:
+        raise GeneralError(
+            error_code="INVALID_USAGE_DESCRIPTION",
+            message="Invalid usage description (min. 40, max. 500 characters).",
+            status_code=422
+        )
+
+    user.usage_description = new_description
+    user.access_level_reason = "We are currently reviewing your usage description. Please check in later."
+    db.session.commit()
+
+
+def delete_user(user_id: str, data: DeleteUserSchema):
     """
     Deletes a user from the database
     :param user_id: ID of the user to delete
@@ -157,7 +196,6 @@ def send_verification_email(email: str):
     """
     Sends a verification email to the user
     :param email: Email to which to send
-    :return: None
     """
 
     if not current_app.config["USER_VERIFICATION_ACTIVE"]:
@@ -188,7 +226,7 @@ def send_verification_email(email: str):
             message="Error while sending verification email.",
             status_code=500
         )
-
+ 
 
 def handle_email_verification(token: str):
     """
@@ -212,3 +250,21 @@ def handle_email_verification(token: str):
 
     user.verified = True
     db.session.commit()
+
+
+def check_user_restriction(user_id: str):
+    user = User.query.filter_by(id=user_id).first()
+
+    if user.access.lower() == AccessLevel.PENDING.value:
+        raise GeneralError(
+            error_code="PENDING_ACCESS",
+            message="Your account access and/or usage description is currently being reviewed before granting you access.",
+            status_code=403
+        )
+    
+    if user.access.lower() == AccessLevel.RESTRICTED.value:
+        raise GeneralError(
+            error_code="RESTRICTED_ACCESS",
+            message=f"Since May 2025, we require users to provide a description of how they are using our service to ensure ethical compliance. Your usage description is either missing or insufficient (see the reason below). Please update it in the user settings on our website. Reason: {user.access_level_reason}",
+            status_code=403
+        )

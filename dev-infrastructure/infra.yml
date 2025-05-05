@@ -1,0 +1,85 @@
+version: '3.7'
+
+services:
+  backend:
+    image: n2e-backend
+    restart: always
+    environment:
+      POSTGRES_HOST: dev_database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_DAYS: ${JWT_EXPIRATION_DAYS}
+      MINIO_USER: ${MINIO_USER}
+      MINIO_PASSWORD: ${MINIO_PASSWORD}
+      MINIO_HOST: ${MINIO_HOST}
+      MINIO_PORT: ${MINIO_PORT}
+      MODEL_S3_BUCKET: ${MODEL_S3_BUCKET}
+      BASE_DATA_S3_BUCKET: ${BASE_DATA_S3_BUCKET}
+      BASE_MODEL: ${BASE_MODEL}
+      MAX_MODELS: ${MAX_MODELS}
+      BATCH_SIZE: ${BATCH_SIZE}
+      MAX_NAMES: ${MAX_NAMES}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      FRONTEND_URL: ${FRONTEND_URL}
+      USER_VERIFICATION_ACTIVE: ${USER_VERIFICATION_ACTIVE}
+    ports:
+      - ${FLASK_RUN_PORT}:${FLASK_RUN_PORT}
+    depends_on:
+      - dev_database
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "${MINIO_PORT}:9000"
+      - "${MINIO_UI_PORT}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server --console-address ":${MINIO_UI_PORT}" /data
+    restart: unless-stopped
+
+  minio-init:
+    image: minio/mc
+    depends_on:
+      - minio
+    environment:
+      MINIO_HOST: http://minio:${MINIO_PORT}
+      MINIO_USER: ${MINIO_USER}
+      MINIO_PASSWORD: ${MINIO_PASSWORD}
+    entrypoint: ["/bin/sh", "/minio-init.sh"]
+    volumes:
+      - ./base-data:/base-data
+      - ./model-configurations/:/model-configurations
+      - ./minio-init.sh:/minio-init.sh
+
+  dev_database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./db-seed/init.sql:/docker-entrypoint-initdb.d/00-init.sql
+      - ./db-seed/default-models.sql:/docker-entrypoint-initdb.d/10-default-models.sql
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+
+  dev_adminer:
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+    restart: always
+    ports:
+      - ${ADMINER_PORT}:8080
+
+volumes:
+  minio_data:
+    driver: local
+  db_data:
+    driver: local

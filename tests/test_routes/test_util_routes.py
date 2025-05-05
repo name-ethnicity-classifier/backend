@@ -16,8 +16,9 @@ TEST_USER = {
     "email": "user@test.com",
     "role": "else",
     "password": "StrongPassword123",
+    "consented": True,
     "verified": True,
-    "consented": True
+    "usage_description": "Lorem Ipsum" * 10
 }
 TEST_USER_ID = 1
 
@@ -26,7 +27,7 @@ TEST_USER_ID = 1
 def app_context():
     with app.app_context():
         db.drop_all()
-        with open("./dev-database/init_test.sql", "r") as file:
+        with open("./dev-infrastructure/db-seed/init.sql", "r") as file:
             init_sql_script = file.read()    
             db.session.execute(text(init_sql_script))
 

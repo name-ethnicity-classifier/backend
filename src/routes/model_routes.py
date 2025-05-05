@@ -2,7 +2,7 @@ from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from schemas.model_schema import AddModelSchema, DefaultModelsResponseSchema, DeleteModelSchema, ModelsResponseSchema, N2EModel
 from services.model_services import add_model, get_models, get_default_models, delete_models
-from services.user_services import check_user_existence
+from services.user_services import check_user_existence, check_user_restriction
 from utils import success_response
 from errors import error_handler
 from flask_spec_gen import openapi_generator as og
@@ -21,6 +21,7 @@ def add_model_route():
 
     user_id = get_jwt_identity()
     check_user_existence(user_id)
+    check_user_restriction(user_id)
 
     request_data = AddModelSchema(**request.json)
     add_model(user_id, request_data)

@@ -1,4 +1,3 @@
-from flask import jsonify
 import pytest
 import json
 from utils import *
@@ -7,7 +6,7 @@ from app import app
 
 @pytest.fixture
 def app_context():
-    # Create Flask application context for testing
+
     with app.app_context():
         app.config.update({
             "TESTING": True,
@@ -17,7 +16,6 @@ def app_context():
 
 @pytest.mark.it("should return the correct error response data when returning an error response")
 def test_error_response(app_context):
-    # Test error response
     response = error_response(
         error_code="TEST_ERROR",
         message="Test error message.",
