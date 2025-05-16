@@ -265,6 +265,6 @@ def check_user_restriction(user_id: str):
     if user.access.lower() == AccessLevel.RESTRICTED.value:
         raise GeneralError(
             error_code="RESTRICTED_ACCESS",
-            message=f"Since May 2025, we require users to provide a description of how they are using our service to ensure ethical compliance. Your usage description is either missing or insufficient (see the reason below). Please update it in the user settings on our website. Reason: {user.access_level_reason}",
+            message=f"Since May 2025, we require users to provide a description of how they are using our service to ensure ethical compliance. Your usage description is either missing, insufficient or currently under review (see the reason below). Please update it in the user settings on our website. Reason: {user.access_level_reason}",
             status_code=403
         )
