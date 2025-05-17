@@ -1,0 +1,86 @@
+{
+  "tutorialSidebar": [
+    {
+      "type": "doc",
+      "id": "n2e/name-to-ethnicity-api"
+    }
+  ],
+  "openApiSidebar": [
+    {
+      "type": "category",
+      "label": "N2E API",
+      "link": {
+        "type": "generated-index",
+        "title": "N2E API",
+        "description": "This is the official REST API documentation for www.name-to-ethnicity.com. Using our public API you can classify names into their most likely ethnicity. Do not use our API as part of your backend or any kind of deployed service. It is meant for doing experiments and to be included in, for example, your Python Notebooks or R scripts.",
+        "slug": "/"
+      },
+      "items": [
+        {
+          "type": "doc",
+          "id": "n2e/name-to-ethnicity-api"
+        },
+        {
+          "type": "category",
+          "label": "Classification",
+          "link": {
+            "type": "doc",
+            "id": "n2e/classification"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "n2e/classification-route",
+              "label": "Classify names.",
+              "className": "api-method post"
+            },
+            {
+              "type": "doc",
+              "id": "n2e/classification-distribution-route",
+              "label": "Classify names, predicting entire distribution.",
+              "className": "api-method post"
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Model Management",
+          "link": {
+            "type": "doc",
+            "id": "n2e/model-management"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "n2e/get-models-route",
+              "label": "Get all models.",
+              "className": "api-method get"
+            },
+            {
+              "type": "doc",
+              "id": "n2e/get-default-models-route",
+              "label": "Get all default models.",
+              "className": "api-method get"
+            }
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Miscellaneous",
+          "link": {
+            "type": "doc",
+            "id": "n2e/miscellaneous"
+          },
+          "items": [
+            {
+              "type": "doc",
+              "id": "n2e/get-nationalities-route",
+              "label": "Get nationalities.",
+              "className": "api-method get"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

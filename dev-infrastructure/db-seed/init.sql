@@ -34,7 +34,7 @@ CREATE TABLE "user" (
 CREATE TABLE user_to_model (
     user_id             INTEGER            NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     model_id            VARCHAR(40)        NOT NULL REFERENCES "model"(id) ON DELETE CASCADE,
-    name                VARCHAR(64)        NOT NULL,
+    name                VARCHAR(32)        NOT NULL,
     description         VARCHAR(512),
     request_count       INTEGER DEFAULT 0  NOT NULL,
     id                  SERIAL             NOT NULL CONSTRAINT user_to_model_pk PRIMARY KEY

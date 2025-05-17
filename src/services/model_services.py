@@ -24,10 +24,10 @@ def add_model(user_id: str, data: AddModelSchema) -> None:
             status_code=404
         )
     
-    if len(data.name) > 64 or len(data.name) == 0:
+    if len(data.name) > 32 or len(data.name) == 0:
         raise GeneralError(
             error_code="MODEL_NAME_INVALID",
-            message=f"Model name too long or not existant.",
+            message=f"Model name too long or not existent.",
             status_code=422
         )
     
