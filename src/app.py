@@ -4,6 +4,7 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from prometheus_flask_exporter import PrometheusMetrics
 from dotenv import load_dotenv
 import os
 from flask_spec_gen import openapi_generator as og
@@ -44,14 +45,18 @@ with open("./api-config.json", "r") as f:
     openapi_base_config = json.load(f)
 
 openapi_generator = og.OpenAPIGenerator(app, openapi_base_config)
-
 CORS(app)
 JWTManager(app)
 db.init_app(app)
 
+metrics = PrometheusMetrics(app)
+metrics.info("app_info", "N2E Application Info", version=VERSION)
+
 @app.route("/")
+@metrics.do_not_track()
 def index():
-    return json.dumps({"status": "OK"})
+    return json.dumps({"version": VERSION})
+
 
 app.logger.setLevel(logging.INFO)
 app.register_blueprint(user_routes)

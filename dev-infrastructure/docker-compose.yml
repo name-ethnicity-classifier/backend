@@ -48,6 +48,21 @@ services:
     ports:
       - ${ADMINER_PORT}:8080
 
+  prometheus:
+    image: prom/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - "5252:3000"
+
+
 volumes:
   minio_data:
     driver: local
