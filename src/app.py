@@ -52,6 +52,8 @@ db.init_app(app)
 metrics = PrometheusMetrics(app)
 metrics.info("app_info", "N2E Application Info", version=VERSION)
 
+
+
 @app.route("/")
 @metrics.do_not_track()
 def index():
