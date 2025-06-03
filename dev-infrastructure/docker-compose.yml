@@ -48,6 +48,29 @@ services:
     ports:
       - ${ADMINER_PORT}:8080
 
+  prometheus:
+    image: prom/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+
+  grafana:
+    image: grafana/grafana-enterprise
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/
+    ports:
+      - ${GRAFANA_PORT}:3000
+
 volumes:
   minio_data:
+    driver: local
+  prometheus_data:
     driver: local

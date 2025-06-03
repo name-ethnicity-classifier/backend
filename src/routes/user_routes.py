@@ -2,11 +2,10 @@ from flask import Blueprint, redirect, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import create_access_token
 
-from db.tables import AccessLevel, User
 from schemas.user_schema import LoginSchema, SignupSchema, DeleteUserSchema, UpdateUsageDescriptionSchema
 from services.user_services import add_user, check_user_login, delete_user, handle_email_verification, check_user_existence, send_verification_email, update_usage_description
 from utils import error_response, success_response
-from errors import GeneralError, error_handler
+from errors import error_handler
 
 user_routes = Blueprint("user", __name__)
 
