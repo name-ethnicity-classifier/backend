@@ -56,7 +56,7 @@ def classification_route():
     update_name_quota(user_id, len(request_data.names))
     increment_request_counter(user_id=user_id, model_id=model_id, name_amount=len(request_data.names))
 
-    current_app.logger.info("Successfully classified names.")
+    current_app.logger.info(f"Successfully classified names. [user-id: {user_id}, model-id: {model_id}]")
     return success_response(data=response_data)
   
 
@@ -103,5 +103,5 @@ def classification_distribution_route():
     update_name_quota(user_id, len(request_data.names))
     increment_request_counter(user_id=user_id, model_id=model_id, name_amount=len(request_data.names))
 
-    current_app.logger.info("Successfully classified names.")
+    current_app.logger.info(f"Successfully classified (distribution) names. [user-id: {user_id}, model-id: {model_id}]")
     return success_response(data=response_data)
