@@ -18,7 +18,8 @@ def docker_compose_services(request):
     
     compose = DockerCompose(
         context="dev-infrastructure",
-        compose_file_name="docker-compose.yml"
+        compose_file_name="docker-compose.yml",
+        wait=False
     )
 
     os.environ["ADMINER_PORT"] = "0"
